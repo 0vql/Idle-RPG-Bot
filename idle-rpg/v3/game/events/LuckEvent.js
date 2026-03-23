@@ -102,10 +102,10 @@ class LuckEvent {
           const timeLimit = randomBetween(maximumTimer * 60000, (maximumTimer * 15) * 60000);
           eventMsg.push(`Dionysus has partied with ${generatePlayerName(updatedPlayer, true)} increasing ${generateGenderString(updatedPlayer, 'his')} multiplier by ${increaseMult} for ${Math.floor(timeLimit / 60000)} minutes!`);
           eventLog.push(`Dionysus partied with you increasing your multiplier by ${increaseMult} for ${Math.ceil(timeLimit / 60000)} minutes!`);
-          updatedPlayer.personalMultiplier += increaseMult;
+          updatedPlayer.personalMultiplier = increaseMult;
           setTimeout(() => {
             this.db.loadPlayer(updatedPlayer.discordId).then((loadedPlayer) => {
-              loadedPlayer.personalMultiplier = Math.max(0, loadedPlayer.personalMultiplier - increaseMult);
+              loadedPlayer.personalMultiplier = 0;
               return loadedPlayer;
             }).then(loadedPlayer => this.db.savePlayer(loadedPlayer));
           }, timeLimit);
@@ -244,6 +244,8 @@ class LuckEvent {
     const eventMsg = [];
     const eventLog = [];
     try {
+      const luckGoldChance = randomBetween(0, 99);
+      if (luckGoldChance < 75) return { updatedPlayer };
       const luckGoldDice = randomBetween(5, 100);
       const goldAmount = Math.max(1, Math.round((luckGoldDice * updatedPlayer.stats.luk) / 2) * multiplier);
       updatedPlayer.gold.current += goldAmount;

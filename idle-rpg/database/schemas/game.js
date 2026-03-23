@@ -20,6 +20,10 @@ const gameSchema = mongoose.Schema({
     activeBless: {
       type: Number,
       default: 0
+    },
+    blessExpiries: {
+      type: [Number],
+      default: []
     }
   },
   events: {

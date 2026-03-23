@@ -39,8 +39,11 @@ module.exports = [
             player.gold.current -= globalSpells.bless.spellCost * calcAmount;
             await game.db.savePlayer(player);
             author.send('Spell has been cast!');
+            const blessDuration = 1800000 * 2;
+            const expiresAt = Date.now() + blessDuration;
             guildConfig.multiplier += calcAmount;
             guildConfig.spells.activeBless += calcAmount;
+            for (let i = 0; i < calcAmount; i++) guildConfig.spells.blessExpiries.push(expiresAt);
             await game.db.updateGame(player.guildId, guildConfig);
             game.guildConfigs.set(player.guildId, guildConfig);
             if (actionsChannel) actionsChannel.send(setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
@@ -48,10 +51,11 @@ module.exports = [
               const newConfig = await game.db.loadGame(player.guildId);
               newConfig.multiplier = Math.max(1, newConfig.multiplier - calcAmount);
               newConfig.spells.activeBless = Math.max(0, newConfig.spells.activeBless - calcAmount);
+              newConfig.spells.blessExpiries.splice(newConfig.spells.blessExpiries.indexOf(expiresAt), calcAmount);
               await game.db.updateGame(player.guildId, newConfig);
               game.guildConfigs.set(player.guildId, newConfig);
               if (actionsChannel) actionsChannel.send(setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell} just wore off.\nCurrent Active Bless: ${newConfig.spells.activeBless}\nCurrent Multiplier is: ${newConfig.multiplier}x`));
-            }, 1800000 * 2);
+            }, blessDuration);
           } else {
             author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold.`);
           }
