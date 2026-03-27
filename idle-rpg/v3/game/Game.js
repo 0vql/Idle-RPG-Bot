@@ -175,13 +175,8 @@ class Game {
     for (const expiresAt of pendingBless) {
       setTimeout(async () => {
         await this.db.expireBless(guildId, expiresAt);
-        const updated = this.guildConfigs.get(guildId);
-        if (updated) {
-          updated.spells.activeBless = Math.max(0, updated.spells.activeBless - 1);
-          updated.multiplier = Math.max(1, updated.multiplier - 1);
-          const idx = updated.spells.blessExpiries.indexOf(expiresAt);
-          if (idx !== -1) updated.spells.blessExpiries.splice(idx, 1);
-        }
+        const updated = await this.db.loadGame(guildId);
+        this.guildConfigs.set(guildId, updated);
       }, expiresAt - now);
     }
   }

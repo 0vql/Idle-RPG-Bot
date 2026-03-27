@@ -85,6 +85,18 @@ class Database {
     }
   }
 
+  async castBless(guildId, expiresAt, count) {
+    try {
+      const expiries = Array.from({ length: count }, () => expiresAt);
+      return await Game.updateOne({ guildId }, {
+        $inc: { multiplier: count, 'spells.activeBless': count },
+        $push: { 'spells.blessExpiries': { $each: expiries } }
+      });
+    } catch (err) {
+      errorLog.error(err);
+    }
+  }
+
   async expireBless(guildId, expiresAt, count = 1) {
     try {
       return await Game.updateOne({ guildId }, {
