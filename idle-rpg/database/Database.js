@@ -85,6 +85,17 @@ class Database {
     }
   }
 
+  async expireBless(guildId, expiresAt, count = 1) {
+    try {
+      return await Game.updateOne({ guildId }, {
+        $inc: { multiplier: -count, 'spells.activeBless': -count },
+        $pull: { 'spells.blessExpiries': expiresAt }
+      });
+    } catch (err) {
+      errorLog.error(err);
+    }
+  }
+
   // PLAYER
   async createNewPlayer(discordId, guildId, name) {
     try {

@@ -151,24 +151,38 @@ class Game {
       }, Math.floor(Math.random() * (21600000 - 7200000)) + 7200000);
     }
     const blessExpiries = loadedConfig.spells.blessExpiries || [];
+    const now = Date.now();
+    const { expiredBless, pendingBless } = blessExpiries.reduce((prev, t) => {
+      if (t <= now) {
+        prev.expiredBless.push(t);
+        return prev;
+      }
+      prev.pendingBless.push(t);
+      return prev;
+    }, { expiredBless: [], pendingBless: [] });
     if (loadedConfig.spells.activeBless > 0 && blessExpiries.length === 0) {
       loadedConfig.multiplier = 1;
       loadedConfig.spells.activeBless = 0;
       await this.db.updateGame(guildId, loadedConfig);
       this.guildConfigs.set(guildId, loadedConfig);
-    } else {
-      for (const expiresAt of blessExpiries) {
-        const remaining = expiresAt - Date.now();
-        setTimeout(async () => {
-          const newLoadedConfig = await this.db.loadGame(guildId);
-          newLoadedConfig.spells.activeBless = Math.max(0, newLoadedConfig.spells.activeBless - 1);
-          newLoadedConfig.multiplier = Math.max(1, newLoadedConfig.multiplier - 1);
-          const idx = newLoadedConfig.spells.blessExpiries.indexOf(expiresAt);
-          if (idx !== -1) newLoadedConfig.spells.blessExpiries.splice(idx, 1);
-          await this.db.updateGame(guildId, newLoadedConfig);
-          this.guildConfigs.set(guildId, newLoadedConfig);
-        }, Math.max(0, remaining));
-      }
+    } else if (expiredBless.length > 0) {
+      loadedConfig.spells.activeBless = Math.max(0, loadedConfig.spells.activeBless - expiredBless.length);
+      loadedConfig.multiplier = Math.max(1, loadedConfig.multiplier - expiredBless.length);
+      loadedConfig.spells.blessExpiries = pendingBless;
+      await this.db.updateGame(guildId, loadedConfig);
+      this.guildConfigs.set(guildId, loadedConfig);
+    }
+    for (const expiresAt of pendingBless) {
+      setTimeout(async () => {
+        await this.db.expireBless(guildId, expiresAt);
+        const updated = this.guildConfigs.get(guildId);
+        if (updated) {
+          updated.spells.activeBless = Math.max(0, updated.spells.activeBless - 1);
+          updated.multiplier = Math.max(1, updated.multiplier - 1);
+          const idx = updated.spells.blessExpiries.indexOf(expiresAt);
+          if (idx !== -1) updated.spells.blessExpiries.splice(idx, 1);
+        }
+      }, expiresAt - now);
     }
   }
 
