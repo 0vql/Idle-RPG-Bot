@@ -2,15 +2,18 @@ const items = require('../../../game/data/items');
 const enumHelper = require('../../../utils/enumHelper');
 const { randomBetween } = require('../../utils/helpers');
 
-const snowflakeTemplate = items.type[3].find(item => item.name === 'Snowflake');
+const snowflakeTemplate = items.type[3].find((item) => item.name === 'Snowflake');
 
 class ItemGen {
-
   async generateItem(updatedPlayer, mob) {
-    const randomRarityChance = Math.round(randomBetween(0, 99) - (updatedPlayer.level / 6));
-    const randomMaterialChance = Math.round(randomBetween(0, 99) - (updatedPlayer.level / 6));
-    const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
-    const itemMaterialList = items.material.filter(materialRarity => materialRarity.rarity >= randomMaterialChance);
+    const randomRarityChance = Math.round(randomBetween(0, 99) - updatedPlayer.level / 6);
+    const randomMaterialChance = Math.round(randomBetween(0, 99) - updatedPlayer.level / 6);
+    const itemRarityList = items.rarity.filter(
+      (itemRarity) => itemRarity.rarity >= randomRarityChance,
+    );
+    const itemMaterialList = items.material.filter(
+      (materialRarity) => materialRarity.rarity >= randomMaterialChance,
+    );
 
     const randomRarityIndex = randomBetween(0, itemRarityList.length - 1);
     const randomMaterialIndex = randomBetween(0, itemMaterialList.length - 1);
@@ -22,7 +25,10 @@ class ItemGen {
     if (mob && mob.holiday) {
       do {
         randomTypeIndex = randomBetween(0, items.type[3].length - 1);
-        if (items.type[3][randomTypeIndex].droppedBy.includes(mobName) && items.type[3][randomTypeIndex].isDroppable) {
+        if (
+          items.type[3][randomTypeIndex].droppedBy.includes(mobName) &&
+          items.type[3][randomTypeIndex].isDroppable
+        ) {
           itemType = items.type[3][randomTypeIndex];
         }
       } while (itemType === undefined);
@@ -30,7 +36,10 @@ class ItemGen {
       do {
         randomEquipmentIndex = randomBetween(0, items.type.length - 1);
         randomTypeIndex = randomBetween(0, items.type[randomEquipmentIndex].length - 1);
-        if (items.type[randomEquipmentIndex][randomTypeIndex].position !== enumHelper.equipment.types.relic.position) {
+        if (
+          items.type[randomEquipmentIndex][randomTypeIndex].position !==
+          enumHelper.equipment.types.relic.position
+        ) {
           itemType = items.type[randomEquipmentIndex][randomTypeIndex];
         }
       } while (itemType === undefined);
@@ -47,10 +56,16 @@ class ItemGen {
       itemObj = {
         name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
         position: itemType.position,
-        str: itemStr, dex: itemDex, end: itemEnd, int: itemInt, luk: itemLuk,
+        str: itemStr,
+        dex: itemDex,
+        end: itemEnd,
+        int: itemInt,
+        luk: itemLuk,
         holiday: itemType.holiday,
         rating: itemRating,
-        gold: Number((itemRarityList[randomRarityIndex].gold * itemType.gold).toFixed()) * itemType.power
+        gold:
+          Number((itemRarityList[randomRarityIndex].gold * itemType.gold).toFixed()) *
+          itemType.power,
       };
     } else if (itemType.position === enumHelper.inventory.position) {
       itemObj = {
@@ -58,17 +73,34 @@ class ItemGen {
         position: itemType.position,
         holiday: itemType.holiday,
         power: itemRarityList[randomRarityIndex].power + itemType.power,
-        gold: Number((itemRarityList[randomRarityIndex].gold * itemMaterialList[randomMaterialIndex].gold * itemType.gold).toFixed()) * itemType.power
+        gold:
+          Number(
+            (
+              itemRarityList[randomRarityIndex].gold *
+              itemMaterialList[randomMaterialIndex].gold *
+              itemType.gold
+            ).toFixed(),
+          ) * itemType.power,
       };
     } else {
-      const basePower = itemRarityList[randomRarityIndex].power + itemMaterialList[randomMaterialIndex].power + itemType.power;
+      const basePower =
+        itemRarityList[randomRarityIndex].power +
+        itemMaterialList[randomMaterialIndex].power +
+        itemType.power;
       itemObj = {
         name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
         position: itemType.position,
         holiday: itemType.holiday,
         power: basePower,
         attackType: itemType.attackType,
-        gold: Number((itemRarityList[randomRarityIndex].gold * itemMaterialList[randomMaterialIndex].gold * itemType.gold).toFixed()) * itemType.power
+        gold:
+          Number(
+            (
+              itemRarityList[randomRarityIndex].gold *
+              itemMaterialList[randomMaterialIndex].gold *
+              itemType.gold
+            ).toFixed(),
+          ) * itemType.power,
       };
     }
 
@@ -76,8 +108,8 @@ class ItemGen {
   }
 
   generateInvasionRelic(updatedPlayer, invasionMobType) {
-    const randomRarityChance = Math.round(randomBetween(0, 99) - (updatedPlayer.level / 6));
-    const itemRarityList = items.rarity.filter(r => r.rarity >= randomRarityChance);
+    const randomRarityChance = Math.round(randomBetween(0, 99) - updatedPlayer.level / 6);
+    const itemRarityList = items.rarity.filter((r) => r.rarity >= randomRarityChance);
     const randomRarityIndex = randomBetween(0, itemRarityList.length - 1);
     const rarity = itemRarityList[randomRarityIndex];
     const base = Math.ceil(rarity.power);
@@ -91,16 +123,22 @@ class ItemGen {
     return {
       name: `${rarity.name} War Relic of the ${invasionMobType}`,
       position: 'relic',
-      str, dex, end, int, luk,
+      str,
+      dex,
+      end,
+      int,
+      luk,
       rating,
-      gold: Number((rarity.gold * 3).toFixed()) * Math.max(1, rating)
+      gold: Number((rarity.gold * 3).toFixed()) * Math.max(1, rating),
     };
   }
 
   generateSnowflake(updatedPlayer) {
     const snowFlake = snowflakeTemplate;
-    const randomRarityChance = Math.round(randomBetween(0, 99) - (updatedPlayer.level / 6));
-    const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
+    const randomRarityChance = Math.round(randomBetween(0, 99) - updatedPlayer.level / 6);
+    const itemRarityList = items.rarity.filter(
+      (itemRarity) => itemRarity.rarity >= randomRarityChance,
+    );
     const randomRarityIndex = randomBetween(0, itemRarityList.length - 1);
 
     const itemStr = Math.round((itemRarityList[randomRarityIndex].power + snowFlake.stats.str) / 4);
@@ -113,17 +151,21 @@ class ItemGen {
     return {
       name: `${itemRarityList[randomRarityIndex].name} ${snowFlake.name}`,
       position: snowFlake.position,
-      str: itemStr, dex: itemDex, end: itemEnd, int: itemInt, luk: itemLuk,
+      str: itemStr,
+      dex: itemDex,
+      end: itemEnd,
+      int: itemInt,
+      luk: itemLuk,
       holiday: snowFlake.holiday,
       rating: itemRating,
-      gold: Number((itemRarityList[randomRarityIndex].gold * snowFlake.gold).toFixed()) * itemRating
+      gold:
+        Number((itemRarityList[randomRarityIndex].gold * snowFlake.gold).toFixed()) * itemRating,
     };
   }
 
   get items() {
     return items.type;
   }
-
 }
 
 module.exports = ItemGen;

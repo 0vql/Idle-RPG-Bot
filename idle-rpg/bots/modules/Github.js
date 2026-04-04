@@ -1,7 +1,6 @@
 const Requester = require('../../utils/Requester');
 
 class Github {
-
   randomRepo() {
     const options = {
       host: 'api.github.com',
@@ -10,12 +9,11 @@ class Github {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'Discord Idle-RPG-Bot Command'
-      }
+        'User-Agent': 'Discord Idle-RPG-Bot Command',
+      },
     };
 
     return Requester.request(options);
   }
-
 }
 module.exports = new Github();

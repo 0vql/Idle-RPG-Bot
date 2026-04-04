@@ -11,12 +11,12 @@ const commandList = [
   ...gameplayHandlers,
   ...tradeHandlers,
   ...socialHandlers,
-  ...adminHandlers
+  ...adminHandlers,
 ];
 
 const commandMap = new Map();
-commandList.forEach(cmd => {
-  cmd.aliases.forEach(alias => {
+commandList.forEach((cmd) => {
+  cmd.aliases.forEach((alias) => {
     commandMap.set(alias.toLowerCase(), cmd);
   });
 });

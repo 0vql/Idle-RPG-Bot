@@ -4,7 +4,6 @@ const BaseHelper = require('../../v2/Base/Helper');
 const mapSize = maps[maps.length - 1].coords;
 
 class Map extends BaseHelper {
-
   constructor() {
     super();
     this.maps = maps;
@@ -19,20 +18,17 @@ class Map extends BaseHelper {
           return {
             map: this.getMapByCoords([
               updatedPlayer.map.coords[0],
-              updatedPlayer.map.coords[1] + 1
+              updatedPlayer.map.coords[1] + 1,
             ]),
             direction: 'South',
-            previousLocation: updatedPlayer.map.name
+            previousLocation: updatedPlayer.map.name,
           };
         }
 
         return {
-          map: this.getMapByCoords([
-            updatedPlayer.map.coords[0],
-            updatedPlayer.map.coords[1] - 1
-          ]),
+          map: this.getMapByCoords([updatedPlayer.map.coords[0], updatedPlayer.map.coords[1] - 1]),
           direction: 'North',
-          previousLocation: updatedPlayer.map.name
+          previousLocation: updatedPlayer.map.name,
         };
 
       case 1:
@@ -40,20 +36,17 @@ class Map extends BaseHelper {
           return {
             map: this.getMapByCoords([
               updatedPlayer.map.coords[0],
-              updatedPlayer.map.coords[1] - 1
+              updatedPlayer.map.coords[1] - 1,
             ]),
             direction: 'North',
-            previousLocation: updatedPlayer.map.name
+            previousLocation: updatedPlayer.map.name,
           };
         }
 
         return {
-          map: this.getMapByCoords([
-            updatedPlayer.map.coords[0],
-            updatedPlayer.map.coords[1] + 1
-          ]),
+          map: this.getMapByCoords([updatedPlayer.map.coords[0], updatedPlayer.map.coords[1] + 1]),
           direction: 'South',
-          previousLocation: updatedPlayer.map.name
+          previousLocation: updatedPlayer.map.name,
         };
 
       case 2:
@@ -61,20 +54,17 @@ class Map extends BaseHelper {
           return {
             map: this.getMapByCoords([
               updatedPlayer.map.coords[0] - 1,
-              updatedPlayer.map.coords[1]
+              updatedPlayer.map.coords[1],
             ]),
             direction: 'West',
-            previousLocation: updatedPlayer.map.name
+            previousLocation: updatedPlayer.map.name,
           };
         }
 
         return {
-          map: this.getMapByCoords([
-            updatedPlayer.map.coords[0] + 1,
-            updatedPlayer.map.coords[1]
-          ]),
+          map: this.getMapByCoords([updatedPlayer.map.coords[0] + 1, updatedPlayer.map.coords[1]]),
           direction: 'East',
-          previousLocation: updatedPlayer.map.name
+          previousLocation: updatedPlayer.map.name,
         };
 
       case 3:
@@ -82,26 +72,23 @@ class Map extends BaseHelper {
           return {
             map: this.getMapByCoords([
               updatedPlayer.map.coords[0] + 1,
-              updatedPlayer.map.coords[1]
+              updatedPlayer.map.coords[1],
             ]),
             direction: 'East',
-            previousLocation: updatedPlayer.map.name
+            previousLocation: updatedPlayer.map.name,
           };
         }
 
         return {
-          map: this.getMapByCoords([
-            updatedPlayer.map.coords[0] - 1,
-            updatedPlayer.map.coords[1]
-          ]),
+          map: this.getMapByCoords([updatedPlayer.map.coords[0] - 1, updatedPlayer.map.coords[1]]),
           direction: 'West',
-          previousLocation: updatedPlayer.map.name
+          previousLocation: updatedPlayer.map.name,
         };
     }
   }
 
   getMapByCoords(coords) {
-    return this.maps.find(map => map.coords[0] === coords[0] && map.coords[1] === coords[1]);
+    return this.maps.find((map) => map.coords[0] === coords[0] && map.coords[1] === coords[1]);
   }
 
   getMapByIndex(index) {
@@ -109,21 +96,20 @@ class Map extends BaseHelper {
   }
 
   getTowns() {
-    return this.maps.filter(area => area.type.name === 'Town').map(area => area.name);
+    return this.maps.filter((area) => area.type.name === 'Town').map((area) => area.name);
   }
 
   getRandomTown() {
-    const towns = this.maps.filter(area => area.type.name === 'Town');
+    const towns = this.maps.filter((area) => area.type.name === 'Town');
     return towns[this.randomBetween(0, towns.length - 1)];
   }
 
   getMapByName(name) {
-    return this.maps.find(map => map.name === name);
+    return this.maps.find((map) => map.name === name);
   }
 
   getMapsByType(type) {
-    return this.maps.filter(area => area.biome === type).map(area => area.name);
+    return this.maps.filter((area) => area.biome === type).map((area) => area.name);
   }
-
 }
 module.exports = Map;

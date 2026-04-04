@@ -1,5 +1,5 @@
-const enumHelper = require('../../../utils/enumHelper');
 const { ChannelType } = require('discord.js');
+const enumHelper = require('../../../utils/enumHelper');
 const { setImportantMessage } = require('../../utils/messageHelpers');
 
 const DISCORD_MAX_LENGTH = 2000;

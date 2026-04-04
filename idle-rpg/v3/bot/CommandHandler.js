@@ -4,7 +4,6 @@ const { commandMap } = require('../commands/registry');
 const { commandLog, errorLog } = require('../../utils/logger');
 
 class CommandHandler {
-
   constructor({ game, bot }) {
     this.game = game;
     this.bot = bot;
@@ -23,7 +22,10 @@ class CommandHandler {
         commandChannelId = 'dm';
       } else {
         guildId = message.guild.id;
-        const commandsChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === 'commands' && channel.type === ChannelType.GuildText);
+        const commandsChannel = message.guild.channels.cache.find(
+          (channel) =>
+            channel.name.toLowerCase() === 'commands' && channel.type === ChannelType.GuildText,
+        );
         commandChannelId = commandsChannel ? commandsChannel.id : null;
       }
 
@@ -40,18 +42,21 @@ class CommandHandler {
       if (!message.content.startsWith(guildPrefix)) return;
 
       // Normalize command prefix
-      const normalizedContent = guildPrefix === '!irpg'
-        ? message.content.replace('!irpg ', '!')
-        : message.content.replace(guildPrefix, '!');
+      const normalizedContent =
+        guildPrefix === '!irpg'
+          ? message.content.replace('!irpg ', '!')
+          : message.content.replace(guildPrefix, '!');
 
       const commandAlias = normalizedContent.split(' ')[0].toLowerCase();
-      const author = message.author;
+      const { author } = message;
       const channelId = message.channel.id;
 
       const commandDef = commandMap.get(commandAlias);
       if (!commandDef) {
         if (message.content.startsWith(guildPrefix) && !isDM && channelId !== commandChannelId) {
-          return author.send(`Please check ${guildPrefix}help for more info. ${commandAlias} was an invalid command.`);
+          return author.send(
+            `Please check ${guildPrefix}help for more info. ${commandAlias} was an invalid command.`,
+          );
         }
         return;
       }
@@ -59,12 +64,16 @@ class CommandHandler {
       commandLog.info({ author: author.username, command: message.content, guildId });
 
       if (commandDef.channelOnly && !isDM && channelId !== commandChannelId) {
-        try { await message.delete(); } catch (_) {}
+        try {
+          await message.delete();
+        } catch (_) {}
         return author.send(`Please send this to <#${commandChannelId}> or PM me.`);
       }
 
       if (commandDef.operatorOnly && !botOperators.includes(author.id)) {
-        try { await message.delete(); } catch (_) {}
+        try {
+          await message.delete();
+        } catch (_) {}
         return author.send('This is a bot operator only command.');
       }
 
@@ -73,7 +82,7 @@ class CommandHandler {
         bot: this.bot,
         message,
         guildId,
-        author
+        author,
       };
 
       return commandDef.handler(ctx);
@@ -81,7 +90,6 @@ class CommandHandler {
       errorLog.error(err);
     }
   }
-
 }
 
 module.exports = CommandHandler;

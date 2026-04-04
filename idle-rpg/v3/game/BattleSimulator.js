@@ -1,9 +1,15 @@
 const enumHelper = require('../../utils/enumHelper');
 const { randomBetween } = require('../utils/helpers');
-const { sumPlayerTotalStrength, sumPlayerTotalDexterity, sumPlayerTotalEndurance, sumPlayerTotalIntelligence, sumPlayerTotalLuck, printBattleDebug } = require('../utils/battleHelpers');
+const {
+  sumPlayerTotalStrength,
+  sumPlayerTotalDexterity,
+  sumPlayerTotalEndurance,
+  sumPlayerTotalIntelligence,
+  sumPlayerTotalLuck,
+  printBattleDebug,
+} = require('../utils/battleHelpers');
 
 class BattleSimulator {
-
   simulateBattle(attacker, defender) {
     const maxRounds = 5;
     let attackerDamage = 0;
@@ -39,8 +45,12 @@ class BattleSimulator {
 
   // DEX-weighted initiative: higher DEX + jitter wins more often
   initialAttack(attacker, defender, battleStats) {
-    const aDex = battleStats.attacker.cachedStats ? battleStats.attacker.cachedStats.dex : attacker.stats.dex;
-    const dDex = battleStats.defender.cachedStats ? battleStats.defender.cachedStats.dex : defender.stats.dex;
+    const aDex = battleStats.attacker.cachedStats
+      ? battleStats.attacker.cachedStats.dex
+      : attacker.stats.dex;
+    const dDex = battleStats.defender.cachedStats
+      ? battleStats.defender.cachedStats.dex
+      : defender.stats.dex;
     const aSpeed = aDex + randomBetween(1, 15);
     const dSpeed = dDex + randomBetween(1, 15);
     return aSpeed >= dSpeed ? attacker : defender;
@@ -49,7 +59,7 @@ class BattleSimulator {
   round(attacker, defender) {
     const battleStats = {
       attacker: this.getBattleStats(attacker),
-      defender: this.getBattleStats(defender)
+      defender: this.getBattleStats(defender),
     };
     // Initiative rolled once per round and passed through all phases
     const initiative = this.initialAttack(attacker, defender, battleStats);
@@ -67,22 +77,32 @@ class BattleSimulator {
     const defenderMagDef = battleStats.defender.defensePower.magicDefensePower;
 
     // Pre-compute crit rolls (LUK-based)
-    const attackerLuk = battleStats.attacker.cachedStats ? battleStats.attacker.cachedStats.luk : attacker.stats.luk;
-    const defenderLuk = battleStats.defender.cachedStats ? battleStats.defender.cachedStats.luk : defender.stats.luk;
+    const attackerLuk = battleStats.attacker.cachedStats
+      ? battleStats.attacker.cachedStats.luk
+      : attacker.stats.luk;
+    const defenderLuk = battleStats.defender.cachedStats
+      ? battleStats.defender.cachedStats.luk
+      : defender.stats.luk;
     const attackerCrit = randomBetween(1, 100) <= this.getCritChance(attackerLuk);
     const defenderCrit = randomBetween(1, 100) <= this.getCritChance(defenderLuk);
     const effectiveAttackerAP = attackerCrit ? Math.round(attackerAP * 1.75) : attackerAP;
     const effectiveDefenderAP = defenderCrit ? Math.round(defenderAP * 1.75) : defenderAP;
 
     // Pre-compute dodge rolls (DEX-based, physical attacks only)
-    const attackerDex = battleStats.attacker.cachedStats ? battleStats.attacker.cachedStats.dex : attacker.stats.dex;
-    const defenderDex = battleStats.defender.cachedStats ? battleStats.defender.cachedStats.dex : defender.stats.dex;
+    const attackerDex = battleStats.attacker.cachedStats
+      ? battleStats.attacker.cachedStats.dex
+      : attacker.stats.dex;
+    const defenderDex = battleStats.defender.cachedStats
+      ? battleStats.defender.cachedStats.dex
+      : defender.stats.dex;
     const attackerPhysical = attackerWeaponType === 'melee' || attackerWeaponType === 'range';
     const defenderPhysical = defenderWeaponType === 'melee' || defenderWeaponType === 'range';
     // defenderDodged: defender dodges attacker's physical swing
-    const defenderDodged = attackerPhysical && randomBetween(1, 100) <= this.getDodgeChance(attackerDex, defenderDex);
+    const defenderDodged =
+      attackerPhysical && randomBetween(1, 100) <= this.getDodgeChance(attackerDex, defenderDex);
     // attackerDodged: attacker dodges defender's physical swing
-    const attackerDodged = defenderPhysical && randomBetween(1, 100) <= this.getDodgeChance(defenderDex, attackerDex);
+    const attackerDodged =
+      defenderPhysical && randomBetween(1, 100) <= this.getDodgeChance(defenderDex, attackerDex);
 
     let attackerDamage;
     let defenderDamage;
@@ -95,7 +115,7 @@ class BattleSimulator {
       if (defenderDodged) {
         attackerDamage = 0;
         roundDodges++;
-        printBattleDebug('Defender dodged attacker\'s swing!');
+        printBattleDebug("Defender dodged attacker's swing!");
       } else {
         const defAP = attackerPhysical ? defenderPhysDef : defenderMagDef;
         attackerDamage = this.calcDamage(effectiveAttackerAP, defAP);
@@ -104,12 +124,20 @@ class BattleSimulator {
       defender.health -= attackerDamage;
       if (this.isMonster(defender)) defender.dmgReceived += attackerDamage;
       printBattleDebug(`Attacker Damage: ${attackerDamage}`);
-      if (defender.health <= 0) return { attacker, defender, attackerDamage, defenderDamage: 0, crits: roundCrits, dodges: roundDodges };
+      if (defender.health <= 0)
+        return {
+          attacker,
+          defender,
+          attackerDamage,
+          defenderDamage: 0,
+          crits: roundCrits,
+          dodges: roundDodges,
+        };
 
       if (attackerDodged) {
         defenderDamage = 0;
         roundDodges++;
-        printBattleDebug('Attacker dodged defender\'s swing!');
+        printBattleDebug("Attacker dodged defender's swing!");
       } else {
         const atkAP = defenderPhysical ? attackerPhysDef : attackerMagDef;
         defenderDamage = this.calcDamage(effectiveDefenderAP, atkAP);
@@ -124,7 +152,7 @@ class BattleSimulator {
       if (attackerDodged) {
         defenderDamage = 0;
         roundDodges++;
-        printBattleDebug('Attacker dodged defender\'s swing!');
+        printBattleDebug("Attacker dodged defender's swing!");
       } else {
         const atkAP = defenderPhysical ? attackerPhysDef : attackerMagDef;
         defenderDamage = this.calcDamage(effectiveDefenderAP, atkAP);
@@ -133,12 +161,20 @@ class BattleSimulator {
       if (this.isMonster(defender)) defender.dmgDealt += defenderDamage;
       attacker.health -= defenderDamage;
       printBattleDebug(`Defender Damage: ${defenderDamage}`);
-      if (attacker.health <= 0) return { attacker, defender, attackerDamage: 0, defenderDamage, crits: roundCrits, dodges: roundDodges };
+      if (attacker.health <= 0)
+        return {
+          attacker,
+          defender,
+          attackerDamage: 0,
+          defenderDamage,
+          crits: roundCrits,
+          dodges: roundDodges,
+        };
 
       if (defenderDodged) {
         attackerDamage = 0;
         roundDodges++;
-        printBattleDebug('Defender dodged attacker\'s swing!');
+        printBattleDebug("Defender dodged attacker's swing!");
       } else {
         const defAP = attackerPhysical ? defenderPhysDef : defenderMagDef;
         attackerDamage = this.calcDamage(effectiveAttackerAP, defAP);
@@ -149,10 +185,28 @@ class BattleSimulator {
       printBattleDebug(`Attacker Damage: ${attackerDamage}`);
     }
 
-    return this.spellTurn(attacker, defender, battleStats, attackerDamage, defenderDamage, initiative, roundCrits, roundDodges);
+    return this.spellTurn(
+      attacker,
+      defender,
+      battleStats,
+      attackerDamage,
+      defenderDamage,
+      initiative,
+      roundCrits,
+      roundDodges,
+    );
   }
 
-  spellTurn(attacker, defender, battleStats, attackerDamage, defenderDamage, initiative, roundCrits, roundDodges) {
+  spellTurn(
+    attacker,
+    defender,
+    battleStats,
+    attackerDamage,
+    defenderDamage,
+    initiative,
+    roundCrits,
+    roundDodges,
+  ) {
     const applySpell = (caster, target, isAttacker) => {
       if (caster.spells.length === 0) return;
       const spellIdx = randomBetween(0, caster.spells.length - 1);
@@ -168,11 +222,16 @@ class BattleSimulator {
       if (spell.type === 'self' && spell.name.toLowerCase().includes('heal')) {
         caster.health += spell.power * 2;
         caster.mana -= spell.power;
-        if (caster.health >= enumHelper.maxHealth(caster.level)) caster.health = enumHelper.maxHealth(caster.level);
+        if (caster.health >= enumHelper.maxHealth(caster.level))
+          caster.health = enumHelper.maxHealth(caster.level);
         if (isAttacker) {
-          if (defenderDamage > spell.power * 2) { defenderDamage -= spell.power * 2; if (this.isMonster(defender)) defender.dmgDealt -= spell.power * 2; }
-        } else {
-          if (attackerDamage > spell.power * 2) { attackerDamage -= spell.power * 2; if (this.isMonster(defender)) defender.dmgReceived -= spell.power * 2; }
+          if (defenderDamage > spell.power * 2) {
+            defenderDamage -= spell.power * 2;
+            if (this.isMonster(defender)) defender.dmgDealt -= spell.power * 2;
+          }
+        } else if (attackerDamage > spell.power * 2) {
+          attackerDamage -= spell.power * 2;
+          if (this.isMonster(defender)) defender.dmgReceived -= spell.power * 2;
         }
       } else if (spell.type === 'self' && spell.name.toLowerCase().includes('shield')) {
         caster.mana -= spell.power;
@@ -182,7 +241,7 @@ class BattleSimulator {
           attackerDamage = Math.max(0, attackerDamage - spell.power * 2);
         }
       } else if (spell.type === 'target' && spell.name.toLowerCase().includes('fireball')) {
-        let spellDamage = Math.round((spell.power * 2) - magicDefense);
+        let spellDamage = Math.round(spell.power * 2 - magicDefense);
         if (spellDamage < 0) spellDamage = 0;
         caster.mana -= spell.power;
         if (isAttacker) {
@@ -196,7 +255,7 @@ class BattleSimulator {
         }
       } else if (spell.type === 'target' && spell.name.toLowerCase().includes('lightning bolt')) {
         // Penetrates 50% of magic defense
-        const spellDamage = Math.max(1, Math.round((spell.power * 3) - (magicDefense * 0.5)));
+        const spellDamage = Math.max(1, Math.round(spell.power * 3 - magicDefense * 0.5));
         caster.mana -= spell.power;
         if (isAttacker) {
           attackerDamage += spellDamage;
@@ -217,31 +276,63 @@ class BattleSimulator {
       applySpell(defender, attacker, false);
       applySpell(attacker, defender, true);
     }
-    return this.inventoryTurn(attacker, defender, battleStats, attackerDamage, defenderDamage, initiative, roundCrits, roundDodges);
+    return this.inventoryTurn(
+      attacker,
+      defender,
+      battleStats,
+      attackerDamage,
+      defenderDamage,
+      initiative,
+      roundCrits,
+      roundDodges,
+    );
   }
 
-  inventoryTurn(attacker, defender, battleStats, attackerDamage, defenderDamage, initiative, roundCrits, roundDodges) {
+  inventoryTurn(
+    attacker,
+    defender,
+    battleStats,
+    attackerDamage,
+    defenderDamage,
+    initiative,
+    roundCrits,
+    roundDodges,
+  ) {
     const applyPotion = (player, isAttacker) => {
       if (player.inventory.items.length === 0) return;
-      const healthPotions = player.inventory.items.filter(item => item.name.includes('Health Potion'));
+      const healthPotions = player.inventory.items.filter((item) =>
+        item.name.includes('Health Potion'),
+      );
       if (healthPotions.length > 0 && player.health < enumHelper.maxHealth(player.level)) {
         const potion = healthPotions[randomBetween(0, healthPotions.length - 1)];
         const healAmount = Math.ceil(potion.power * (player.level / 2));
         player.health += healAmount;
-        if (player.health > enumHelper.maxHealth(player.level)) player.health = enumHelper.maxHealth(player.level);
+        if (player.health > enumHelper.maxHealth(player.level))
+          player.health = enumHelper.maxHealth(player.level);
         player.inventory.items.splice(player.inventory.items.indexOf(potion), 1);
         if (isAttacker) {
-          if (defenderDamage > healAmount) { defenderDamage -= healAmount; if (this.isMonster(defender)) defender.dmgDealt -= healAmount; }
-        } else {
-          if (attackerDamage > healAmount) { attackerDamage -= healAmount; if (this.isMonster(defender)) defender.dmgReceived -= healAmount; }
+          if (defenderDamage > healAmount) {
+            defenderDamage -= healAmount;
+            if (this.isMonster(defender)) defender.dmgDealt -= healAmount;
+          }
+        } else if (attackerDamage > healAmount) {
+          attackerDamage -= healAmount;
+          if (this.isMonster(defender)) defender.dmgReceived -= healAmount;
         }
       }
-      const manaPotions = player.inventory.items.filter(item => item.name.includes('Mana Potion'));
-      if (manaPotions.length > 0 && player.spells.length > 0 && player.mana < enumHelper.maxMana(player.level)) {
+      const manaPotions = player.inventory.items.filter((item) =>
+        item.name.includes('Mana Potion'),
+      );
+      if (
+        manaPotions.length > 0 &&
+        player.spells.length > 0 &&
+        player.mana < enumHelper.maxMana(player.level)
+      ) {
         const potion = manaPotions[randomBetween(0, manaPotions.length - 1)];
         const manaAmount = Math.ceil(potion.power * player.level);
         player.mana += manaAmount;
-        if (player.mana > enumHelper.maxMana(player.level)) player.mana = enumHelper.maxMana(player.level);
+        if (player.mana > enumHelper.maxMana(player.level))
+          player.mana = enumHelper.maxMana(player.level);
         player.inventory.items.splice(player.inventory.items.indexOf(potion), 1);
       }
     };
@@ -252,18 +343,27 @@ class BattleSimulator {
       applyPotion(defender, false);
       applyPotion(attacker, true);
     }
-    return { attacker, defender, attackerDamage, defenderDamage, crits: roundCrits, dodges: roundDodges };
+    return {
+      attacker,
+      defender,
+      attackerDamage,
+      defenderDamage,
+      crits: roundCrits,
+      dodges: roundDodges,
+    };
   }
 
   getBattleStats(player) {
     // Pre-compute all stat sums once per round for players (monsters use plain stat objects)
-    const cachedStats = this.isMonster(player) ? null : {
-      str: sumPlayerTotalStrength(player),
-      dex: sumPlayerTotalDexterity(player),
-      end: sumPlayerTotalEndurance(player),
-      int: sumPlayerTotalIntelligence(player),
-      luk: sumPlayerTotalLuck(player),
-    };
+    const cachedStats = this.isMonster(player)
+      ? null
+      : {
+          str: sumPlayerTotalStrength(player),
+          dex: sumPlayerTotalDexterity(player),
+          end: sumPlayerTotalEndurance(player),
+          int: sumPlayerTotalIntelligence(player),
+          luk: sumPlayerTotalLuck(player),
+        };
     return {
       attackPower: this.calculateAttack(player, cachedStats),
       defensePower: this.calculateDefense(player, cachedStats),
@@ -276,31 +376,46 @@ class BattleSimulator {
     switch (player.equipment.weapon.attackType) {
       case 'melee': {
         if (this.isMonster(player)) {
-          attackPower = (player.stats.str + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (randomBetween(1, player.stats.str) / 2)));
+          attackPower =
+            player.stats.str +
+            player.equipment.weapon.power +
+            player.power +
+            (player.stats.dex + (player.stats.luk + randomBetween(1, player.stats.str) / 2));
         } else {
-          const str = cachedStats.str;
-          const luk = cachedStats.luk;
-          attackPower = str + player.equipment.weapon.power + (((luk * 1.5) + randomBetween(1, str)) / 2);
+          const { str } = cachedStats;
+          const { luk } = cachedStats;
+          attackPower =
+            str + player.equipment.weapon.power + (luk * 1.5 + randomBetween(1, str)) / 2;
         }
         break;
       }
       case 'range': {
         if (this.isMonster(player)) {
-          attackPower = (player.stats.dex + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (randomBetween(1, player.stats.dex) / 2)));
+          attackPower =
+            player.stats.dex +
+            player.equipment.weapon.power +
+            player.power +
+            (player.stats.dex + (player.stats.luk + randomBetween(1, player.stats.dex) / 2));
         } else {
-          const dex = cachedStats.dex;
-          const luk = cachedStats.luk;
-          attackPower = dex + player.equipment.weapon.power + (((luk * 1.5) + randomBetween(1, dex)) / 2);
+          const { dex } = cachedStats;
+          const { luk } = cachedStats;
+          attackPower =
+            dex + player.equipment.weapon.power + (luk * 1.5 + randomBetween(1, dex)) / 2;
         }
         break;
       }
       case 'magic': {
         if (this.isMonster(player)) {
-          attackPower = (player.stats.int + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (randomBetween(1, player.stats.int) / 2)));
+          attackPower =
+            player.stats.int +
+            player.equipment.weapon.power +
+            player.power +
+            (player.stats.dex + (player.stats.luk + randomBetween(1, player.stats.int) / 2));
         } else {
-          const int = cachedStats.int;
-          const luk = cachedStats.luk;
-          attackPower = int + player.equipment.weapon.power + (((luk * 1.5) + randomBetween(1, int)) / 2);
+          const { int } = cachedStats;
+          const { luk } = cachedStats;
+          attackPower =
+            int + player.equipment.weapon.power + (luk * 1.5 + randomBetween(1, int)) / 2;
         }
         break;
       }
@@ -312,7 +427,7 @@ class BattleSimulator {
     if (this.isMonster(player)) {
       const base = player.stats.end + player.equipment.armor.power + player.power;
       const magBase = player.stats.int + player.equipment.armor.power + player.power;
-      const bonus = (player.stats.dex / 2) + (player.stats.luk / 2);
+      const bonus = player.stats.dex / 2 + player.stats.luk / 2;
       return {
         physicalDefensePower: base + bonus,
         magicDefensePower: magBase + bonus,
@@ -320,7 +435,7 @@ class BattleSimulator {
     }
     const { end, int, dex, luk } = cachedStats;
     const armorBonus = (player.equipment.armor.power + player.equipment.helmet.power) / 2;
-    const dexLukBonus = dex + ((luk * 1.5) / 2);
+    const dexLukBonus = dex + (luk * 1.5) / 2;
     return {
       physicalDefensePower: end + armorBonus + dexLukBonus,
       magicDefensePower: int + armorBonus + dexLukBonus,
@@ -331,7 +446,7 @@ class BattleSimulator {
   // At equal values: 50% damage; 2x attack vs defense: 67% damage; 0.5x: 33%
   calcDamage(attackPower, defensePower) {
     if (attackPower <= 0) return 0;
-    return Math.max(1, Math.round(attackPower * attackPower / (attackPower + defensePower)));
+    return Math.max(1, Math.round((attackPower * attackPower) / (attackPower + defensePower)));
   }
 
   // LUK-based crit chance: 5% base + 0.5% per LUK, capped at 40%
@@ -347,7 +462,6 @@ class BattleSimulator {
   isMonster(obj) {
     return obj.power !== undefined;
   }
-
 }
 
 module.exports = BattleSimulator;

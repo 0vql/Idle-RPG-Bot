@@ -6,14 +6,24 @@ function setImportantMessage(message) {
   return `\`\`\`css\n${message}\`\`\``;
 }
 
-function generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item, luckGambleGold, victimPlayer, otherPlayerLog) {
-  eventMsg = eventMsg.replace(/(\$\$)/g, selectedPlayer.map.name)
+function generateMessageWithNames(
+  eventMsg,
+  eventLog,
+  selectedPlayer,
+  item,
+  luckGambleGold,
+  victimPlayer,
+  otherPlayerLog,
+) {
+  eventMsg = eventMsg
+    .replace(/(\$\$)/g, selectedPlayer.map.name)
     .replace(/(##)/g, generatePlayerName(selectedPlayer, true))
     .replace(/(@@)/g, generateGenderString(selectedPlayer, 'him'))
     .replace(/(\^\^)/g, generateGenderString(selectedPlayer, 'his'))
     .replace(/(&&)/g, generateGenderString(selectedPlayer, 'he'));
 
-  eventLog = eventLog.replace('$$', selectedPlayer.map.name)
+  eventLog = eventLog
+    .replace('$$', selectedPlayer.map.name)
     .replace(/(##)/g, selectedPlayer.name)
     .replace(/(@@)/g, generateGenderString(selectedPlayer, 'him'))
     .replace(/(\^\^)/g, generateGenderString(selectedPlayer, 'his'))
@@ -63,5 +73,5 @@ module.exports = {
   generateMessageWithNames,
   randomCampEventMessage,
   randomItemEventMessage,
-  randomGambleEventMessage
+  randomGambleEventMessage,
 };

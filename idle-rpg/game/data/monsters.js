@@ -2,7 +2,7 @@ const { map } = require('../../utils/enumHelper');
 
 const monsters = {
   rarity: [
-    starving = {
+    (starving = {
       name: 'Starving',
       power: 0.5,
       health: 3,
@@ -11,13 +11,13 @@ const monsters = {
         dex: 0.5,
         end: 0.5,
         int: 0.5,
-        luk: 0.5
+        luk: 0.5,
       },
       experience: 1,
       gold: 0.25,
-      rarity: 100
-    },
-    normal = {
+      rarity: 100,
+    }),
+    (normal = {
       name: 'Normal',
       power: 1,
       health: 5,
@@ -26,13 +26,13 @@ const monsters = {
         dex: 1,
         end: 1,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       experience: 1,
       gold: 1,
-      rarity: 100
-    },
-    veteran = {
+      rarity: 100,
+    }),
+    (veteran = {
       name: 'Veteran',
       power: 1.25,
       health: 8,
@@ -41,13 +41,13 @@ const monsters = {
         dex: 1.25,
         end: 1.25,
         int: 1.25,
-        luk: 1.25
+        luk: 1.25,
       },
       experience: 2,
       gold: 2,
-      rarity: 50
-    },
-    elite = {
+      rarity: 50,
+    }),
+    (elite = {
       name: 'Elite',
       power: 1.5,
       health: 10,
@@ -56,13 +56,13 @@ const monsters = {
         dex: 1.5,
         end: 1.5,
         int: 1.5,
-        luk: 1.5
+        luk: 1.5,
       },
       experience: 3,
       gold: 3,
-      rarity: 30
-    },
-    champion = {
+      rarity: 30,
+    }),
+    (champion = {
       name: 'Champion',
       power: 1.75,
       health: 13,
@@ -71,13 +71,13 @@ const monsters = {
         dex: 1.75,
         end: 1.75,
         int: 1.75,
-        luk: 1.75
+        luk: 1.75,
       },
       experience: 4,
       gold: 4,
-      rarity: 15
-    },
-    legendary = {
+      rarity: 15,
+    }),
+    (legendary = {
       name: 'Legendary',
       power: 2,
       health: 15,
@@ -86,13 +86,13 @@ const monsters = {
         dex: 2,
         end: 2,
         int: 2,
-        luk: 2
+        luk: 2,
       },
       experience: 5,
       gold: 5,
-      rarity: 10
-    },
-    omega = {
+      rarity: 10,
+    }),
+    (omega = {
       name: 'Omega',
       power: 2.25,
       health: 20,
@@ -101,13 +101,13 @@ const monsters = {
         dex: 2.25,
         end: 2.25,
         int: 2.25,
-        luk: 2.25
+        luk: 2.25,
       },
       experience: 6,
       gold: 6,
-      rarity: 2
-    },
-    undead = {
+      rarity: 2,
+    }),
+    (undead = {
       name: 'Undead',
       power: 2.5,
       health: 13,
@@ -116,13 +116,13 @@ const monsters = {
         dex: 2.5,
         end: 2.5,
         int: 2.5,
-        luk: 2.5
+        luk: 2.5,
       },
       experience: 1,
       gold: 1,
-      rarity: 5
-    },
-    deadly = {
+      rarity: 5,
+    }),
+    (deadly = {
       name: 'Deadly',
       power: 2.75,
       health: 18,
@@ -131,13 +131,13 @@ const monsters = {
         dex: 2.75,
         end: 2.75,
         int: 2.75,
-        luk: 2.75
+        luk: 2.75,
       },
       experience: 6,
       gold: 6,
-      rarity: 4
-    },
-    berserk = {
+      rarity: 4,
+    }),
+    (berserk = {
       name: 'Berserk',
       power: 3,
       health: 23,
@@ -146,13 +146,13 @@ const monsters = {
         dex: 3,
         end: 3,
         int: 3,
-        luk: 3
+        luk: 3,
       },
       experience: 3,
       gold: 1,
-      rarity: 3
-    },
-    corrupted = {
+      rarity: 3,
+    }),
+    (corrupted = {
       name: 'Corrupted',
       power: 3.25,
       health: 15,
@@ -161,16 +161,16 @@ const monsters = {
         dex: 3.25,
         end: 3.25,
         int: 3.25,
-        luk: 3.25
+        luk: 3.25,
       },
       experience: 7,
       gold: 7,
-      rarity: 2
-    },
+      rarity: 2,
+    }),
   ],
 
   type: [
-    rat = {
+    (rat = {
       name: 'Rat',
       isSpawnable: true,
       spawnableBiomes: [
@@ -184,44 +184,41 @@ const monsters = {
         map.biomes.caves,
         map.biomes.plateau,
         map.biomes.moors,
-        map.biomes.desert
+        map.biomes.desert,
       ],
       power: 1,
       health: 4,
       stats: {
         str: 0.5,
         dex: 0.5,
-        end: 0.10,
+        end: 0.1,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'claws',
-          power: 0.25
+          power: 0.25,
         },
         armor: {
           name: 'fur',
-          power: 0.01
-        }
+          power: 0.01,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 4,
       gold: 2,
-      rarity: 100
-    },
+      rarity: 100,
+    }),
 
-    crab = {
+    (crab = {
       name: 'Crab',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.coast,
-        map.biomes.swamp
-      ],
+      spawnableBiomes: [map.biomes.coast, map.biomes.swamp],
       power: 1.25,
       health: 5,
       stats: {
@@ -229,36 +226,32 @@ const monsters = {
         dex: 0.25,
         end: 0.25,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'pinchers',
-          power: 0.5
+          power: 0.5,
         },
         armor: {
           name: 'shell',
           power: 0.02,
-        }
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 2,
       gold: 1,
-      rarity: 100
-    },
+      rarity: 100,
+    }),
 
-    bat = {
+    (bat = {
       name: 'Bat',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.caves,
-        map.biomes.forest,
-        map.biomes.haunted
-      ],
+      spawnableBiomes: [map.biomes.caves, map.biomes.forest, map.biomes.haunted],
       power: 1.25,
       health: 23,
       stats: {
@@ -266,29 +259,29 @@ const monsters = {
         dex: 0.25,
         end: 0.5,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'claws',
-          power: 0.5
+          power: 0.5,
         },
         armor: {
           name: 'fur',
-          power: 0.02
-        }
+          power: 0.02,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 7,
       gold: 4,
-      rarity: 90
-    },
+      rarity: 90,
+    }),
 
-    slime = {
+    (slime = {
       name: 'Slime',
       isSpawnable: true,
       spawnableBiomes: [
@@ -296,7 +289,7 @@ const monsters = {
         map.biomes.plains,
         map.biomes.forest,
         map.biomes.plateau,
-        map.biomes.moors
+        map.biomes.moors,
       ],
       power: 1.5,
       health: 18,
@@ -305,34 +298,32 @@ const monsters = {
         dex: 0.5,
         end: 0.5,
         int: 1.25,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'slime',
-          power: 0.5
+          power: 0.5,
         },
         armor: {
           name: 'slime',
-          power: 0.05
-        }
+          power: 0.05,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 5,
       gold: 2,
-      rarity: 100
-    },
+      rarity: 100,
+    }),
 
-    pixie = {
+    (pixie = {
       name: 'Pixie',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.forest
-      ],
+      spawnableBiomes: [map.biomes.forest],
       power: 1.5,
       health: 18,
       stats: {
@@ -340,29 +331,29 @@ const monsters = {
         dex: 1,
         end: 0.5,
         int: 1.5,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'wand',
-          power: 0.75
+          power: 0.75,
         },
         armor: {
           name: 'stuff',
-          power: 0.05
-        }
+          power: 0.05,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 2,
       gold: 2,
-      rarity: 75
-    },
+      rarity: 75,
+    }),
 
-    goblin = {
+    (goblin = {
       name: 'Goblin',
       isSpawnable: true,
       spawnableBiomes: [
@@ -370,7 +361,7 @@ const monsters = {
         map.biomes.plateau,
         map.biomes.mountains,
         map.biomes.plains,
-        map.biomes.moors
+        map.biomes.moors,
       ],
       power: 1.75,
       health: 25,
@@ -379,29 +370,29 @@ const monsters = {
         dex: 0.5,
         end: 1.5,
         int: 1.25,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'dagger',
-          power: 0.75
+          power: 0.75,
         },
         armor: {
           name: 'rusty chainmail',
-          power: 0.10
-        }
+          power: 0.1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 6,
       gold: 2,
-      rarity: 90
-    },
+      rarity: 90,
+    }),
 
-    bandit = {
+    (bandit = {
       name: 'Bandit',
       isSpawnable: true,
       spawnableBiomes: [
@@ -410,7 +401,7 @@ const monsters = {
         map.biomes.forest,
         map.biomes.plains,
         map.biomes.mountains,
-        map.biomes.moors
+        map.biomes.moors,
       ],
       power: 1.75,
       health: 38,
@@ -419,34 +410,32 @@ const monsters = {
         dex: 2,
         end: 1.5,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'dagger',
-          power: 1
+          power: 1,
         },
         armor: {
           name: 'leather armor',
-          power: 0.10
-        }
+          power: 0.1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 10,
       gold: 3,
-      rarity: 80
-    },
+      rarity: 80,
+    }),
 
-    zombie = {
+    (zombie = {
       name: 'Zombie',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.haunted
-      ],
+      spawnableBiomes: [map.biomes.haunted],
       power: 1.5,
       health: 33,
       stats: {
@@ -454,29 +443,29 @@ const monsters = {
         dex: 0.5,
         end: 2,
         int: 2,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'undeadly hands ewwww',
-          power: 1.25
+          power: 1.25,
         },
         armor: {
           name: '',
-          power: 0.25
-        }
+          power: 0.25,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 15,
       gold: 3,
-      rarity: 75
-    },
+      rarity: 75,
+    }),
 
-    knight = {
+    (knight = {
       name: 'Knight',
       isSpawnable: true,
       spawnableBiomes: [
@@ -485,7 +474,7 @@ const monsters = {
         map.biomes.coast,
         map.biomes.plateau,
         map.biomes.mountains,
-        map.biomes.haunted
+        map.biomes.haunted,
       ],
       power: 1.75,
       health: 50,
@@ -494,35 +483,32 @@ const monsters = {
         dex: 2,
         end: 1.5,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'claymore',
-          power: 1.25
+          power: 1.25,
         },
         armor: {
           name: 'iron full armor',
-          power: 0.15
-        }
+          power: 0.15,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 25,
       gold: 6,
-      rarity: 50
-    },
+      rarity: 50,
+    }),
 
-    necromancer = {
+    (necromancer = {
       name: 'Necromancer',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.haunted,
-        map.biomes.caves
-      ],
+      spawnableBiomes: [map.biomes.haunted, map.biomes.caves],
       power: 2,
       health: 43,
       stats: {
@@ -530,35 +516,32 @@ const monsters = {
         dex: 2.5,
         end: 1,
         int: 2,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'magic',
           name: 'staff',
-          power: 1.25
+          power: 1.25,
         },
         armor: {
           name: 'robe',
-          power: 0.10
-        }
+          power: 0.1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 30,
       gold: 7,
-      rarity: 50
-    },
+      rarity: 50,
+    }),
 
-    gargoyle = {
+    (gargoyle = {
       name: 'Gargoyle',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.haunted,
-        map.biomes.mountains
-      ],
+      spawnableBiomes: [map.biomes.haunted, map.biomes.mountains],
       power: 2,
       health: 80,
       stats: {
@@ -566,29 +549,29 @@ const monsters = {
         dex: 2,
         end: 2,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'claws',
-          power: 0.90
+          power: 0.9,
         },
         armor: {
           name: '',
-          power: 0.5
-        }
+          power: 0.5,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 20,
       gold: 6,
-      rarity: 25
-    },
+      rarity: 25,
+    }),
 
-    bugbear = {
+    (bugbear = {
       name: 'Bugbear',
       isSpawnable: true,
       spawnableBiomes: [
@@ -596,7 +579,7 @@ const monsters = {
         map.biomes.forest,
         map.biomes.plateau,
         map.biomes.mountains,
-        map.biomes.caves
+        map.biomes.caves,
       ],
       power: 2.25,
       health: 88,
@@ -605,35 +588,32 @@ const monsters = {
         dex: 1.5,
         end: 1.75,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'mouth',
-          power: 1.25
+          power: 1.25,
         },
         armor: {
           name: '',
-          power: 0.40
-        }
+          power: 0.4,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 5,
       gold: 3,
-      rarity: 75
-    },
+      rarity: 75,
+    }),
 
-    griffin = {
+    (griffin = {
       name: 'Griffin',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.plains,
-        map.biomes.plateau
-      ],
+      spawnableBiomes: [map.biomes.plains, map.biomes.plateau],
       power: 2,
       health: 60,
       stats: {
@@ -641,36 +621,36 @@ const monsters = {
         dex: 2.25,
         end: 1.5,
         int: 1.5,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'claws',
-          power: 1.25
+          power: 1.25,
         },
         armor: {
           name: '',
-          power: 0.25
-        }
+          power: 0.25,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 8,
       gold: 8,
-      rarity: 48
-    },
+      rarity: 48,
+    }),
 
-    orc = {
+    (orc = {
       name: 'Orc',
       isSpawnable: true,
       spawnableBiomes: [
         map.biomes.plains,
         map.biomes.mountains,
         map.biomes.forest,
-        map.biomes.moors
+        map.biomes.moors,
       ],
       power: 2.5,
       health: 63,
@@ -679,34 +659,32 @@ const monsters = {
         dex: 0.5,
         end: 2,
         int: 0.25,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'rusty broadsword',
-          power: 1.5
+          power: 1.5,
         },
         armor: {
           name: '',
-          power: 0.25
-        }
+          power: 0.25,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 20,
       gold: 8,
-      rarity: 50
-    },
+      rarity: 50,
+    }),
 
-    elf = {
+    (elf = {
       name: 'Elf',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.forest
-      ],
+      spawnableBiomes: [map.biomes.forest],
       power: 2,
       health: 45,
       stats: {
@@ -714,35 +692,32 @@ const monsters = {
         dex: 3,
         end: 1.75,
         int: 1.25,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'range',
           name: 'bow',
-          power: 1.5
+          power: 1.5,
         },
         armor: {
           name: '',
-          power: 0.25
-        }
+          power: 0.25,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 20,
       gold: 9,
-      rarity: 15
-    },
+      rarity: 15,
+    }),
 
-    wereWolf = {
+    (wereWolf = {
       name: 'Werewolf',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.forest,
-        map.biomes.mountains
-      ],
+      spawnableBiomes: [map.biomes.forest, map.biomes.mountains],
       power: 2,
       health: 58,
       stats: {
@@ -750,34 +725,32 @@ const monsters = {
         dex: 2,
         end: 2,
         int: 0.75,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'claws',
-          power: 1.75
+          power: 1.75,
         },
         armor: {
           name: '',
-          power: 0.75
-        }
+          power: 0.75,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 11,
       gold: 11,
-      rarity: 35
-    },
+      rarity: 35,
+    }),
 
-    basilisk = {
+    (basilisk = {
       name: 'Basilisk',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.caves
-      ],
+      spawnableBiomes: [map.biomes.caves],
       power: 2.25,
       health: 95,
       stats: {
@@ -785,69 +758,65 @@ const monsters = {
         dex: 1.5,
         end: 2.25,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'mouth',
-          power: 1.75
+          power: 1.75,
         },
         armor: {
           name: '',
-          power: 0.5
-        }
+          power: 0.5,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 27,
       gold: 9,
-      rarity: 10
-    },
+      rarity: 10,
+    }),
 
-    unicorn = {
+    (unicorn = {
       name: 'Unicorn',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.forest
-      ],
-      power: 0.90,
+      spawnableBiomes: [map.biomes.forest],
+      power: 0.9,
       health: 23,
       stats: {
         str: 1,
         dex: 1.85,
         end: 0.9,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'horn',
-          power: 0.75
+          power: 0.75,
         },
         armor: {
           name: '',
-          power: 0.5
-        }
+          power: 0.5,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 5,
       gold: 4,
-      rarity: 50
-    },
+      rarity: 50,
+    }),
 
-    wraith = {
+    (wraith = {
       name: 'Wraith',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.haunted
-      ],
+      spawnableBiomes: [map.biomes.haunted],
       power: 1.2,
       health: 48,
       stats: {
@@ -855,34 +824,32 @@ const monsters = {
         dex: 1.75,
         end: 1.2,
         int: 1.5,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'something',
-          power: 1.75
+          power: 1.75,
         },
         armor: {
           name: '',
-          power: 0.75
-        }
+          power: 0.75,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 6,
       gold: 5,
-      rarity: 80
-    },
+      rarity: 80,
+    }),
 
-    dragon = {
+    (dragon = {
       name: 'Dragon',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.mountains
-      ],
+      spawnableBiomes: [map.biomes.mountains],
       power: 3,
       health: 73,
       stats: {
@@ -890,36 +857,33 @@ const monsters = {
         dex: 1.75,
         end: 3,
         int: 2,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'claws',
-          power: 2.5
+          power: 2.5,
         },
         armor: {
           name: 'scales',
-          power: 1.75
-        }
+          power: 1.75,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 35,
       gold: 5,
-      rarity: 65
-    },
+      rarity: 65,
+    }),
 
-    yeti = {
+    (yeti = {
       name: 'Yeti',
       holiday: 'xmas',
       isSpawnable: false,
-      spawnableBiomes: [
-        map.biomes.caves,
-        map.biomes.mountains
-      ],
+      spawnableBiomes: [map.biomes.caves, map.biomes.mountains],
       power: 1.75,
       health: 75,
       stats: {
@@ -927,29 +891,29 @@ const monsters = {
         dex: 1.75,
         end: 1.75,
         int: 1.75,
-        luk: 1.75
+        luk: 1.75,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: '',
-          power: 1.75
+          power: 1.75,
         },
         armor: {
           name: '',
-          power: 1.75
-        }
+          power: 1.75,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 25,
       gold: 12,
-      rarity: 60
-    },
+      rarity: 60,
+    }),
 
-    xmasGnome = {
+    (xmasGnome = {
       name: 'Christmas Gnome',
       holiday: 'xmas',
       isSpawnable: false,
@@ -958,7 +922,7 @@ const monsters = {
         map.biomes.moors,
         map.biomes.mountains,
         map.biomes.plains,
-        map.biomes.forest
+        map.biomes.forest,
       ],
       power: 0.75,
       health: 23,
@@ -967,35 +931,32 @@ const monsters = {
         dex: 0.75,
         end: 0.75,
         int: 0.75,
-        luk: 0.75
+        luk: 0.75,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: '',
-          power: 0.75
+          power: 0.75,
         },
         armor: {
           name: '',
-          power: 0.75
-        }
+          power: 0.75,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 5,
       gold: 9,
-      rarity: 95
-    },
+      rarity: 95,
+    }),
 
-    giantSpider = {
+    (giantSpider = {
       name: 'Giant Spider',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.forest,
-        map.biomes.desert
-      ],
+      spawnableBiomes: [map.biomes.forest, map.biomes.desert],
       power: 1,
       health: 38,
       stats: {
@@ -1003,34 +964,32 @@ const monsters = {
         dex: 2,
         end: 0.75,
         int: 0.5,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'fangs',
-          power: 0.55
+          power: 0.55,
         },
         armor: {
           name: '',
-          power: 0.5
-        }
+          power: 0.5,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 7,
       gold: 7,
-      rarity: 50
-    },
+      rarity: 50,
+    }),
 
-    killerBee = {
+    (killerBee = {
       name: 'Killer Bee',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.forest
-      ],
+      spawnableBiomes: [map.biomes.forest],
       power: 0.2,
       health: 25,
       stats: {
@@ -1038,36 +997,36 @@ const monsters = {
         dex: 2,
         end: 0.2,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'stinger',
-          power: 0.75
+          power: 0.75,
         },
         armor: {
           name: '',
-          power: 0.5
-        }
+          power: 0.5,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 2,
       gold: 1,
-      rarity: 90
-    },
+      rarity: 90,
+    }),
 
-    golem = {
+    (golem = {
       name: 'Golem',
       isSpawnable: true,
       spawnableBiomes: [
         map.biomes.mountains,
         map.biomes.plains,
         map.biomes.caves,
-        map.biomes.desert
+        map.biomes.desert,
       ],
       power: 2,
       health: 100,
@@ -1076,34 +1035,32 @@ const monsters = {
         dex: 0.2,
         end: 3,
         int: 1.2,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'hands',
-          power: 0.75
+          power: 0.75,
         },
         armor: {
           name: '',
-          power: 2
-        }
+          power: 2,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 8,
       gold: 8,
-      rarity: 60
-    },
+      rarity: 60,
+    }),
 
-    centaur = {
+    (centaur = {
       name: 'Centaur',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.plains
-      ],
+      spawnableBiomes: [map.biomes.plains],
       power: 1,
       health: 68,
       stats: {
@@ -1111,35 +1068,32 @@ const monsters = {
         dex: 1,
         end: 1,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'sword',
-          power: 1
+          power: 1,
         },
         armor: {
           name: '',
-          power: 1
-        }
+          power: 1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 3,
       gold: 3,
-      rarity: 71
-    },
+      rarity: 71,
+    }),
 
-    cyclops = {
+    (cyclops = {
       name: 'Cyclops',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.mountains,
-        map.biomes.plains
-      ],
+      spawnableBiomes: [map.biomes.mountains, map.biomes.plains],
       power: 1,
       health: 80,
       stats: {
@@ -1147,34 +1101,32 @@ const monsters = {
         dex: 0.5,
         end: 1.2,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'sword',
-          power: 1.75
+          power: 1.75,
         },
         armor: {
           name: '',
-          power: 0.75
-        }
+          power: 0.75,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 5,
       gold: 3,
-      rarity: 63
-    },
+      rarity: 63,
+    }),
 
-    demon = {
+    (demon = {
       name: 'Demon',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.haunted
-      ],
+      spawnableBiomes: [map.biomes.haunted],
       power: 2,
       health: 93,
       stats: {
@@ -1182,36 +1134,36 @@ const monsters = {
         dex: 1.2,
         end: 2,
         int: 1.75,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'club',
-          power: 1.3
+          power: 1.3,
         },
         armor: {
           name: '',
-          power: 0.75
-        }
+          power: 0.75,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 6,
       gold: 6,
-      rarity: 66.6
-    },
+      rarity: 66.6,
+    }),
 
-    elemental = {
+    (elemental = {
       name: 'Elemental',
       isSpawnable: true,
       spawnableBiomes: [
         map.biomes.plains,
         map.biomes.forest,
         map.biomes.mountains,
-        map.biomes.desert
+        map.biomes.desert,
       ],
       power: 1,
       health: 75,
@@ -1220,34 +1172,32 @@ const monsters = {
         dex: 1.2,
         end: 1,
         int: 2.5,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'magic',
           name: 'magic',
-          power: 1
+          power: 1,
         },
         armor: {
           name: '',
-          power: 1
-        }
+          power: 1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 3,
       gold: 5,
-      rarity: 73
-    },
+      rarity: 73,
+    }),
 
-    sphinx = {
+    (sphinx = {
       name: 'Sphinx',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.desert
-      ],
+      spawnableBiomes: [map.biomes.desert],
       power: 1.45,
       health: 105,
       stats: {
@@ -1255,36 +1205,32 @@ const monsters = {
         dex: 2,
         end: 1.25,
         int: 1.75,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'claws',
-          power: 1.25
+          power: 1.25,
         },
         armor: {
           name: '',
-          power: 0.75
-        }
+          power: 0.75,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 10,
       gold: 15,
-      rarity: 41
-    },
+      rarity: 41,
+    }),
 
-    tribalWarrior = {
+    (tribalWarrior = {
       name: 'Tribal Warrior',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.forest,
-        map.biomes.plains,
-        map.biomes.plateau
-      ],
+      spawnableBiomes: [map.biomes.forest, map.biomes.plains, map.biomes.plateau],
       power: 1,
       health: 55,
       stats: {
@@ -1292,34 +1238,32 @@ const monsters = {
         dex: 0.5,
         end: 1.15,
         int: 0.5,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'sword',
-          power: 1
+          power: 1,
         },
         armor: {
           name: '',
-          power: 0.95
-        }
+          power: 0.95,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 15,
       gold: 5,
-      rarity: 33
-    },
+      rarity: 33,
+    }),
 
-    chaoticTriceratops = {
-      name: 'Will-o\'-the-wisp',
+    (chaoticTriceratops = {
+      name: "Will-o'-the-wisp",
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.forest
-      ],
+      spawnableBiomes: [map.biomes.forest],
       power: 1,
       health: 38,
       stats: {
@@ -1327,36 +1271,36 @@ const monsters = {
         dex: 2.15,
         end: 1,
         int: 2.5,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'magic',
           name: 'magic',
-          power: 2
+          power: 2,
         },
         armor: {
           name: '',
-          power: 0.95
-        }
+          power: 0.95,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 10,
       gold: 25,
-      rarity: 20
-    },
+      rarity: 20,
+    }),
 
-    chaoticTriceratops = {
+    (chaoticTriceratops = {
       name: 'Chaotic Triceratops',
       isSpawnable: true,
       spawnableBiomes: [
         map.biomes.plains,
         map.biomes.forest,
         map.biomes.swamp,
-        map.biomes.grassland
+        map.biomes.grassland,
       ],
       power: 1,
       health: 118,
@@ -1365,29 +1309,29 @@ const monsters = {
         dex: 0.5,
         end: 2.15,
         int: 0.5,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'claws',
-          power: 1.2
+          power: 1.2,
         },
         armor: {
           name: '',
-          power: 0.95
-        }
+          power: 0.95,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 20,
       gold: 5,
-      rarity: 15
-    },
+      rarity: 15,
+    }),
 
-    earthSpirit = {
+    (earthSpirit = {
       name: 'Earth Spirit',
       isSpawnable: true,
       spawnableBiomes: [
@@ -1395,7 +1339,7 @@ const monsters = {
         map.biomes.forest,
         map.biomes.grassland,
         map.biomes.mountains,
-        map.biomes.moors
+        map.biomes.moors,
       ],
       power: 1.3,
       health: 60,
@@ -1404,29 +1348,29 @@ const monsters = {
         dex: 1.15,
         end: 1,
         int: 2,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'magic',
           name: 'magic',
-          power: 2.2
+          power: 2.2,
         },
         armor: {
           name: '',
-          power: 1
-        }
+          power: 1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 15,
       gold: 5,
-      rarity: 35
-    },
+      rarity: 35,
+    }),
 
-    airSpirit = {
+    (airSpirit = {
       name: 'Air Spirit',
       isSpawnable: true,
       spawnableBiomes: [
@@ -1434,7 +1378,7 @@ const monsters = {
         map.biomes.forest,
         map.biomes.grassland,
         map.biomes.mountains,
-        map.biomes.moors
+        map.biomes.moors,
       ],
       power: 2,
       health: 68,
@@ -1443,35 +1387,32 @@ const monsters = {
         dex: 1.15,
         end: 1,
         int: 2.5,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'magic',
           name: 'magic',
-          power: 2.2
+          power: 2.2,
         },
         armor: {
           name: '',
-          power: 1
-        }
+          power: 1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 25,
       gold: 5,
-      rarity: 35
-    },
+      rarity: 35,
+    }),
 
-    fireSpirit = {
+    (fireSpirit = {
       name: 'Fire Spirit',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.plains,
-        map.biomes.desert
-      ],
+      spawnableBiomes: [map.biomes.plains, map.biomes.desert],
       power: 2,
       health: 88,
       stats: {
@@ -1479,35 +1420,32 @@ const monsters = {
         dex: 1.15,
         end: 1,
         int: 2.75,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'magic',
           name: 'magic',
-          power: 2.5
+          power: 2.5,
         },
         armor: {
           name: '',
-          power: 1
-        }
+          power: 1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 35,
       gold: 5,
-      rarity: 35
-    },
+      rarity: 35,
+    }),
 
-    waterSpirit = {
+    (waterSpirit = {
       name: 'Water Spirit',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.coast,
-        map.biomes.swamp
-      ],
+      spawnableBiomes: [map.biomes.coast, map.biomes.swamp],
       power: 1,
       health: 63,
       stats: {
@@ -1515,34 +1453,32 @@ const monsters = {
         dex: 1.15,
         end: 1,
         int: 2,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'magic',
           name: 'magic',
-          power: 2
+          power: 2,
         },
         armor: {
           name: '',
-          power: 1
-        }
+          power: 1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 15,
       gold: 5,
-      rarity: 35
-    },
+      rarity: 35,
+    }),
 
-    caveTroll = {
+    (caveTroll = {
       name: 'Cave Troll',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.caves
-      ],
+      spawnableBiomes: [map.biomes.caves],
       power: 3,
       health: 113,
       stats: {
@@ -1550,34 +1486,32 @@ const monsters = {
         dex: 0.5,
         end: 2.45,
         int: 0.15,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'club',
-          power: 3.2
+          power: 3.2,
         },
         armor: {
           name: '',
-          power: 1
-        }
+          power: 1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 45,
       gold: 5,
-      rarity: 25
-    },
+      rarity: 25,
+    }),
 
-    caveTroll = {
+    (caveTroll = {
       name: 'Cave Troll',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.caves
-      ],
+      spawnableBiomes: [map.biomes.caves],
       power: 3,
       health: 113,
       stats: {
@@ -1585,34 +1519,32 @@ const monsters = {
         dex: 0.5,
         end: 2.45,
         int: 0.15,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'club',
-          power: 3.2
+          power: 3.2,
         },
         armor: {
           name: '',
-          power: 1
-        }
+          power: 1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 45,
       gold: 5,
-      rarity: 25
-    },
+      rarity: 25,
+    }),
 
-    mountainTroll = {
+    (mountainTroll = {
       name: 'Mountain Troll',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.mountains
-      ],
+      spawnableBiomes: [map.biomes.mountains],
       power: 2.75,
       health: 185,
       stats: {
@@ -1620,35 +1552,32 @@ const monsters = {
         dex: 0.75,
         end: 2,
         int: 0.2,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'club',
-          power: 2.8
+          power: 2.8,
         },
         armor: {
           name: '',
-          power: 1
-        }
+          power: 1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 40,
       gold: 7,
-      rarity: 25
-    },
+      rarity: 25,
+    }),
 
-    vampire = {
+    (vampire = {
       name: 'Vampire',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.haunted,
-        map.biomes.swamp
-      ],
+      spawnableBiomes: [map.biomes.haunted, map.biomes.swamp],
       power: 1.75,
       health: 175,
       stats: {
@@ -1656,29 +1585,29 @@ const monsters = {
         dex: 2.15,
         end: 1.75,
         int: 2,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'bite',
-          power: 2.4
+          power: 2.4,
         },
         armor: {
           name: '',
-          power: 1.5
-        }
+          power: 1.5,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 35,
       gold: 15,
-      rarity: 40
-    },
+      rarity: 40,
+    }),
 
-    imp = {
+    (imp = {
       name: 'Imp',
       isSpawnable: true,
       spawnableBiomes: [
@@ -1695,29 +1624,29 @@ const monsters = {
         dex: 3,
         end: 1.15,
         int: 1.15,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'claws',
-          power: 1.2
+          power: 1.2,
         },
         armor: {
           name: '',
-          power: 0.75
-        }
+          power: 0.75,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 15,
       gold: 5,
-      rarity: 35
-    },
+      rarity: 35,
+    }),
 
-    ogre = {
+    (ogre = {
       name: 'Ogre',
       isSpawnable: true,
       spawnableBiomes: [
@@ -1733,34 +1662,32 @@ const monsters = {
         dex: 1,
         end: 3,
         int: 1,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'club',
-          power: 2.7
+          power: 2.7,
         },
         armor: {
           name: '',
-          power: 2
-        }
+          power: 2,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 30,
       gold: 5,
-      rarity: 20
-    },
+      rarity: 20,
+    }),
 
-    witch = {
+    (witch = {
       name: 'Witch',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.haunted
-      ],
+      spawnableBiomes: [map.biomes.haunted],
       power: 1.5,
       health: 90,
       stats: {
@@ -1768,37 +1695,32 @@ const monsters = {
         dex: 2,
         end: 1.4,
         int: 3,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'magic',
           name: 'staff',
-          power: 2.4
+          power: 2.4,
         },
         armor: {
           name: '',
-          power: 0.5
-        }
+          power: 0.5,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 40,
       gold: 9,
-      rarity: 40
-    },
+      rarity: 40,
+    }),
 
-    salamander = {
+    (salamander = {
       name: 'Salamander',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.plains,
-        map.biomes.forest,
-        map.biomes.swamp,
-        map.biomes.deser,
-      ],
+      spawnableBiomes: [map.biomes.plains, map.biomes.forest, map.biomes.swamp, map.biomes.deser],
       power: 1.2,
       health: 115,
       stats: {
@@ -1806,35 +1728,32 @@ const monsters = {
         dex: 3,
         end: 1,
         int: 0.5,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'claws',
-          power: 1.2
+          power: 1.2,
         },
         armor: {
           name: '',
-          power: 1
-        }
+          power: 1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 25,
       gold: 2,
-      rarity: 65
-    },
+      rarity: 65,
+    }),
 
-    banshee = {
+    (banshee = {
       name: 'Banshee',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.haunted,
-        map.biomes.swamp,
-      ],
+      spawnableBiomes: [map.biomes.haunted, map.biomes.swamp],
       power: 1.7,
       health: 145,
       stats: {
@@ -1842,29 +1761,29 @@ const monsters = {
         dex: 3.2,
         end: 0.7,
         int: 2,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'magic',
           name: 'shriek',
-          power: 1.2
+          power: 1.2,
         },
         armor: {
           name: '',
-          power: 1
-        }
+          power: 1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 40,
       gold: 7,
-      rarity: 40
-    },
+      rarity: 40,
+    }),
 
-    boar = {
+    (boar = {
       name: 'Boar',
       isSpawnable: true,
       spawnableBiomes: [
@@ -1880,34 +1799,32 @@ const monsters = {
         dex: 2,
         end: 1,
         int: 0.15,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'bite',
-          power: 0.7
+          power: 0.7,
         },
         armor: {
           name: '',
-          power: 2
-        }
+          power: 2,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 7,
       gold: 1,
-      rarity: 90
-    },
+      rarity: 90,
+    }),
 
-    pirate = {
+    (pirate = {
       name: 'Pirate',
       isSpawnable: true,
-      spawnableBiomes: [
-        map.biomes.coast
-      ],
+      spawnableBiomes: [map.biomes.coast],
       power: 1.2,
       health: 85,
       stats: {
@@ -1915,29 +1832,29 @@ const monsters = {
         dex: 3,
         end: 1,
         int: 0.15,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'cutlass',
-          power: 1.2
+          power: 1.2,
         },
         armor: {
           name: '',
-          power: 0.75
-        }
+          power: 0.75,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 9,
       gold: 11,
-      rarity: 65
-    },
+      rarity: 65,
+    }),
 
-    thrillerGuy = {
+    (thrillerGuy = {
       name: 'Some Guy with a Thriller Costume',
       holiday: 'halloween',
       isSpawnable: false,
@@ -1948,7 +1865,7 @@ const monsters = {
         map.biomes.mountains,
         map.biomes.plains,
         map.biomes.forest,
-        map.biomes.swamp
+        map.biomes.swamp,
       ],
       power: 0.75,
       health: 45,
@@ -1957,35 +1874,32 @@ const monsters = {
         dex: 0.75,
         end: 0.75,
         int: 0.75,
-        luk: 0.75
+        luk: 0.75,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'moonwalk',
-          power: 0.75
+          power: 0.75,
         },
         armor: {
           name: '',
-          power: 0.75
-        }
+          power: 0.75,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 5,
       gold: 9,
-      rarity: 95
-    },
+      rarity: 95,
+    }),
 
-    slenderMan = {
+    (slenderMan = {
       name: 'Slenderman',
       isSpawnable: false,
-      spawnableBiomes: [
-        map.biomes.forest,
-        map.biomes.haunted
-      ],
+      spawnableBiomes: [map.biomes.forest, map.biomes.haunted],
       power: 1.2,
       health: 85,
       stats: {
@@ -1993,29 +1907,29 @@ const monsters = {
         dex: 3,
         end: 1,
         int: 0.15,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: '???',
-          power: 4
+          power: 4,
         },
         armor: {
           name: '',
-          power: 0.1
-        }
+          power: 0.1,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 12,
       gold: 11,
-      rarity: 65
-    },
+      rarity: 65,
+    }),
 
-    chucky = {
+    (chucky = {
       name: 'Chucky',
       isSpawnable: false,
       spawnableBiomes: [
@@ -2025,7 +1939,7 @@ const monsters = {
         map.biomes.mountains,
         map.biomes.plains,
         map.biomes.forest,
-        map.biomes.swamp
+        map.biomes.swamp,
       ],
       power: 1.7,
       health: 145,
@@ -2034,27 +1948,27 @@ const monsters = {
         dex: 3.2,
         end: 0.7,
         int: 2,
-        luk: 1
+        luk: 1,
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'stab',
-          power: 3.2
+          power: 3.2,
         },
         armor: {
           name: '',
-          power: 2.2
-        }
+          power: 2.2,
+        },
       },
       inventory: {
-        items: []
+        items: [],
       },
       spells: [],
       experience: 40,
       gold: 7,
-      rarity: 25
-    },
-  ]
+      rarity: 25,
+    }),
+  ],
 };
 module.exports = monsters;

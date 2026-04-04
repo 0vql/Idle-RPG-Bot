@@ -1,15 +1,14 @@
 const enumHelper = require('../../utils/enumHelper');
-const Battle = require('../utils/Battle');
-const Monster = require('../utils/Monster');
-const Item = require('../utils/Item');
-const Inventory = require('../utils/Inventory');
-const Spell = require('../utils/Spell');
+const Battle = require('./Battle');
+const Monster = require('./Monster');
+const Item = require('./Item');
+const Inventory = require('./Inventory');
+const Spell = require('./Spell');
 const events = require('../data/events');
 const { errorLog } = require('../../utils/logger');
-const Map = require('../utils/Map');
+const Map = require('./Map');
 
 class Event {
-
   constructor(Database, Helper, discordHook) {
     this.Helper = Helper;
     this.Database = Database;
@@ -30,7 +29,7 @@ class Event {
     this.params = {
       hook: this.discordHook,
       db: this.Database,
-      helper: this.Helper
+      helper: this.Helper,
     };
   }
 
@@ -38,7 +37,10 @@ class Event {
   async moveEvent(updatedPlayer, multiplier) {
     try {
       const mapObj = await this.MapManager.moveToRandomMap(updatedPlayer);
-      if (mapObj.map.name === updatedPlayer.map.name || mapObj.map.name === updatedPlayer.previousMap) {
+      if (
+        mapObj.map.name === updatedPlayer.map.name ||
+        mapObj.map.name === updatedPlayer.previousMap
+      ) {
         this.MapManager.getTowns().includes(updatedPlayer.map.name)
           ? this.generateQuestEvent(updatedPlayer)
           : this.attackEventMob(updatedPlayer, multiplier);
@@ -52,7 +54,12 @@ class Event {
   async attackEventPlayerVsPlayer(updatedPlayer, onlinePlayers, multiplier) {
     try {
       const mappedPlayers = await this.Database.getSameMapPlayers(updatedPlayer.map.name);
-      const prepResults = await events.battle.pvpPreperation(this.params, updatedPlayer, mappedPlayers, onlinePlayers);
+      const prepResults = await events.battle.pvpPreperation(
+        this.params,
+        updatedPlayer,
+        mappedPlayers,
+        onlinePlayers,
+      );
       const battleResults = prepResults.randomPlayer
         ? await this.Battle.newSimulateBattle(updatedPlayer, prepResults.randomPlayer)
         : await this.attackEventMob(updatedPlayer, multiplier);
@@ -65,21 +72,56 @@ class Event {
       }
       switch (results.result) {
         case enumHelper.battle.outcomes.win:
-          const winResults = await events.battle.steal(this.params, results.updatedAttacker, results.updatedDefender, this.InventoryManager);
-          const updatedVictim = await this.Helper.checkHealth(this.params, this.MapManager, winResults.victimPlayer, winResults.stealingPlayer);
-          await this.Database.savePlayer(updatedVictim.updatedPlayer.guildId, updatedVictim.updatedPlayer);
+          const winResults = await events.battle.steal(
+            this.params,
+            results.updatedAttacker,
+            results.updatedDefender,
+            this.InventoryManager,
+          );
+          const updatedVictim = await this.Helper.checkHealth(
+            this.params,
+            this.MapManager,
+            winResults.victimPlayer,
+            winResults.stealingPlayer,
+          );
+          await this.Database.savePlayer(
+            updatedVictim.updatedPlayer.guildId,
+            updatedVictim.updatedPlayer,
+          );
           return this.Helper.checkExperience(this.params, winResults.stealingPlayer);
 
         case enumHelper.battle.outcomes.fled:
-          const fledUpdatedDefender = await this.Helper.checkExperience(this.params, results.updatedDefender);
-          await this.Database.savePlayer(fledUpdatedDefender.updatedPlayer.guildId, fledUpdatedDefender.updatedPlayer);
+          const fledUpdatedDefender = await this.Helper.checkExperience(
+            this.params,
+            results.updatedDefender,
+          );
+          await this.Database.savePlayer(
+            fledUpdatedDefender.updatedPlayer.guildId,
+            fledUpdatedDefender.updatedPlayer,
+          );
           return this.Helper.checkExperience(this.params, results.updatedAttacker);
 
         case enumHelper.battle.outcomes.lost:
-          const loseResults = await events.battle.steal(this.params, results.updatedDefender, results.updatedAttacker, this.InventoryManager);
-          const lostUpdatedDefender = await this.Helper.checkExperience(this.params, loseResults.stealingPlayer);
-          await this.Database.savePlayer(lostUpdatedDefender.updatedPlayer.guildId, lostUpdatedDefender.updatedPlayer);
-          return this.Helper.checkHealth(this.params, this.MapManager, loseResults.victimPlayer, lostUpdatedDefender.updatedPlayer);
+          const loseResults = await events.battle.steal(
+            this.params,
+            results.updatedDefender,
+            results.updatedAttacker,
+            this.InventoryManager,
+          );
+          const lostUpdatedDefender = await this.Helper.checkExperience(
+            this.params,
+            loseResults.stealingPlayer,
+          );
+          await this.Database.savePlayer(
+            lostUpdatedDefender.updatedPlayer.guildId,
+            lostUpdatedDefender.updatedPlayer,
+          );
+          return this.Helper.checkHealth(
+            this.params,
+            this.MapManager,
+            loseResults.victimPlayer,
+            lostUpdatedDefender.updatedPlayer,
+          );
       }
     } catch (err) {
       errorLog.error(err);
@@ -90,17 +132,34 @@ class Event {
     try {
       const mob = await this.MonsterManager.generateMonster(updatedPlayer);
       const simulatedBattle = await this.Battle.newSimulateBattle(updatedPlayer, mob);
-      const battleResults = await events.battle.pveResults(this.params, simulatedBattle, multiplier);
+      const battleResults = await events.battle.pveResults(
+        this.params,
+        simulatedBattle,
+        multiplier,
+      );
       updatedPlayer = battleResults.updatedPlayer;
       switch (battleResults.result) {
         case enumHelper.battle.outcomes.win:
-          const dropItemResults = await events.battle.dropItem(this.params, updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager);
-          const checkedWinResults = await this.Helper.checkExperience(this.params, dropItemResults.updatedPlayer);
+          const dropItemResults = await events.battle.dropItem(
+            this.params,
+            updatedPlayer,
+            battleResults.updatedMob,
+            this.ItemManager,
+            this.InventoryManager,
+          );
+          const checkedWinResults = await this.Helper.checkExperience(
+            this.params,
+            dropItemResults.updatedPlayer,
+          );
           return {
             type: 'actions',
             updatedPlayer: checkedWinResults.updatedPlayer,
-            msg: battleResults.msg.concat(dropItemResults.msg ? `\n${dropItemResults.msg}` : '').concat(checkedWinResults.msg ? `\n${checkedWinResults.msg}` : ''),
-            pmMsg: battleResults.pmMsg.concat(dropItemResults.pmMsg ? `\n${dropItemResults.pmMsg}` : '').concat(checkedWinResults.pmMsg ? `\n${checkedWinResults.pmMsg}` : '')
+            msg: battleResults.msg
+              .concat(dropItemResults.msg ? `\n${dropItemResults.msg}` : '')
+              .concat(checkedWinResults.msg ? `\n${checkedWinResults.msg}` : ''),
+            pmMsg: battleResults.pmMsg
+              .concat(dropItemResults.pmMsg ? `\n${dropItemResults.pmMsg}` : '')
+              .concat(checkedWinResults.pmMsg ? `\n${checkedWinResults.pmMsg}` : ''),
           };
 
         case enumHelper.battle.outcomes.fled:
@@ -108,17 +167,28 @@ class Event {
           return {
             type: 'actions',
             updatedPlayer: checkedFledResults.updatedPlayer,
-            msg: battleResults.msg.concat(checkedFledResults.msg ? `${checkedFledResults.msg}` : ''),
-            pmMsg: battleResults.pmMsg.concat(checkedFledResults.pmMsg ? `\n${checkedFledResults.pmMsg}` : '')
+            msg: battleResults.msg.concat(
+              checkedFledResults.msg ? `${checkedFledResults.msg}` : '',
+            ),
+            pmMsg: battleResults.pmMsg.concat(
+              checkedFledResults.pmMsg ? `\n${checkedFledResults.pmMsg}` : '',
+            ),
           };
 
         case enumHelper.battle.outcomes.lost:
-          const checkLostResults = await this.Helper.checkHealth(this.params, this.MapManager, updatedPlayer, battleResults.updatedMob);
+          const checkLostResults = await this.Helper.checkHealth(
+            this.params,
+            this.MapManager,
+            updatedPlayer,
+            battleResults.updatedMob,
+          );
           return {
             type: 'actions',
             updatedPlayer: checkLostResults.updatedPlayer,
             msg: battleResults.msg.concat(checkLostResults.msg ? `\n${checkLostResults.msg}` : ''),
-            pmMsg: battleResults.pmMsg.concat(checkLostResults.pmMsg ? `\n${checkLostResults.pmMsg}` : '')
+            pmMsg: battleResults.pmMsg.concat(
+              checkLostResults.pmMsg ? `\n${checkLostResults.pmMsg}` : '',
+            ),
           };
       }
     } catch (err) {
@@ -205,10 +275,10 @@ class Event {
   async generateLuckItemEvent(updatedPlayer) {
     try {
       const luckItemDice = await this.Helper.randomBetween(0, 99);
-      if (luckItemDice <= 15 + (updatedPlayer.stats.luk / 4)) {
+      if (luckItemDice <= 15 + updatedPlayer.stats.luk / 4) {
         const spell = await this.SpellManager.generateSpell(updatedPlayer);
         events.luck.item.spell(this.params, updatedPlayer, spell);
-      } else if (luckItemDice <= 30 + (updatedPlayer.stats.luk / 4)) {
+      } else if (luckItemDice <= 30 + updatedPlayer.stats.luk / 4) {
         const item = await this.ItemManager.generateItem(updatedPlayer);
         events.luck.item.item(this.params, updatedPlayer, item, this.InventoryManager);
       }
@@ -238,7 +308,12 @@ class Event {
         }
 
         this.isBlizzardActive = true;
-        this.Helper.sendMessage(this.discordHook, undefined, false, '\`\`\`python\n\'Heroes, sit near a fireplace at your home or take a beer with your friends at the inn. It\`s better to stay in cozy place as lots of heroes are in the midst of a violent snowstorm across the lands fighting mighty Yetis!\'\`\`\`');
+        this.Helper.sendMessage(
+          this.discordHook,
+          undefined,
+          false,
+          "\`\`\`python\n'Heroes, sit near a fireplace at your home or take a beer with your friends at the inn. It\`s better to stay in cozy place as lots of heroes are in the midst of a violent snowstorm across the lands fighting mighty Yetis!'\`\`\`",
+        );
         return this.isBlizzardActive;
       case 'off':
         if (!this.isBlizzardActive) {
@@ -246,7 +321,12 @@ class Event {
         }
 
         this.isBlizzardActive = false;
-        this.Helper.sendMessage(this.discordHook, undefined, false, '\`\`\`python\n\'It seems that blizzard has ended, you can safely travel to other realms. Do not walk away from the road as evil creatures may wait for you in dark forests!\'\`\`\`');
+        this.Helper.sendMessage(
+          this.discordHook,
+          undefined,
+          false,
+          "\`\`\`python\n'It seems that blizzard has ended, you can safely travel to other realms. Do not walk away from the road as evil creatures may wait for you in dark forests!'\`\`\`",
+        );
         return this.isBlizzardActive;
     }
   }
@@ -254,9 +334,12 @@ class Event {
   blizzardRandom() {
     if (!this.isBlizzardActive) {
       this.isBlizzardActive = true;
-      setTimeout(() => {
-        this.isBlizzardActive = false;
-      }, this.Helper.randomBetween(7200000, 72000000)); // 2-20hrs
+      setTimeout(
+        () => {
+          this.isBlizzardActive = false;
+        },
+        this.Helper.randomBetween(7200000, 72000000),
+      ); // 2-20hrs
     }
   }
 
@@ -287,6 +370,5 @@ class Event {
   get SpellClass() {
     return this.SpellManager;
   }
-
 }
 module.exports = Event;

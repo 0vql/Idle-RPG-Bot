@@ -2,7 +2,6 @@ const http = require('http');
 const https = require('https');
 
 class Requester {
-
   request(options) {
     return new Promise((resolve, reject) => {
       console.log(options);
@@ -15,14 +14,10 @@ class Requester {
           output += chunk;
         });
 
-        res.on('end', () => {
-          return resolve(JSON.parse(output));
-        });
+        res.on('end', () => resolve(JSON.parse(output)));
       });
 
-      req.on('error', (err) => {
-        return reject(err);
-      });
+      req.on('error', (err) => reject(err));
 
       if (options.json) {
         req.write(options.json);
@@ -31,6 +26,5 @@ class Requester {
       req.end();
     });
   }
-
 }
 module.exports = new Requester();

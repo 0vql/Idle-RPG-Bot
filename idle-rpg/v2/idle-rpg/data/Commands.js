@@ -7,14 +7,13 @@ const BaseHelper = require('../../Base/Helper');
 const titles = require('./titles');
 const globalSpells = require('../../../game/data/globalSpells');
 const enumHelper = require('../../../utils/enumHelper');
-const holidays = require('../data/holidays');
+const holidays = require('./holidays');
 const { guildID } = require('../../../../settings');
 
 // UTILS
 const { errorLog } = require('../../../utils/logger');
 
 class Commands extends aggregation(BaseGame, BaseHelper) {
-
   constructor(params) {
     super();
     const { Database, Events, MapManager, ItemManager, MonsterManager } = params;
@@ -27,47 +26,74 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
 
   async playerStats(params) {
     const { author, playerToCheck } = params;
-    const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.statsSelectFields);
+    const loadedPlayer = await this.Database.loadPlayer(
+      playerToCheck ? playerToCheck.id : author.id,
+      enumHelper.statsSelectFields,
+    );
     if (!loadedPlayer) {
       return playerToCheck && playerToCheck.id !== author.id
-        ? author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
-        : author.send('Your character was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+        ? author.send(
+            'This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.',
+          )
+        : author.send(
+            'Your character was not found! You probably were not born yet. Please be patient until destiny has chosen you.',
+          );
     }
     const result = this.generateStatsString(loadedPlayer);
 
     return !playerToCheck || playerToCheck.id === author.id
       ? author.send(result)
-      : author.send(result.replace('Here are your stats!', `Here are ${loadedPlayer.name}'s stats!`));
+      : author.send(
+          result.replace('Here are your stats!', `Here are ${loadedPlayer.name}'s stats!`),
+        );
   }
 
   async playerEquipment(params) {
     const { author, playerToCheck } = params;
-    const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.equipSelectFields);
+    const loadedPlayer = await this.Database.loadPlayer(
+      playerToCheck ? playerToCheck.id : author.id,
+      enumHelper.equipSelectFields,
+    );
     if (!loadedPlayer) {
       return playerToCheck && playerToCheck.id !== author.id
-        ? author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
-        : author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+        ? author.send(
+            'This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.',
+          )
+        : author.send(
+            'Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.',
+          );
     }
     const result = this.generateEquipmentsString(loadedPlayer);
 
     return !playerToCheck || playerToCheck.id === author.id
       ? author.send(result)
-      : author.send(result.replace('Here is your equipment!', `Here is ${loadedPlayer.name}'s equipment!`));
+      : author.send(
+          result.replace('Here is your equipment!', `Here is ${loadedPlayer.name}'s equipment!`),
+        );
   }
 
   async playerSpellBook(params) {
     const { author, playerToCheck } = params;
-    const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.statsSelectFields);
+    const loadedPlayer = await this.Database.loadPlayer(
+      playerToCheck ? playerToCheck.id : author.id,
+      enumHelper.statsSelectFields,
+    );
     if (!loadedPlayer) {
       return playerToCheck && playerToCheck.id !== author.id
-        ? author.send('This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
-        : author.send('Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+        ? author.send(
+            'This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.',
+          )
+        : author.send(
+            'Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.',
+          );
     }
     const result = this.generateSpellBookString(loadedPlayer);
 
     return !playerToCheck || playerToCheck.id === author.id
       ? author.send(result)
-      : author.send(result.replace('Here\'s your spellbook!', `Here\'s ${loadedPlayer.name}'s spellbook!`));
+      : author.send(
+          result.replace("Here's your spellbook!", `Here\'s ${loadedPlayer.name}'s spellbook!`),
+        );
   }
 
   playerInventory(params) {
@@ -89,13 +115,19 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     const lotteryChannel = await guild.channels.cache.get(enumHelper.channels.lottery);
     if (lotteryChannel) {
       let lotteryMessages = await lotteryChannel.messages.fetch({ limit: 10 });
-      lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
+      lotteryMessages = await lotteryMessages.sort(
+        (message1, message2) => message1.createdTimestamp - message2.createdTimestamp,
+      );
       if (lotteryMessages.size <= 0) {
-        await lotteryChannel.send('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');
+        await lotteryChannel.send(
+          'Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join',
+        );
         await lotteryChannel.send(`Current lottery prize pool: ${newPrizePool}`);
         await lotteryChannel.send('Contestants:');
       } else {
-        await lotteryMessages.array()[0].edit('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');
+        await lotteryMessages
+          .array()[0]
+          .edit('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');
         await lotteryMessages.array()[1].edit(`Current lottery prize pool: ${newPrizePool}`);
         await lotteryMessages.array()[2].edit('Contestants:');
       }
@@ -114,10 +146,10 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     const loadedPlayer = await this.Database.loadPlayer(author.id);
     try {
       if (!loadedPlayer || !loadedPlayer.quest) {
-        return 'I\'m sorry but you have no quest.';
+        return "I'm sorry but you have no quest.";
       }
-      if (((new Date() - loadedPlayer.quest.updated_at) / (1000 * 60 * 60 * 24)) <= 2) {
-        return 'I\'m sorry but you must have a quest at least 2 days old';
+      if ((new Date() - loadedPlayer.quest.updated_at) / (1000 * 60 * 60 * 24) <= 2) {
+        return "I'm sorry but you must have a quest at least 2 days old";
       }
       const oldQuestMob = loadedPlayer.quest.questMob.name;
       let { updatedPlayer } = await this.Events.retrieveNewQuest(loadedPlayer, true);
@@ -140,7 +172,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
 
     const player = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
     if (player.lottery.joined) {
-      return author.send('You\'ve already joined todays daily lottery!');
+      return author.send("You've already joined todays daily lottery!");
     }
     if (player.gold.current < 100) {
       return author.send('You do not have enough gold to join the lottery!');
@@ -154,18 +186,30 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     guildConfig.dailyLottery.prizePool += 100;
     await this.Database.updateGame(player.guildId, guildConfig);
     await this.Database.savePlayer(player);
-    const lotteryChannel = await Bot.guilds.cache.get(player.guildId).channels.cache.get(enumHelper.channels.lottery);
+    const lotteryChannel = await Bot.guilds.cache
+      .get(player.guildId)
+      .channels.cache.get(enumHelper.channels.lottery);
     if (lotteryChannel) {
       let lotteryMessages = await lotteryChannel.messages.fetch({ limit: 10 });
-      lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
+      lotteryMessages = await lotteryMessages.sort(
+        (message1, message2) => message1.createdTimestamp - message2.createdTimestamp,
+      );
       if (lotteryMessages.size <= 0) {
-        await lotteryChannel.send('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join!');
-        await lotteryChannel.send(`Current lottery prize pool: ${guildConfig.dailyLottery.prizePool}`);
+        await lotteryChannel.send(
+          'Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join!',
+        );
+        await lotteryChannel.send(
+          `Current lottery prize pool: ${guildConfig.dailyLottery.prizePool}`,
+        );
         await lotteryChannel.send('Contestants:');
         await lotteryChannel.send(`${player.name}`);
       } else {
-        await lotteryMessages.array()[1].edit(`Current lottery prize pool: ${guildConfig.dailyLottery.prizePool}`);
-        await lotteryMessages.array()[2].edit(lotteryMessages.array()[2].content.concat(`\n${player.name}`));
+        await lotteryMessages
+          .array()[1]
+          .edit(`Current lottery prize pool: ${guildConfig.dailyLottery.prizePool}`);
+        await lotteryMessages
+          .array()[2]
+          .edit(lotteryMessages.array()[2].content.concat(`\n${player.name}`));
       }
     }
 
@@ -178,7 +222,9 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     const lotteryPlayers = await this.Database.loadLotteryPlayers(player.guildId);
     const guildConfig = await this.Database.loadGame(player.guildId);
 
-    return author.send(`There are ${lotteryPlayers.length} contestants for a prize pool of ${guildConfig.dailyLottery.prizePool} gold!`);
+    return author.send(
+      `There are ${lotteryPlayers.length} contestants for a prize pool of ${guildConfig.dailyLottery.prizePool} gold!`,
+    );
   }
 
   async checkMultiplier(params) {
@@ -186,17 +232,21 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     const loadedPlayer = await this.Database.loadPlayer(author.id, { guildId: -1 });
     const config = await this.Database.loadGame(loadedPlayer.guildId);
 
-    return author.send(`Current Multiplier: ${config.multiplier}x\nActive Bless: ${config.spells.activeBless}x`);
+    return author.send(
+      `Current Multiplier: ${config.multiplier}x\nActive Bless: ${config.spells.activeBless}x`,
+    );
   }
 
   async listTitles(params) {
     const { author } = params;
     const loadedPlayer = await this.Database.loadPlayer(author.id, { titles: -1 });
     if (loadedPlayer.titles.unlocked.length <= 0) {
-      return author.send('I\'m sorry, you currently do not have any titles unlocked.');
+      return author.send("I'm sorry, you currently do not have any titles unlocked.");
     }
 
-    return author.send(`You currently have ${loadedPlayer.titles.unlocked.join(', ')} unlocked!\nUse \`!st\` or \`!settitle <title>\` to change titles.`);
+    return author.send(
+      `You currently have ${loadedPlayer.titles.unlocked.join(', ')} unlocked!\nUse \`!st\` or \`!settitle <title>\` to change titles.`,
+    );
   }
 
   async setTitle(params) {
@@ -205,9 +255,12 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
       return author.send(`${value} is not a title.`);
     }
 
-    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    const loadedPlayer = await this.Database.loadPlayer(author.id, {
+      pastEvents: 0,
+      pastPvpEvents: 0,
+    });
     if (loadedPlayer.titles.unlocked.length <= 0) {
-      return author.send('I\'m sorry, but you have no titles unlocked as of yet.');
+      return author.send("I'm sorry, but you have no titles unlocked as of yet.");
     }
 
     if (!loadedPlayer.titles.unlocked.includes(value)) {
@@ -216,16 +269,25 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
 
     loadedPlayer.titles.current = value;
     await this.Database.savePlayer(loadedPlayer);
-    return author.send(`Title has been set to ${value}, you're now known as ${loadedPlayer.name} the ${value}.`);
+    return author.send(
+      `Title has been set to ${value}, you're now known as ${loadedPlayer.name} the ${value}.`,
+    );
   }
 
   async top10(params) {
     const { author, type, guildId, Bot } = params;
     const loadedTop10 = await this.Database.loadTop10(type, guildId, Bot.user.id);
-    const rankString = await `${loadedTop10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
+    const rankString = await `${loadedTop10
+      .filter((player) =>
+        Object.keys(type)[0].includes('.')
+          ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]
+          : player[Object.keys(type)[0]] > 0,
+      )
       .sort((player1, player2) => {
         if (Object.keys(type)[0] === 'level') {
-          return player2.experience.current - player1.experience.current && player2.level - player1.level;
+          return (
+            player2.experience.current - player1.experience.current && player2.level - player1.level
+          );
         }
 
         if (Object.keys(type)[0].includes('.')) {
@@ -235,7 +297,10 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
 
         return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
       })
-      .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
+      .map(
+        (player, rank) =>
+          `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`,
+      )
       .join('\n')}`;
 
     return author.send(`\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}`}:
@@ -245,29 +310,44 @@ ${rankString}\`\`\``);
   getRank(params) {
     const { author, type } = params;
     return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
-      .then(player => this.Database.loadCurrentRank(player, type))
-      .then(currentRank => currentRank.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
-        .sort((player1, player2) => {
-          if (Object.keys(type)[0] === 'level') {
-            return player2.experience.current - player1.experience.current && player2.level - player1.level;
-          }
+      .then((player) => this.Database.loadCurrentRank(player, type))
+      .then((currentRank) =>
+        currentRank
+          .filter((player) =>
+            Object.keys(type)[0].includes('.')
+              ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]
+              : player[Object.keys(type)[0]] > 0,
+          )
+          .sort((player1, player2) => {
+            if (Object.keys(type)[0] === 'level') {
+              return (
+                player2.experience.current - player1.experience.current &&
+                player2.level - player1.level
+              );
+            }
 
-          if (Object.keys(type)[0].includes('.')) {
-            const keys = Object.keys(type)[0].split('.');
-            return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
-          }
+            if (Object.keys(type)[0].includes('.')) {
+              const keys = Object.keys(type)[0].split('.');
+              return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
+            }
 
-          return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
-        }).findIndex(player => player.discordId === author.id))
+            return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
+          })
+          .findIndex((player) => player.discordId === author.id),
+      )
       .then((rank) => {
-        author.send(`You're currently ranked ${rank + 1} in ${Object.keys(type)[0].includes('.') ? Object.keys(type)[0].split('.')[0] : Object.keys(type)[0]}!`);
+        author.send(
+          `You're currently ranked ${rank + 1} in ${Object.keys(type)[0].includes('.') ? Object.keys(type)[0].split('.')[0] : Object.keys(type)[0]}!`,
+        );
       });
   }
 
   async castSpell(params) {
     const { author, Bot, spell, amount } = params;
     const player = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
-    const actionsChannel = Bot.guilds.cache.get(player.guildId).channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text');
+    const actionsChannel = Bot.guilds.cache
+      .get(player.guildId)
+      .channels.cache.find((channel) => channel.name === 'actions' && channel.type === 'text');
     const guildConfig = await this.Database.loadGame(player.guildId);
     switch (spell) {
       case 'bless':
@@ -281,27 +361,40 @@ ${rankString}\`\`\``);
             return author.send('You must cast a valid amount');
           }
         }
-        if (player.gold.current >= (globalSpells.bless.spellCost * calcAmount) && calcAmount >= 1) {
+        if (player.gold.current >= globalSpells.bless.spellCost * calcAmount && calcAmount >= 1) {
           player.spellCast += calcAmount;
-          player.gold.current -= (globalSpells.bless.spellCost * calcAmount);
-          await this.Database.savePlayer(player)
-            .then(() => {
-              author.send('Spell has been cast!');
-            });
+          player.gold.current -= globalSpells.bless.spellCost * calcAmount;
+          await this.Database.savePlayer(player).then(() => {
+            author.send('Spell has been cast!');
+          });
           guildConfig.multiplier += calcAmount;
           guildConfig.spells.activeBless += calcAmount;
           await this.Database.updateGame(player.guildId, guildConfig);
-          actionsChannel.send(this.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
+          actionsChannel.send(
+            this.setImportantMessage(
+              `${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`,
+            ),
+          );
           setTimeout(async () => {
             const newLoadedConfig = await this.Database.loadGame(player.guildId);
             newLoadedConfig.multiplier = Math.max(1, newLoadedConfig.multiplier - calcAmount);
-            newLoadedConfig.spells.activeBless = Math.max(0, newLoadedConfig.spells.activeBless - calcAmount);
-            newLoadedConfig.multiplier = newLoadedConfig.multiplier <= 0 ? 1 : newLoadedConfig.multiplier;
+            newLoadedConfig.spells.activeBless = Math.max(
+              0,
+              newLoadedConfig.spells.activeBless - calcAmount,
+            );
+            newLoadedConfig.multiplier =
+              newLoadedConfig.multiplier <= 0 ? 1 : newLoadedConfig.multiplier;
             await this.Database.updateGame(player.guildId, newLoadedConfig);
-            actionsChannel.send(this.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
+            actionsChannel.send(
+              this.setImportantMessage(
+                `${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`,
+              ),
+            );
           }, 1800000 * 2); // 60 minutes
         } else {
-          author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You're lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);
+          author.send(
+            `You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You're lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`,
+          );
         }
         break;
 
@@ -310,14 +403,17 @@ ${rankString}\`\`\``);
           player.gold.current -= globalSpells.home.spellCost;
           const randomHome = this.MapManager.getRandomTown();
           player.map = randomHome;
-          actionsChannel.send(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast ${spell} and teleported back to ${randomHome.name}.`);
+          actionsChannel.send(
+            `${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast ${spell} and teleported back to ${randomHome.name}.`,
+          );
           author.send(`Teleported back to ${randomHome.name}.`);
-          await this.Database.savePlayer(player)
-            .then(() => {
-              author.send('Spell has been cast!');
-            });
+          await this.Database.savePlayer(player).then(() => {
+            author.send('Spell has been cast!');
+          });
         } else {
-          author.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold.You are lacking ${globalSpells.home.spellCost - player.gold.current} gold.`);
+          author.send(
+            `You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold.You are lacking ${globalSpells.home.spellCost - player.gold.current} gold.`,
+          );
         }
         break;
     }
@@ -325,21 +421,33 @@ ${rankString}\`\`\``);
 
   async placeBounty(params) {
     const { author, Bot, recipient, amount } = params;
-    const bountyPlacer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    const bountyPlacer = await this.Database.loadPlayer(author.id, {
+      pastEvents: 0,
+      pastPvpEvents: 0,
+    });
     if (bountyPlacer.gold.current < amount) {
       return author.send('You need more gold to place this bounty');
     }
-    const bountyRecipient = await this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 });
+    const bountyRecipient = await this.Database.loadPlayer(recipient, {
+      pastEvents: 0,
+      pastPvpEvents: 0,
+    });
     if (!bountyRecipient) {
       return author.send('This player does not exist.');
     }
 
     bountyPlacer.gold.current -= Number(amount);
     bountyRecipient.currentBounty += Number(amount);
-    const actionsChannel = await Bot.guilds.cache.get(bountyPlacer.guildId).channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text');
+    const actionsChannel = await Bot.guilds.cache
+      .get(bountyPlacer.guildId)
+      .channels.cache.find((channel) => channel.name === 'actions' && channel.type === 'text');
     await this.Database.savePlayer(bountyPlacer);
     await this.Database.savePlayer(bountyRecipient);
-    await actionsChannel.send(this.setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
+    await actionsChannel.send(
+      this.setImportantMessage(
+        `${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`,
+      ),
+    );
 
     return author.send(`Bounty of ${amount} placed on ${bountyRecipient.name}'s head!`);
   }
@@ -362,7 +470,10 @@ ${rankString}\`\`\``);
 
   async modifyPM(params) {
     const { author, value } = params;
-    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    const loadedPlayer = await this.Database.loadPlayer(author.id, {
+      pastEvents: 0,
+      pastPvpEvents: 0,
+    });
     if (!loadedPlayer) {
       return author.send('Please set this after you have been born');
     }
@@ -379,7 +490,10 @@ ${rankString}\`\`\``);
 
   async modifyMention(params) {
     const { author, value } = params;
-    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    const loadedPlayer = await this.Database.loadPlayer(author.id, {
+      pastEvents: 0,
+      pastPvpEvents: 0,
+    });
     if (!loadedPlayer) {
       return author.send('Please set this after you have been born');
     }
@@ -397,19 +511,30 @@ ${rankString}\`\`\``);
   async setServer(params) {
     const { Bot, author, value, confirmation } = params;
     if (!confirmation && value === guildID) {
-      return author.send('Your character will be reset if joining the official server. Type `!setServer <Official Server ID> true` to confirm being reset.');
+      return author.send(
+        'Your character will be reset if joining the official server. Type `!setServer <Official Server ID> true` to confirm being reset.',
+      );
     }
-    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    const loadedPlayer = await this.Database.loadPlayer(author.id, {
+      pastEvents: 0,
+      pastPvpEvents: 0,
+    });
     if (value === loadedPlayer.guildId) {
       return author.send('Your primary server is already set to this.');
     }
     if (!confirmation && value !== guildID && loadedPlayer.equipment.relic.name !== 'Nothing') {
-      return author.send('Your character has a relic that may only exist in this server. If you would like to continue changing servers, type `!setServer <Server ID> true` to confirm. *This will destroy your relic!*');
+      return author.send(
+        'Your character has a relic that may only exist in this server. If you would like to continue changing servers, type `!setServer <Server ID> true` to confirm. *This will destroy your relic!*',
+      );
     }
     let count = 0;
-    await Bot.guilds.cache.forEach(guild => guild.members.cache.get(author.id) ? count++ : count);
+    await Bot.guilds.cache.forEach((guild) =>
+      guild.members.cache.get(author.id) ? count++ : count,
+    );
     if (count <= 1) {
-      return author.send('You must be in more than one server with this bot in order to change primary servers.');
+      return author.send(
+        'You must be in more than one server with this bot in order to change primary servers.',
+      );
     }
     const guildToSet = await Bot.guilds.cache.get(value);
     if (!guildToSet) {
@@ -417,7 +542,7 @@ ${rankString}\`\`\``);
     }
     const memberInGuild = await guildToSet.members.cache.get(author.id);
     if (!memberInGuild) {
-      return author.send('You\'re not in this server.');
+      return author.send("You're not in this server.");
     }
     if (confirmation && value === guildID) {
       await this.Database.deletePlayer(author.id);
@@ -438,7 +563,10 @@ ${rankString}\`\`\``);
       await this.Database.updateGame(guildId, loadedConfig);
       author.send(`Changed server ${guildId} command prefix to ${value}.`);
       const server = await Bot.guilds.cache.get(guildId);
-      const faqChannel = await server.channels.cache.find(channel => channel.name === 'faq' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+      const faqChannel = await server.channels.cache.find(
+        (channel) =>
+          channel.name === 'faq' && channel.type === 'text' && channel.parent.name === 'Idle-RPG',
+      );
       const faqMessage = await faqChannel.messages.fetch();
       // TODO move FAQ message somewhere else so I dont have to look everywhere to update these messages
       await faqMessage.array()[0].edit(`
@@ -487,7 +615,10 @@ There's a command to get the invite link ${value}invite`);
 
   async modifyGender(params) {
     const { author, value } = params;
-    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    const loadedPlayer = await this.Database.loadPlayer(author.id, {
+      pastEvents: 0,
+      pastPvpEvents: 0,
+    });
     if (!loadedPlayer) {
       return author.send('Please set this after you have been born');
     }
@@ -509,21 +640,23 @@ There's a command to get the invite link ${value}invite`);
 
   setPlayerBounty(params) {
     const { recipient, amount } = params;
-    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((player) => {
+    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 }).then(
+      (player) => {
         player.currentBounty = amount;
         return this.Database.savePlayer(player);
-      });
+      },
+    );
   }
 
   setPlayergold(params) {
     const { recipient, amount } = params;
-    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((player) => {
+    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 }).then(
+      (player) => {
         player.gold.current = Number(amount);
         player.gold.total += Number(amount);
         return this.Database.savePlayer(player);
-      });
+      },
+    );
   }
 
   deletePlayer(params) {
@@ -533,12 +666,13 @@ There's a command to get the invite link ${value}invite`);
 
   giveGold(params) {
     const { recipient, amount } = params;
-    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((updatingPlayer) => {
+    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 }).then(
+      (updatingPlayer) => {
         updatingPlayer.gold.current += Number(amount);
         updatingPlayer.gold.total += Number(amount);
         this.Database.savePlayer(updatingPlayer);
-      });
+      },
+    );
   }
 
   getStolenEquip(params) {
@@ -553,7 +687,11 @@ There's a command to get the invite link ${value}invite`);
       case 'secondpreevent':
         const message = holidays[whichHoliday].messages[whichMessage];
         if (message) {
-          await Bot.guilds.cache.forEach(guild => guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+          await Bot.guilds.cache.forEach((guild) =>
+            guild.channels.cache
+              .find((channel) => channel.name === 'actions' && channel.type === 'text')
+              .send(message),
+          );
           return author.send(`Holiday ${whichHoliday} ${whichMessage} message sent`);
         }
 
@@ -582,7 +720,11 @@ There's a command to get the invite link ${value}invite`);
 
       const message = holidays[whichHoliday].messages.holidaystart;
       if (message) {
-        await Bot.guilds.cache.forEach(guild => guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+        await Bot.guilds.cache.forEach((guild) =>
+          guild.channels.cache
+            .find((channel) => channel.name === 'actions' && channel.type === 'text')
+            .send(message),
+        );
         return author.send(`Holiday ${whichHoliday} start message sent`);
       }
 
@@ -603,7 +745,11 @@ There's a command to get the invite link ${value}invite`);
     });
     const message = holidays[whichHoliday].messages.holidayend;
     if (message) {
-      await Bot.guilds.cache.forEach(guild => guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+      await Bot.guilds.cache.forEach((guild) =>
+        guild.channels.cache
+          .find((channel) => channel.name === 'actions' && channel.type === 'text')
+          .send(message),
+      );
       return author.send(`Holiday ${whichHoliday} end message sent`);
     }
 
@@ -616,17 +762,26 @@ There's a command to get the invite link ${value}invite`);
     if (!guild) {
       return author.send('No guild with that id');
     }
-    const leaderboardChannel = await guild.channels.cache.find(channel => channel.name === 'leaderboards' && channel.type === 'text');
-    const announcementChannel = await guild.channels.cache.find(channel => channel.name === 'announcements' && (channel.type === 'text' || channel.type === 'news'));
-    const actionChannel = await guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text');
-    const movementChannel = await guild.channels.cache.find(channel => channel.name === 'movement' && channel.type === 'text');
+    const leaderboardChannel = await guild.channels.cache.find(
+      (channel) => channel.name === 'leaderboards' && channel.type === 'text',
+    );
+    const announcementChannel = await guild.channels.cache.find(
+      (channel) =>
+        channel.name === 'announcements' && (channel.type === 'text' || channel.type === 'news'),
+    );
+    const actionChannel = await guild.channels.cache.find(
+      (channel) => channel.name === 'actions' && channel.type === 'text',
+    );
+    const movementChannel = await guild.channels.cache.find(
+      (channel) => channel.name === 'movement' && channel.type === 'text',
+    );
     let resetMsg = '';
-    let messagePromises = [];
+    const messagePromises = [];
     if (leaderboardChannel) {
       const leaderboardMessages = await leaderboardChannel.messages.fetch({ limit: 10 });
       if (leaderboardMessages.size > 0) {
         const messages = leaderboardMessages.array();
-        messages.forEach(msg => {
+        messages.forEach((msg) => {
           resetMsg = resetMsg.concat(`${msg.content}\n`);
           messagePromises.push(msg.delete());
         });
@@ -637,24 +792,34 @@ There's a command to get the invite link ${value}invite`);
     const defaultConfig = {
       multiplier: 1,
       spells: {
-        activeBless: 0
+        activeBless: 0,
       },
       dailyLottery: {
-        prizePool: 1500
-      }
+        prizePool: 1500,
+      },
     };
 
     const lotteryChannel = await guild.channels.cache.get(enumHelper.channels.lottery);
     if (lotteryChannel) {
       let lotteryMessages = await lotteryChannel.messages.fetch({ limit: 10 });
-      lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
+      lotteryMessages = await lotteryMessages.sort(
+        (message1, message2) => message1.createdTimestamp - message2.createdTimestamp,
+      );
       if (lotteryMessages.size <= 0) {
-        await lotteryChannel.send('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');
-        await lotteryChannel.send(`Current lottery prize pool: ${defaultConfig.dailyLottery.prizePool}`);
+        await lotteryChannel.send(
+          'Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join',
+        );
+        await lotteryChannel.send(
+          `Current lottery prize pool: ${defaultConfig.dailyLottery.prizePool}`,
+        );
         await lotteryChannel.send('Contestants:');
       } else {
-        await lotteryMessages.array()[0].edit('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');
-        await lotteryMessages.array()[1].edit(`Current lottery prize pool: ${defaultConfig.dailyLottery.prizePool}`);
+        await lotteryMessages
+          .array()[0]
+          .edit('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');
+        await lotteryMessages
+          .array()[1]
+          .edit(`Current lottery prize pool: ${defaultConfig.dailyLottery.prizePool}`);
         await lotteryMessages.array()[2].edit('Contestants:');
       }
     }
@@ -665,8 +830,7 @@ There's a command to get the invite link ${value}invite`);
     await this.Database.removeLotteryPlayers(guildId);
     if (announcementChannel) {
       if (messagePromises.length) {
-        await Promise.all(messagePromises)
-          .then(announcementChannel.send(resetMsg));
+        await Promise.all(messagePromises).then(announcementChannel.send(resetMsg));
       } else {
         await announcementChannel.send(resetMsg);
       }
@@ -679,6 +843,5 @@ There's a command to get the invite link ${value}invite`);
     }
     return author.send('Reset complete...');
   }
-
 }
 module.exports = Commands;

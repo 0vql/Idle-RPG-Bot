@@ -4,12 +4,12 @@ const pvpLog = mongoose.Schema({
   playerId: String,
   type: {
     type: String,
-    default: 'PVP'
+    default: 'PVP',
   },
   log: {
     type: Array,
-    default: []
-  }
+    default: [],
+  },
 });
 
 pvpLog.set('autoIndex', false);

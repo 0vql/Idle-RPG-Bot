@@ -4,8 +4,8 @@ const questLog = mongoose.Schema({
   playerId: String,
   log: {
     type: Array,
-    default: []
-  }
+    default: [],
+  },
 });
 
 questLog.set('autoIndex', false);

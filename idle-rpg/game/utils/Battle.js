@@ -2,7 +2,6 @@ const BaseHelper = require('../../v2/Base/Helper');
 const enumHelper = require('../../utils/enumHelper');
 
 class Battle extends BaseHelper {
-
   simulateBattle(attacker, defender) {
     return new Promise((resolve) => {
       const maxRounds = 5;
@@ -25,25 +24,24 @@ class Battle extends BaseHelper {
         }
       }
 
-      return Promise.all(battleResults)
-        .then((results) => {
-          let attackerDamage = 0;
-          let defenderDamage = 0;
-          results.forEach((result) => {
-            attackerDamage += result.attackerDamage ? result.attackerDamage : 0;
-            defenderDamage += result.defenderDamage ? result.defenderDamage : 0;
-          });
-          if (attacker.health < 0) {
-            attacker.health = 0;
-          }
-          if (defender instanceof Object) {
-            if (defender.health < 0) {
-              defender.health = 0;
-            }
-          }
-
-          return resolve({ attacker, defender, attackerDamage, defenderDamage });
+      return Promise.all(battleResults).then((results) => {
+        let attackerDamage = 0;
+        let defenderDamage = 0;
+        results.forEach((result) => {
+          attackerDamage += result.attackerDamage ? result.attackerDamage : 0;
+          defenderDamage += result.defenderDamage ? result.defenderDamage : 0;
         });
+        if (attacker.health < 0) {
+          attacker.health = 0;
+        }
+        if (defender instanceof Object) {
+          if (defender.health < 0) {
+            defender.health = 0;
+          }
+        }
+
+        return resolve({ attacker, defender, attackerDamage, defenderDamage });
+      });
     });
   }
 
@@ -55,7 +53,7 @@ class Battle extends BaseHelper {
   round(attacker, defender) {
     const battleStats = {
       attacker: this.getBattleStats(attacker),
-      defender: this.getBattleStats(defender)
+      defender: this.getBattleStats(defender),
     };
 
     return this.battleTurn(attacker, defender, battleStats);
@@ -68,8 +66,14 @@ class Battle extends BaseHelper {
       let defenderDamage;
       if (initiative.name === attacker.name) {
         this.printBattleDebug('\nBattle Initiative is Attacker');
-        if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
-          attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.physicalDefensePower / 100));
+        if (
+          attacker.equipment.weapon.attackType === 'melee' ||
+          attacker.equipment.weapon.attackType === 'range'
+        ) {
+          attackerDamage = Math.round(
+            battleStats.attacker.attackPower -
+              battleStats.defender.defensePower.physicalDefensePower / 100,
+          );
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -80,7 +84,10 @@ class Battle extends BaseHelper {
           }
           this.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
-          attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.magicDefensePower / 100));
+          attackerDamage = Math.round(
+            battleStats.attacker.attackPower -
+              battleStats.defender.defensePower.magicDefensePower / 100,
+          );
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -97,8 +104,14 @@ class Battle extends BaseHelper {
           return resolve({ attacker, defender, attackerDamage, defenderDamage });
         }
 
-        if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
-          defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.physicalDefensePower / 100));
+        if (
+          defender.equipment.weapon.attackType === 'melee' ||
+          defender.equipment.weapon.attackType === 'range'
+        ) {
+          defenderDamage = Math.round(
+            battleStats.defender.attackPower -
+              battleStats.attacker.defensePower.physicalDefensePower / 100,
+          );
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -109,7 +122,10 @@ class Battle extends BaseHelper {
           attacker.health -= defenderDamage;
           this.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         } else {
-          defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.magicDefensePower / 100));
+          defenderDamage = Math.round(
+            battleStats.defender.attackPower -
+              battleStats.attacker.defensePower.magicDefensePower / 100,
+          );
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -124,8 +140,14 @@ class Battle extends BaseHelper {
         this.printBattleDebug(`Defender Damage: ${defenderDamage}`);
       } else if (initiative.name === defender.name) {
         this.printBattleDebug('\nBattle Initiative is Defender');
-        if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
-          defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.physicalDefensePower / 100));
+        if (
+          defender.equipment.weapon.attackType === 'melee' ||
+          defender.equipment.weapon.attackType === 'range'
+        ) {
+          defenderDamage = Math.round(
+            battleStats.defender.attackPower -
+              battleStats.attacker.defensePower.physicalDefensePower / 100,
+          );
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -136,7 +158,10 @@ class Battle extends BaseHelper {
           attacker.health -= defenderDamage;
           this.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         } else {
-          defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.magicDefensePower / 100));
+          defenderDamage = Math.round(
+            battleStats.defender.attackPower -
+              battleStats.attacker.defensePower.magicDefensePower / 100,
+          );
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -153,8 +178,14 @@ class Battle extends BaseHelper {
           return resolve({ attacker, defender, attackerDamage, defenderDamage });
         }
 
-        if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
-          attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.physicalDefensePower / 100));
+        if (
+          attacker.equipment.weapon.attackType === 'melee' ||
+          attacker.equipment.weapon.attackType === 'range'
+        ) {
+          attackerDamage = Math.round(
+            battleStats.attacker.attackPower -
+              battleStats.defender.defensePower.physicalDefensePower / 100,
+          );
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -165,7 +196,10 @@ class Battle extends BaseHelper {
           }
           this.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
-          attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.magicDefensePower / 100));
+          attackerDamage = Math.round(
+            battleStats.attacker.attackPower -
+              battleStats.defender.defensePower.magicDefensePower / 100,
+          );
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -180,7 +214,9 @@ class Battle extends BaseHelper {
         this.printBattleDebug(`Attacker Damage: ${attackerDamage}`);
       }
 
-      return resolve(this.spellTurn(attacker, defender, battleStats, attackerDamage, defenderDamage));
+      return resolve(
+        this.spellTurn(attacker, defender, battleStats, attackerDamage, defenderDamage),
+      );
     });
   }
 
@@ -194,26 +230,35 @@ class Battle extends BaseHelper {
           const attackerSpellToCast = attacker.spells[attackerRandomSpell];
           switch (attackerSpellToCast.type) {
             case 'self':
-              if (attackerSpellToCast.name.toLowerCase().includes('heal') && attacker.mana >= attackerSpellToCast.power) {
+              if (
+                attackerSpellToCast.name.toLowerCase().includes('heal') &&
+                attacker.mana >= attackerSpellToCast.power
+              ) {
                 attacker.health += attackerSpellToCast.power * 2;
                 attacker.mana -= attackerSpellToCast.power;
                 this.printBattleDebug(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
-                HEALTH ${attacker.health - (attackerSpellToCast.power * 2)} -> ${attacker.health}`);
+                HEALTH ${attacker.health - attackerSpellToCast.power * 2} -> ${attacker.health}`);
                 if (attacker.health >= enumHelper.maxHealth(attacker.level)) {
                   attacker.health = enumHelper.maxHealth(attacker.level);
                 }
-                if (defenderDamage > (attackerSpellToCast.power * 2)) {
-                  defenderDamage -= (attackerSpellToCast.power * 2);
+                if (defenderDamage > attackerSpellToCast.power * 2) {
+                  defenderDamage -= attackerSpellToCast.power * 2;
 
                   if (this.isMonster(defender)) {
-                    defender.dmgDealt -= (attackerSpellToCast.power * 2);
+                    defender.dmgDealt -= attackerSpellToCast.power * 2;
                   }
                 }
               }
               break;
             case 'target':
-              if (attackerSpellToCast.name.toLowerCase().includes('fireball') && attacker.mana >= attackerSpellToCast.power) {
-                let spellDamage = Math.round((attackerSpellToCast.power * 2) - battleStats.defender.defensePower.magicDefensePower);
+              if (
+                attackerSpellToCast.name.toLowerCase().includes('fireball') &&
+                attacker.mana >= attackerSpellToCast.power
+              ) {
+                let spellDamage = Math.round(
+                  attackerSpellToCast.power * 2 -
+                    battleStats.defender.defensePower.magicDefensePower,
+                );
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
@@ -223,7 +268,8 @@ class Battle extends BaseHelper {
                   defender.dmgReceived += spellDamage;
                 }
                 attacker.mana -= attackerSpellToCast.power;
-                this.printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
+                this
+                  .printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
               }
               break;
@@ -234,25 +280,34 @@ class Battle extends BaseHelper {
           const defenderSpellToCast = defender.spells[defenderRandomSpell];
           switch (defenderSpellToCast.type) {
             case 'self':
-              if (defenderSpellToCast.name.toLowerCase().includes('heal') && defender.mana >= defenderSpellToCast.power) {
+              if (
+                defenderSpellToCast.name.toLowerCase().includes('heal') &&
+                defender.mana >= defenderSpellToCast.power
+              ) {
                 defender.health += defenderSpellToCast.power * 2;
                 defender.mana -= defenderSpellToCast.power;
                 this.printBattleDebug(`${defender.name} healed for ${defenderSpellToCast.power * 2}
-                HEALTH ${defender.health - (defenderSpellToCast.power * 2)} -> ${defender.health}`);
+                HEALTH ${defender.health - defenderSpellToCast.power * 2} -> ${defender.health}`);
                 if (defender.health >= enumHelper.maxHealth(defender.level)) {
                   defender.health = enumHelper.maxHealth(defender.level);
                 }
-                if (attackerDamage > (defenderSpellToCast.power * 2)) {
-                  attackerDamage -= (defenderSpellToCast.power * 2);
+                if (attackerDamage > defenderSpellToCast.power * 2) {
+                  attackerDamage -= defenderSpellToCast.power * 2;
                   if (this.isMonster(defender)) {
-                    defender.dmgReceived -= (defenderSpellToCast.power * 2);
+                    defender.dmgReceived -= defenderSpellToCast.power * 2;
                   }
                 }
               }
               break;
             case 'target':
-              if (defenderSpellToCast.name.toLowerCase().includes('fireball') && defender.mana >= defenderSpellToCast.power) {
-                let spellDamage = Math.round((defenderSpellToCast.power * 2) - battleStats.attacker.defensePower.magicDefensePower);
+              if (
+                defenderSpellToCast.name.toLowerCase().includes('fireball') &&
+                defender.mana >= defenderSpellToCast.power
+              ) {
+                let spellDamage = Math.round(
+                  defenderSpellToCast.power * 2 -
+                    battleStats.attacker.defensePower.magicDefensePower,
+                );
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
@@ -262,7 +317,8 @@ class Battle extends BaseHelper {
                 }
                 attacker.health -= spellDamage;
                 defender.mana -= defenderSpellToCast.power;
-                this.printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
+                this
+                  .printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${attacker.health + spellDamage} -> ${attacker.health}`);
               }
               break;
@@ -275,25 +331,34 @@ class Battle extends BaseHelper {
           const defenderSpellToCast = defender.spells[defenderRandomSpell];
           switch (defenderSpellToCast.type) {
             case 'self':
-              if (defenderSpellToCast.name.toLowerCase().includes('heal') && defender.mana >= defenderSpellToCast.power) {
+              if (
+                defenderSpellToCast.name.toLowerCase().includes('heal') &&
+                defender.mana >= defenderSpellToCast.power
+              ) {
                 defender.health += defenderSpellToCast.power * 2;
                 defender.mana -= defenderSpellToCast.power;
                 this.printBattleDebug(`${defender.name} healed for ${defenderSpellToCast.power * 2}
-                HEALTH ${defender.health - (defenderSpellToCast.power * 2)} -> ${defender.health}`);
+                HEALTH ${defender.health - defenderSpellToCast.power * 2} -> ${defender.health}`);
                 if (defender.health >= enumHelper.maxHealth(defender.level)) {
                   defender.health = enumHelper.maxHealth(defender.level);
                 }
-                if (attackerDamage > (defenderSpellToCast.power * 2)) {
-                  attackerDamage -= (defenderSpellToCast.power * 2);
+                if (attackerDamage > defenderSpellToCast.power * 2) {
+                  attackerDamage -= defenderSpellToCast.power * 2;
                   if (this.isMonster(defender)) {
-                    defender.dmgReceived -= (defenderSpellToCast.power * 2);
+                    defender.dmgReceived -= defenderSpellToCast.power * 2;
                   }
                 }
               }
               break;
             case 'target':
-              if (defenderSpellToCast.name.toLowerCase().includes('fireball') && defender.mana >= defenderSpellToCast.power) {
-                let spellDamage = Math.round((defenderSpellToCast.power * 2) - battleStats.attacker.defensePower.magicDefensePower);
+              if (
+                defenderSpellToCast.name.toLowerCase().includes('fireball') &&
+                defender.mana >= defenderSpellToCast.power
+              ) {
+                let spellDamage = Math.round(
+                  defenderSpellToCast.power * 2 -
+                    battleStats.attacker.defensePower.magicDefensePower,
+                );
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
@@ -303,7 +368,8 @@ class Battle extends BaseHelper {
                 }
                 attacker.health -= spellDamage;
                 defender.mana -= defenderSpellToCast.power;
-                this.printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
+                this
+                  .printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${attacker.health + spellDamage} -> ${attacker.health}`);
               }
               break;
@@ -314,22 +380,31 @@ class Battle extends BaseHelper {
           const attackerSpellToCast = attacker.spells[attackerRandomSpell];
           switch (attackerSpellToCast.type) {
             case 'self':
-              if (attackerSpellToCast.name.toLowerCase().includes('heal') && attacker.mana >= attackerSpellToCast.power) {
+              if (
+                attackerSpellToCast.name.toLowerCase().includes('heal') &&
+                attacker.mana >= attackerSpellToCast.power
+              ) {
                 attacker.health += attackerSpellToCast.power * 2;
                 attacker.mana -= attackerSpellToCast.power;
                 this.printBattleDebug(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
-                HEALTH ${attacker.health - (attackerSpellToCast.power * 2)} -> ${attacker.health}`);
+                HEALTH ${attacker.health - attackerSpellToCast.power * 2} -> ${attacker.health}`);
                 if (attacker.health >= enumHelper.maxHealth(attacker.level)) {
                   attacker.health = enumHelper.maxHealth(attacker.level);
                 }
-                if (defenderDamage > (attackerSpellToCast.power * 2)) {
-                  defenderDamage -= (attackerSpellToCast.power * 2);
+                if (defenderDamage > attackerSpellToCast.power * 2) {
+                  defenderDamage -= attackerSpellToCast.power * 2;
                 }
               }
               break;
             case 'target':
-              if (attackerSpellToCast.name.toLowerCase().includes('fireball') && attacker.mana >= attackerSpellToCast.power) {
-                let spellDamage = Math.round((attackerSpellToCast.power * 2) - battleStats.defender.defensePower.magicDefensePower);
+              if (
+                attackerSpellToCast.name.toLowerCase().includes('fireball') &&
+                attacker.mana >= attackerSpellToCast.power
+              ) {
+                let spellDamage = Math.round(
+                  attackerSpellToCast.power * 2 -
+                    battleStats.defender.defensePower.magicDefensePower,
+                );
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
@@ -339,7 +414,8 @@ class Battle extends BaseHelper {
                   defender.dmgReceived += spellDamage;
                 }
                 attacker.mana -= attackerSpellToCast.power;
-                this.printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
+                this
+                  .printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
               }
               break;
@@ -347,7 +423,9 @@ class Battle extends BaseHelper {
         }
       }
 
-      return resolve(this.inventoryTurn(attacker, defender, battleStats, attackerDamage, defenderDamage));
+      return resolve(
+        this.inventoryTurn(attacker, defender, battleStats, attackerDamage, defenderDamage),
+      );
     });
   }
 
@@ -356,7 +434,9 @@ class Battle extends BaseHelper {
       const initiative = this.initialAttack(attacker, defender);
       if (initiative.name === attacker.name) {
         this.printBattleDebug('\nInventory Initiative is Attacker');
-        const attackerPotions = attacker.inventory.items.filter(item => item.name.includes('Health Potion'));
+        const attackerPotions = attacker.inventory.items.filter((item) =>
+          item.name.includes('Health Potion'),
+        );
         if (attacker.inventory.items.length > 0 && attackerPotions.length > 0) {
           const potion = attackerPotions[this.randomBetween(0, attackerPotions.length - 1)];
           const healAmount = Math.ceil(potion.power * (attacker.level / 2));
@@ -364,7 +444,10 @@ class Battle extends BaseHelper {
           if (attacker.health > enumHelper.maxHealth(attacker.level)) {
             attacker.health = enumHelper.maxHealth(attacker.level);
           }
-          attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
+          attacker.inventory.items = attacker.inventory.items.splice(
+            attacker.inventory.items.indexOf(potion),
+            1,
+          );
           if (defenderDamage > healAmount) {
             defenderDamage -= healAmount;
             if (this.isMonster(defender)) {
@@ -372,9 +455,13 @@ class Battle extends BaseHelper {
             }
           }
 
-          this.printBattleDebug(`${attacker.name} drank a health potion and healed ${healAmount} health`);
+          this.printBattleDebug(
+            `${attacker.name} drank a health potion and healed ${healAmount} health`,
+          );
         }
-        const defenderPotions = defender.inventory.items.filter(item => item.name.includes('Health Potion'));
+        const defenderPotions = defender.inventory.items.filter((item) =>
+          item.name.includes('Health Potion'),
+        );
         if (defender.inventory.items.length > 0 && defenderPotions.length > 0) {
           const potion = defenderPotions[this.randomBetween(0, defenderPotions.length - 1)];
           const healAmount = Math.ceil(potion.power * (defender.level / 2));
@@ -382,7 +469,10 @@ class Battle extends BaseHelper {
           if (defender.health > enumHelper.maxHealth(defender.level)) {
             defender.health = enumHelper.maxHealth(defender.level);
           }
-          defender.inventory.items = defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
+          defender.inventory.items = defender.inventory.items.splice(
+            defender.inventory.items.indexOf(potion),
+            1,
+          );
           if (attackerDamage > healAmount) {
             attackerDamage -= healAmount;
             if (this.isMonster(defender)) {
@@ -390,11 +480,15 @@ class Battle extends BaseHelper {
             }
           }
 
-          this.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
+          this.printBattleDebug(
+            `${defender.name} drank a health potion and healed ${healAmount} health`,
+          );
         }
       } else if (initiative.name === defender.name) {
         this.printBattleDebug('\nInventory Initiative is defender');
-        const defenderPotions = defender.inventory.items.filter(item => item.name.includes('Health Potion'));
+        const defenderPotions = defender.inventory.items.filter((item) =>
+          item.name.includes('Health Potion'),
+        );
         if (defender.inventory.items.length > 0 && defenderPotions.length > 0) {
           const potion = defenderPotions[this.randomBetween(0, defenderPotions.length - 1)];
           const healAmount = Math.ceil(potion.power * (defender.level / 2));
@@ -402,7 +496,10 @@ class Battle extends BaseHelper {
           if (defender.health > enumHelper.maxHealth(defender.level)) {
             defender.health = enumHelper.maxHealth(defender.level);
           }
-          defender.inventory.items = defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
+          defender.inventory.items = defender.inventory.items.splice(
+            defender.inventory.items.indexOf(potion),
+            1,
+          );
           if (attackerDamage > healAmount) {
             attackerDamage -= healAmount;
             if (this.isMonster(defender)) {
@@ -410,9 +507,13 @@ class Battle extends BaseHelper {
             }
           }
 
-          this.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
+          this.printBattleDebug(
+            `${defender.name} drank a health potion and healed ${healAmount} health`,
+          );
         }
-        const attackerPotions = attacker.inventory.items.filter(item => item.name.includes('Health Potion'));
+        const attackerPotions = attacker.inventory.items.filter((item) =>
+          item.name.includes('Health Potion'),
+        );
         if (attacker.inventory.items.length > 0 && attackerPotions.length > 0) {
           const potion = attackerPotions[this.randomBetween(0, attackerPotions.length - 1)];
           const healAmount = Math.ceil(potion.power * (attacker.level / 2));
@@ -420,7 +521,10 @@ class Battle extends BaseHelper {
           if (attacker.health > enumHelper.maxHealth(attacker.level)) {
             attacker.health = enumHelper.maxHealth(attacker.level);
           }
-          attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
+          attacker.inventory.items = attacker.inventory.items.splice(
+            attacker.inventory.items.indexOf(potion),
+            1,
+          );
           if (defenderDamage > healAmount) {
             defenderDamage -= healAmount;
             if (this.isMonster(defender)) {
@@ -428,7 +532,9 @@ class Battle extends BaseHelper {
             }
           }
 
-          this.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
+          this.printBattleDebug(
+            `${defender.name} drank a health potion and healed ${healAmount} health`,
+          );
         }
       }
 
@@ -446,28 +552,45 @@ class Battle extends BaseHelper {
 
   calculateAttack(player) {
     let attackPower;
-    this.printBattleDebug(`${player.name} - ${player.equipment.weapon.name} - ${player.equipment.weapon.attackType} - ${player.equipment.weapon.power}`);
+    this.printBattleDebug(
+      `${player.name} - ${player.equipment.weapon.name} - ${player.equipment.weapon.attackType} - ${player.equipment.weapon.power}`,
+    );
     switch (player.equipment.weapon.attackType) {
       case 'melee':
         attackPower = this.isMonster(player)
-          ? (player.stats.str + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (this.randomBetween(1, player.stats.str) / 2)))
-          : (this.sumPlayerTotalStrength(player) + player.equipment.weapon.power
-            + (((this.sumPlayerTotalLuck(player) * 1.5)
-              + this.randomBetween(1, this.sumPlayerTotalStrength(player))) / 2));
+          ? player.stats.str +
+            player.equipment.weapon.power +
+            player.power +
+            (player.stats.dex + (player.stats.luk + this.randomBetween(1, player.stats.str) / 2))
+          : this.sumPlayerTotalStrength(player) +
+            player.equipment.weapon.power +
+            (this.sumPlayerTotalLuck(player) * 1.5 +
+              this.randomBetween(1, this.sumPlayerTotalStrength(player))) /
+              2;
         break;
       case 'range':
         attackPower = this.isMonster(player)
-          ? (player.stats.dex + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (this.randomBetween(1, player.stats.dex) / 2)))
-          : (this.sumPlayerTotalDexterity(player) + player.equipment.weapon.power
-            + (((this.sumPlayerTotalLuck(player) * 1.5)
-              + this.randomBetween(1, this.sumPlayerTotalDexterity(player))) / 2));
+          ? player.stats.dex +
+            player.equipment.weapon.power +
+            player.power +
+            (player.stats.dex + (player.stats.luk + this.randomBetween(1, player.stats.dex) / 2))
+          : this.sumPlayerTotalDexterity(player) +
+            player.equipment.weapon.power +
+            (this.sumPlayerTotalLuck(player) * 1.5 +
+              this.randomBetween(1, this.sumPlayerTotalDexterity(player))) /
+              2;
         break;
       case 'magic':
         attackPower = this.isMonster(player)
-          ? (player.stats.int + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (this.randomBetween(1, player.stats.int) / 2)))
-          : (this.sumPlayerTotalIntelligence(player) + player.equipment.weapon.power
-            + (((this.sumPlayerTotalLuck(player) * 1.5)
-              + this.randomBetween(1, this.sumPlayerTotalIntelligence(player))) / 2));
+          ? player.stats.int +
+            player.equipment.weapon.power +
+            player.power +
+            (player.stats.dex + (player.stats.luk + this.randomBetween(1, player.stats.int) / 2))
+          : this.sumPlayerTotalIntelligence(player) +
+            player.equipment.weapon.power +
+            (this.sumPlayerTotalLuck(player) * 1.5 +
+              this.randomBetween(1, this.sumPlayerTotalIntelligence(player))) /
+              2;
         break;
     }
 
@@ -476,15 +599,21 @@ class Battle extends BaseHelper {
 
   calculateDefense(player) {
     const physicalDefensePower = this.isMonster(player)
-      ? (player.stats.end + player.equipment.armor.power + player.power) + ((player.stats.dex / 2) + (player.stats.luk / 2))
-      : (this.sumPlayerTotalEndurance(player)
-        + ((player.equipment.armor.power + player.equipment.helmet.power) / 2))
-      + (this.sumPlayerTotalDexterity(player) + ((this.sumPlayerTotalLuck(player) * 1.5) / 2));
+      ? player.stats.end +
+        player.equipment.armor.power +
+        player.power +
+        (player.stats.dex / 2 + player.stats.luk / 2)
+      : this.sumPlayerTotalEndurance(player) +
+        (player.equipment.armor.power + player.equipment.helmet.power) / 2 +
+        (this.sumPlayerTotalDexterity(player) + (this.sumPlayerTotalLuck(player) * 1.5) / 2);
     const magicDefensePower = this.isMonster(player)
-      ? (player.stats.int + player.equipment.armor.power + player.power) + ((player.stats.dex / 2) + (player.stats.luk / 2))
-      : (this.sumPlayerTotalIntelligence(player)
-        + ((player.equipment.armor.power + player.equipment.helmet.power) / 2))
-      + (this.sumPlayerTotalDexterity(player) + ((this.sumPlayerTotalLuck(player) * 1.5) / 2));
+      ? player.stats.int +
+        player.equipment.armor.power +
+        player.power +
+        (player.stats.dex / 2 + player.stats.luk / 2)
+      : this.sumPlayerTotalIntelligence(player) +
+        (player.equipment.armor.power + player.equipment.helmet.power) / 2 +
+        (this.sumPlayerTotalDexterity(player) + (this.sumPlayerTotalLuck(player) * 1.5) / 2);
     this.printBattleDebug(`${player.name} - ${physicalDefensePower} - ${magicDefensePower}`);
 
     return { physicalDefensePower, magicDefensePower };
@@ -493,6 +622,5 @@ class Battle extends BaseHelper {
   isMonster(obj) {
     return obj.power !== undefined;
   }
-
 }
 module.exports = Battle;

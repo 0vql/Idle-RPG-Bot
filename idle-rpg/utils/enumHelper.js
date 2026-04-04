@@ -4,24 +4,20 @@ const enumHelper = {
   logTypes: {
     action: 'ACTION',
     move: 'MOVE',
-    pvp: 'PVP'
+    pvp: 'PVP',
   },
 
-  playableStatus: [
-    'online',
-    'idle',
-    'dnd'
-  ],
+  playableStatus: ['online', 'idle', 'dnd'],
 
   pmMode: {
     on: 'on',
     off: 'off',
-    filtered: 'filtered'
+    filtered: 'filtered',
   },
 
   map: {
     types: {
-      town: 'Town'
+      town: 'Town',
     },
     biomes: {
       land: 'Land',
@@ -36,32 +32,28 @@ const enumHelper = {
       caves: 'Caves',
       plateau: 'Plateau',
       moors: 'Moors',
-      desert: 'Desert'
-    }
+      desert: 'Desert',
+    },
   },
 
   battle: {
     outcomes: {
       win: 'win',
       lost: 'lost',
-      fled: 'fled'
-    }
+      fled: 'fled',
+    },
   },
 
   inventory: {
     maxEquipmentAmount: 10,
     maxItemAmount: 25,
     name: 'Inventory',
-    position: 'inventory'
+    position: 'inventory',
   },
 
-  maxHealth: (level) => {
-    return 100 + (level * 5);
-  },
+  maxHealth: (level) => 100 + level * 5,
 
-  maxMana: (level) => {
-    return 50 + (level * 5);
-  },
+  maxMana: (level) => 50 + level * 5,
 
   equipment: {
     starter: {
@@ -70,34 +62,34 @@ const enumHelper = {
         power: 0.75,
         position: 'weapon',
         attackType: 'melee',
-        previousOwners: []
+        previousOwners: [],
       },
       armor: {
         name: 'Linen Shirt',
         power: 0.75,
         position: 'armor',
-        previousOwners: []
-      }
+        previousOwners: [],
+      },
     },
     empty: {
       helmet: {
         name: 'Nothing',
         power: 0.15,
         position: 'helmet',
-        previousOwners: []
+        previousOwners: [],
       },
       armor: {
         name: 'Nothing',
         power: 0.15,
         position: 'armor',
-        previousOwners: []
+        previousOwners: [],
       },
       weapon: {
         name: 'Fist',
         power: 0.15,
         position: 'weapon',
         attackType: 'melee',
-        previousOwners: []
+        previousOwners: [],
       },
       relic: {
         name: 'Nothing',
@@ -107,27 +99,27 @@ const enumHelper = {
         int: 0,
         luk: 0,
         position: 'relic',
-        previousOwners: []
-      }
+        previousOwners: [],
+      },
     },
     types: {
       helmet: {
         name: 'Helmet',
-        position: 'helmet'
+        position: 'helmet',
       },
       armor: {
         name: 'Armor',
-        position: 'armor'
+        position: 'armor',
       },
       weapon: {
         name: 'Weapon',
-        position: 'weapon'
+        position: 'weapon',
       },
       relic: {
         name: 'Relic',
-        position: 'relic'
-      }
-    }
+        position: 'relic',
+      },
+    },
   },
 
   stats: {
@@ -135,24 +127,22 @@ const enumHelper = {
     dex: 'Dexterity',
     end: 'Endurance',
     int: 'Intelligence',
-    luk: 'Luck'
+    luk: 'Luck',
   },
 
   roamingNpcs: [
-    pyddur = {
+    (pyddur = {
       name: 'Pyddur, God of Beer',
-      discordId: 'pyddur'
-    }
+      discordId: 'pyddur',
+    }),
   ],
 
   // if .fill(undefined) is not used to fill the array with any data, the undefined pointers make the array return as [] with a length of 30 even while mapping.
-  mockPlayers: new Array(30)
-    .fill(undefined)
-    .map((obj, index) => Object.assign({}, {
-      name: `Mocktester${index}`,
-      discordId: `Mocktester${index}`,
-      guildId: guildID
-    })),
+  mockPlayers: new Array(30).fill(undefined).map((obj, index) => ({
+    name: `Mocktester${index}`,
+    discordId: `Mocktester${index}`,
+    guildId: guildID,
+  })),
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
   genders: {
@@ -179,19 +169,19 @@ const enumHelper = {
       his: 'its',
       him: 'it',
       himself: 'itself',
-    }
+    },
   },
 
   inventorySelectFields: {
     name: 1,
     stats: 1,
     equipment: 1,
-    inventory: 1
+    inventory: 1,
   },
 
   playerEventLogSelectFields: {
     name: 1,
-    pastEvents: 1
+    pastEvents: 1,
   },
 
   pvpLogSelectFields: {
@@ -200,7 +190,7 @@ const enumHelper = {
     stolen: 1,
     kills: 1,
     battles: 1,
-    pastPvpEvents: 1
+    pastPvpEvents: 1,
   },
 
   statsSelectFields: {
@@ -243,13 +233,13 @@ const enumHelper = {
     'quest.questMob.killCount': 1,
     'quest.completed': 1,
     'quest.updated_at': 1,
-    spellCast: 1
+    spellCast: 1,
   },
 
   equipSelectFields: {
     name: 1,
     stats: 1,
-    equipment: 1
+    equipment: 1,
   },
 
   leaderboardStats: [
@@ -261,11 +251,11 @@ const enumHelper = {
     { 'deaths.mob': -1 },
     { 'deaths.player': -1 },
     { 'kills.player': -1 },
-    { 'quest.completed': -1 }
+    { 'quest.completed': -1 },
   ],
 
   channels: {
-    lottery: '479906184854372363'
-  }
+    lottery: '479906184854372363',
+  },
 };
 module.exports = enumHelper;

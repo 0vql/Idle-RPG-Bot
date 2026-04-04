@@ -6,7 +6,6 @@ const AttackEvent = require('./events/AttackEvent');
 const LuckEvent = require('./events/LuckEvent');
 
 class EventEngine {
-
   constructor({ db, map, monsterGen, itemGen, spellGen, inventory, player, battle }) {
     this.db = db;
     this.map = map;
@@ -21,16 +20,19 @@ class EventEngine {
   }
 
   async moveEvent(playerObj) {
-    const updatedPlayer = Object.assign({}, playerObj);
+    const updatedPlayer = { ...playerObj };
     const eventMsg = [];
     const eventLog = [];
     try {
       let mapObj;
       let isQuestMovement = false;
 
-      const questMobName = updatedPlayer.quest && updatedPlayer.quest.questMob && updatedPlayer.quest.questMob.name !== 'None'
-        ? updatedPlayer.quest.questMob.name
-        : null;
+      const questMobName =
+        updatedPlayer.quest &&
+        updatedPlayer.quest.questMob &&
+        updatedPlayer.quest.questMob.name !== 'None'
+          ? updatedPlayer.quest.questMob.name
+          : null;
 
       if (questMobName) {
         const mobBiomes = this.map._mobBiomes.get(questMobName);
@@ -56,7 +58,9 @@ class EventEngine {
         : `${generatePlayerName(updatedPlayer)} decided to head \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`;
 
       eventMsg.push(moveMsg);
-      eventLog.push(`Travelled ${mapObj.direction} from ${updatedPlayer.previousMap} and arrived in ${mapObj.map.name}`);
+      eventLog.push(
+        `Travelled ${mapObj.direction} from ${updatedPlayer.previousMap} and arrived in ${mapObj.map.name}`,
+      );
       await this.player.logEvent(updatedPlayer, eventLog[0], enumHelper.logTypes.move);
       return { type: 'movement', updatedPlayer, msg: eventMsg, pm: eventLog };
     } catch (err) {
@@ -65,11 +69,11 @@ class EventEngine {
   }
 
   async attackEvent(loadedPlayer, onlinePlayers, globalMultiplier, guildEvents) {
-    let updatedPlayer = Object.assign({}, loadedPlayer);
+    let updatedPlayer = { ...loadedPlayer };
     try {
       const luckDice = randomBetween(0, 99);
       const towns = this.map.getTowns();
-      if (towns.includes(updatedPlayer.map.name) && luckDice <= 30 + (updatedPlayer.stats.luk / 4)) {
+      if (towns.includes(updatedPlayer.map.name) && luckDice <= 30 + updatedPlayer.stats.luk / 4) {
         const eventMsg = [];
         const eventLog = [];
         const townSellResults = await this.townEvent.sell(updatedPlayer);
@@ -90,21 +94,46 @@ class EventEngine {
       }
 
       if (!towns.includes(updatedPlayer.map.name)) {
-        if (luckDice >= (95 - (updatedPlayer.stats.luk / 4)) && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
+        if (
+          luckDice >= 95 - updatedPlayer.stats.luk / 4 &&
+          updatedPlayer.health > (100 + updatedPlayer.level * 5) / 4
+        ) {
           if (onlinePlayers.length <= 1) {
             const mobToBattle = this.monsterGen.generateMonster(updatedPlayer, guildEvents);
-            return this.battle.playerVsMob(updatedPlayer, mobToBattle, globalMultiplier + updatedPlayer.personalMultiplier, guildEvents);
+            return this.battle.playerVsMob(
+              updatedPlayer,
+              mobToBattle,
+              globalMultiplier + updatedPlayer.personalMultiplier,
+              guildEvents,
+            );
           }
-          const { randomPlayer } = await this.battle.findPlayerToBattle(updatedPlayer, onlinePlayers);
+          const { randomPlayer } = await this.battle.findPlayerToBattle(
+            updatedPlayer,
+            onlinePlayers,
+          );
           if (!randomPlayer) {
             const mobToBattle = this.monsterGen.generateMonster(updatedPlayer, guildEvents);
-            return this.battle.playerVsMob(updatedPlayer, mobToBattle, globalMultiplier + updatedPlayer.personalMultiplier, guildEvents);
+            return this.battle.playerVsMob(
+              updatedPlayer,
+              mobToBattle,
+              globalMultiplier + updatedPlayer.personalMultiplier,
+              guildEvents,
+            );
           }
-          return this.battle.playerVsPlayer(updatedPlayer, randomPlayer, globalMultiplier + updatedPlayer.personalMultiplier);
+          return this.battle.playerVsPlayer(
+            updatedPlayer,
+            randomPlayer,
+            globalMultiplier + updatedPlayer.personalMultiplier,
+          );
         }
-        if (updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
+        if (updatedPlayer.health > (100 + updatedPlayer.level * 5) / 4) {
           const mobToBattle = this.monsterGen.generateMonster(updatedPlayer, guildEvents);
-          return this.battle.playerVsMob(updatedPlayer, mobToBattle, globalMultiplier + updatedPlayer.personalMultiplier, guildEvents);
+          return this.battle.playerVsMob(
+            updatedPlayer,
+            mobToBattle,
+            globalMultiplier + updatedPlayer.personalMultiplier,
+            guildEvents,
+          );
         }
         return this.battle.camp(updatedPlayer);
       }
@@ -116,24 +145,31 @@ class EventEngine {
   }
 
   async luckEvent(loadedPlayer, events, globalMultiplier) {
-    const updatedPlayer = Object.assign({}, loadedPlayer);
+    const updatedPlayer = { ...loadedPlayer };
     const { isBlizzardActive } = events || {};
     try {
       const luckDice = randomBetween(0, 99);
-      if (luckDice <= 3 + (updatedPlayer.stats.luk / 4)) return this.luck.godsEvent(updatedPlayer);
-      if (this.map.getTowns().includes(updatedPlayer.map.name) && updatedPlayer.gold.current >= 18) {
-        if (luckDice <= 20 + (updatedPlayer.stats.luk / 4)) return this.luck.gamblingEvent(updatedPlayer);
-        if (luckDice <= 45 + (updatedPlayer.stats.luk / 4)) {
+      if (luckDice <= 3 + updatedPlayer.stats.luk / 4) return this.luck.godsEvent(updatedPlayer);
+      if (
+        this.map.getTowns().includes(updatedPlayer.map.name) &&
+        updatedPlayer.gold.current >= 18
+      ) {
+        if (luckDice <= 20 + updatedPlayer.stats.luk / 4)
+          return this.luck.gamblingEvent(updatedPlayer);
+        if (luckDice <= 45 + updatedPlayer.stats.luk / 4) {
           const mobForQuest = this.monsterGen.generateQuestMonster(updatedPlayer);
           return this.luck.questEvent(updatedPlayer, mobForQuest);
         }
       }
-      if (isBlizzardActive && luckDice <= 10 + (updatedPlayer.stats.luk / 4)) {
+      if (isBlizzardActive && luckDice <= 10 + updatedPlayer.stats.luk / 4) {
         const snowFlake = this.itemGen.generateSnowflake(updatedPlayer);
         return this.luck.catchSnowFlake(updatedPlayer, snowFlake);
       }
-      if (luckDice >= 65 - (updatedPlayer.stats.luk / 4)) return this.luck.itemEvent(updatedPlayer);
-      return this.luck.goldEvent(updatedPlayer, globalMultiplier + updatedPlayer.personalMultiplier);
+      if (luckDice >= 65 - updatedPlayer.stats.luk / 4) return this.luck.itemEvent(updatedPlayer);
+      return this.luck.goldEvent(
+        updatedPlayer,
+        globalMultiplier + updatedPlayer.personalMultiplier,
+      );
     } catch (err) {
       errorLog.error(err);
     }
@@ -143,7 +179,6 @@ class EventEngine {
     const mobForQuest = this.monsterGen.generateQuestMonster(loadedPlayer);
     return this.luck.questEvent(loadedPlayer, mobForQuest, isCommand);
   }
-
 }
 
 module.exports = EventEngine;

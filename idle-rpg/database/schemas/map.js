@@ -11,10 +11,10 @@ const mapSchema = mongoose.Schema({
   },
   biome: {
     id: Number,
-    name: String
+    name: String,
   },
   levelReq: Number,
-  lore: String
+  lore: String,
 });
 
 mapSchema.set('autoIndex', false);

@@ -4,7 +4,7 @@ const RNG = seedrandom();
 
 function randomBetween(min, max, decimal, exclude) {
   max += 1;
-  if (arguments.length < 2) return (RNG() >= 0.5);
+  if (arguments.length < 2) return RNG() >= 0.5;
 
   let factor = 1;
   let result;
@@ -12,7 +12,7 @@ function randomBetween(min, max, decimal, exclude) {
     factor = decimal ** 10;
   }
   do {
-    result = (RNG() * (max - min)) + min;
+    result = RNG() * (max - min) + min;
     result = Math.trunc(result * factor) / factor;
   } while (result === exclude);
   return result;
@@ -26,7 +26,7 @@ function secondsToTimeFormat(duration) {
   const secNum = parseInt(duration, 10);
   let days = Math.floor(secNum / 86400);
   let hours = Math.floor(secNum / 3600) % 24;
-  let minutes = Math.floor((secNum - (hours * 3600)) / 60) % 60;
+  let minutes = Math.floor((secNum - hours * 3600) / 60) % 60;
   let seconds = secNum % 60;
 
   days = days < 10 ? `0${days}` : days;
@@ -59,4 +59,11 @@ function objectContainsName(obj, nameToCheck) {
   return false;
 }
 
-module.exports = { randomBetween, randomChoice, secondsToTimeFormat, getTimePassed, capitalizeFirstLetter, objectContainsName };
+module.exports = {
+  randomBetween,
+  randomChoice,
+  secondsToTimeFormat,
+  getTimePassed,
+  capitalizeFirstLetter,
+  objectContainsName,
+};

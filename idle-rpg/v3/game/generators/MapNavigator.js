@@ -5,15 +5,14 @@ const { randomBetween } = require('../../utils/helpers');
 const mapSize = maps[maps.length - 1].coords;
 
 class MapNavigator {
-
   constructor() {
     this.maps = maps;
     // Build lookup tables at startup — O(1) for all map queries at runtime
-    this._coordMap = new Map(maps.map(m => [`${m.coords[0]},${m.coords[1]}`, m]));
-    this._towns = maps.filter(area => area.type.name === 'Town');
-    this._townNames = this._towns.map(area => area.name);
+    this._coordMap = new Map(maps.map((m) => [`${m.coords[0]},${m.coords[1]}`, m]));
+    this._towns = maps.filter((area) => area.type.name === 'Town');
+    this._townNames = this._towns.map((area) => area.name);
     // mob name → Set of spawnable biome name strings
-    this._mobBiomes = new Map(monsters.type.map(t => [t.name, new Set(t.spawnableBiomes)]));
+    this._mobBiomes = new Map(monsters.type.map((t) => [t.name, new Set(t.spawnableBiomes)]));
   }
 
   async moveToRandomMap(updatedPlayer) {
@@ -23,57 +22,69 @@ class MapNavigator {
       case 0:
         if (updatedPlayer.map.coords[1] === 0) {
           return {
-            map: this.getMapByCoords([updatedPlayer.map.coords[0], updatedPlayer.map.coords[1] + 1]),
+            map: this.getMapByCoords([
+              updatedPlayer.map.coords[0],
+              updatedPlayer.map.coords[1] + 1,
+            ]),
             direction: 'South',
-            previousLocation: updatedPlayer.map.name
+            previousLocation: updatedPlayer.map.name,
           };
         }
         return {
           map: this.getMapByCoords([updatedPlayer.map.coords[0], updatedPlayer.map.coords[1] - 1]),
           direction: 'North',
-          previousLocation: updatedPlayer.map.name
+          previousLocation: updatedPlayer.map.name,
         };
 
       case 1:
         if (updatedPlayer.map.coords[1] === mapSize[1]) {
           return {
-            map: this.getMapByCoords([updatedPlayer.map.coords[0], updatedPlayer.map.coords[1] - 1]),
+            map: this.getMapByCoords([
+              updatedPlayer.map.coords[0],
+              updatedPlayer.map.coords[1] - 1,
+            ]),
             direction: 'North',
-            previousLocation: updatedPlayer.map.name
+            previousLocation: updatedPlayer.map.name,
           };
         }
         return {
           map: this.getMapByCoords([updatedPlayer.map.coords[0], updatedPlayer.map.coords[1] + 1]),
           direction: 'South',
-          previousLocation: updatedPlayer.map.name
+          previousLocation: updatedPlayer.map.name,
         };
 
       case 2:
         if (updatedPlayer.map.coords[0] === mapSize[0]) {
           return {
-            map: this.getMapByCoords([updatedPlayer.map.coords[0] - 1, updatedPlayer.map.coords[1]]),
+            map: this.getMapByCoords([
+              updatedPlayer.map.coords[0] - 1,
+              updatedPlayer.map.coords[1],
+            ]),
             direction: 'West',
-            previousLocation: updatedPlayer.map.name
+            previousLocation: updatedPlayer.map.name,
           };
         }
         return {
           map: this.getMapByCoords([updatedPlayer.map.coords[0] + 1, updatedPlayer.map.coords[1]]),
           direction: 'East',
-          previousLocation: updatedPlayer.map.name
+          previousLocation: updatedPlayer.map.name,
         };
 
       case 3:
         if (updatedPlayer.map.coords[0] === 0) {
           return {
-            map: this.getMapByCoords([updatedPlayer.map.coords[0] + 1, updatedPlayer.map.coords[1]]),
+            map: this.getMapByCoords([
+              updatedPlayer.map.coords[0] + 1,
+              updatedPlayer.map.coords[1],
+            ]),
             direction: 'East',
-            previousLocation: updatedPlayer.map.name
+            previousLocation: updatedPlayer.map.name,
           };
         }
         return {
           map: this.getMapByCoords([updatedPlayer.map.coords[0] - 1, updatedPlayer.map.coords[1]]),
           direction: 'West',
-          previousLocation: updatedPlayer.map.name
+          previousLocation: updatedPlayer.map.name,
         };
     }
   }
@@ -95,11 +106,11 @@ class MapNavigator {
   }
 
   getMapByName(name) {
-    return this.maps.find(map => map.name === name);
+    return this.maps.find((map) => map.name === name);
   }
 
   getMapsByType(type) {
-    return this.maps.filter(area => area.biome === type).map(area => area.name);
+    return this.maps.filter((area) => area.biome === type).map((area) => area.name);
   }
 
   // Returns the nearest non-town map whose biome can spawn `mobName`, or null.
@@ -126,11 +137,13 @@ class MapNavigator {
     const [tx, ty] = targetCoords;
     const dx = tx - px;
     const dy = ty - py;
-    let newCoords, direction;
+    let newCoords;
+    let direction;
 
-    const preferHorizontal = Math.abs(dx) > Math.abs(dy)
-      || (dx !== 0 && dy === 0)
-      || (Math.abs(dx) === Math.abs(dy) && dx !== 0 && randomBetween(0, 1) === 0);
+    const preferHorizontal =
+      Math.abs(dx) > Math.abs(dy) ||
+      (dx !== 0 && dy === 0) ||
+      (Math.abs(dx) === Math.abs(dy) && dx !== 0 && randomBetween(0, 1) === 0);
 
     if (preferHorizontal && dx !== 0) {
       newCoords = [px + (dx > 0 ? 1 : -1), py];
@@ -148,7 +161,8 @@ class MapNavigator {
 
     // If the new map is the same as the previous map, try to move in a different direction
     if (player.previousMap && map.name === player.previousMap) {
-      let altCoords, altDirection;
+      let altCoords;
+      let altDirection;
       if (preferHorizontal && dy !== 0) {
         altCoords = [px, py + (dy > 0 ? 1 : -1)];
         altDirection = dy > 0 ? 'South' : 'North';
@@ -158,7 +172,8 @@ class MapNavigator {
       }
       if (altCoords) {
         const altMap = this.getMapByCoords(altCoords);
-        if (altMap) return { map: altMap, direction: altDirection, previousLocation: player.map.name };
+        if (altMap)
+          return { map: altMap, direction: altDirection, previousLocation: player.map.name };
       }
       // return null to default to moving to a random map
       return null;
@@ -166,7 +181,6 @@ class MapNavigator {
 
     return { map, direction, previousLocation: player.map.name };
   }
-
 }
 
 module.exports = MapNavigator;

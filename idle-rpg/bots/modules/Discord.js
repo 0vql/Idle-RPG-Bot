@@ -1,8 +1,7 @@
-const requester = require('../../utils/Requester');
 const qs = require('querystring');
+const requester = require('../../utils/Requester');
 
 class Discord {
-
   sendWebHook(content) {
     const postData = qs.stringify({ content });
     const options = {
@@ -12,20 +11,18 @@ class Discord {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(postData)
+        'Content-Length': Buffer.byteLength(postData),
       },
-      json: postData
+      json: postData,
     };
 
-    requester.request(options)
-      .then((err, result) => {
-        if (err) {
-          return console.log(err);
-        }
+    requester.request(options).then((err, result) => {
+      if (err) {
+        return console.log(err);
+      }
 
-        return console.log(result);
-      });
+      return console.log(result);
+    });
   }
-
 }
 module.exports = new Discord();

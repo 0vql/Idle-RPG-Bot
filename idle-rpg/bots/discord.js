@@ -1,14 +1,14 @@
 const Discord = require('discord.js');
-const CommandParser = require('./utils/CommandParser');
 const fs = require('fs');
 const util = require('util');
+const { CronJob } = require('cron');
+const CommandParser = require('./utils/CommandParser');
 const { welcomeLog, errorLog, infoLog } = require('../utils/logger');
 const Antispam = require('./modules/Antispam');
 const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
 const Helper = require('../utils/Helper');
-const VirusTotal = require('../bots/modules/VirusTotal');
-const { CronJob } = require('cron');
+const VirusTotal = require('./modules/VirusTotal');
 const {
   actionWebHookId,
   actionWebHookToken,
@@ -21,7 +21,7 @@ const {
   minimalTimer,
   maximumTimer,
   guildID,
-  botID
+  botID,
 } = require('../../settings');
 
 const webHookOptions = {
@@ -35,29 +35,21 @@ const webHookOptions = {
   disableEveryone: false,
   sync: false,
   restWsBridgeTimeout: 5000,
-  restTimeOffset: 500
+  restTimeOffset: 500,
 };
 
 const helper = new Helper();
 const commandParser = new CommandParser(helper);
 
 const discordBot = new Discord.Client();
-const actionHook = new Discord.WebhookClient(
-  actionWebHookId,
-  actionWebHookToken,
-  webHookOptions
-);
+const actionHook = new Discord.WebhookClient(actionWebHookId, actionWebHookToken, webHookOptions);
 
-const movementHook = new Discord.WebhookClient(
-  moveWebHookId,
-  moveWebHookToken,
-  webHookOptions
-);
+const movementHook = new Discord.WebhookClient(moveWebHookId, moveWebHookToken, webHookOptions);
 
 const hook = {
   actionHook,
   movementHook,
-  discordBot
+  discordBot,
 };
 
 const game = new Game(hook, helper);
@@ -67,8 +59,8 @@ const dailyLotteryTime = '00 00 10 * * 0-6';
 const blizzardRandomTime = '00 00 9 * * 0-6';
 const leadboardUpdateTime = '00 */10 * * * 0-6';
 const timeZone = 'America/Los_Angeles';
-let minTimer = (minimalTimer * 1000) * 60;
-let maxTimer = (maximumTimer * 1000) * 60;
+let minTimer = minimalTimer * 1000 * 60;
+let maxTimer = maximumTimer * 1000 * 60;
 const tickInMinutes = 2;
 let onlinePlayerList = [];
 let guildName;
@@ -81,17 +73,25 @@ if (!process.env.NODE_ENV.includes('production')) {
 } else {
   onlinePlayerList.push({
     name: 'Pyddur, God of Beer',
-    discordId: 'pyddur'
+    discordId: 'pyddur',
   });
   guildName = 'Idle-RPG';
 }
 
 const processDetails = () => {
   let memoryUsage = util.inspect(process.memoryUsage());
-  memoryUsage = JSON.parse(memoryUsage.replace('rss', '"rss"').replace('heapTotal', '"heapTotal"').replace('heapUsed', '"heapUsed"').replace('external', '"external"'));
+  memoryUsage = JSON.parse(
+    memoryUsage
+      .replace('rss', '"rss"')
+      .replace('heapTotal', '"heapTotal"')
+      .replace('heapUsed', '"heapUsed"')
+      .replace('external', '"external"'),
+  );
 
   console.log('------------');
-  console.log(`\n\nHeap Usage:\n  RSS: ${(memoryUsage.rss / 1048576).toFixed(2)}MB\n  HeapTotal: ${(memoryUsage.heapTotal / 1048576).toFixed(2)}MB\n  HeapUsed: ${(memoryUsage.heapUsed / 1048576).toFixed(2)}MB`);
+  console.log(
+    `\n\nHeap Usage:\n  RSS: ${(memoryUsage.rss / 1048576).toFixed(2)}MB\n  HeapTotal: ${(memoryUsage.heapTotal / 1048576).toFixed(2)}MB\n  HeapUsed: ${(memoryUsage.heapUsed / 1048576).toFixed(2)}MB`,
+  );
   console.log(`Current Up Time: ${helper.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
   console.log('------------');
 };
@@ -99,45 +99,53 @@ const processDetails = () => {
 const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1;
 const heartBeat = () => {
   // TODO fix this for test env
-  const discordUsers = discordBot.guilds.cache.size > 0
-    ? discordBot.guilds.cache.get(guildID).members
-    : undefined;
+  const discordUsers =
+    discordBot.guilds.cache.size > 0 ? discordBot.guilds.cache.get(guildID).members : undefined;
 
   if (discordUsers) {
     const discordOfflinePlayers = discordUsers
-      .filter(player => player.presence.status === 'offline' && !player.user.bot)
-      .map((player) => {
-        return {
-          name: player.nickname ? player.nickname : player.displayName,
-          discordId: player.id
-        };
-      });
+      .filter((player) => player.presence.status === 'offline' && !player.user.bot)
+      .map((player) => ({
+        name: player.nickname ? player.nickname : player.displayName,
+        discordId: player.id,
+      }));
 
     const discordOnlinePlayers = discordUsers
-      .filter(player => player.presence.status === 'online' && !player.user.bot
-        || player.presence.status === 'idle' && !player.user.bot
-        || player.presence.status === 'dnd' && !player.user.bot)
-      .map((player) => {
-        return {
-          name: player.nickname ? player.nickname : player.displayName,
-          discordId: player.id
-        };
-      });
+      .filter(
+        (player) =>
+          (player.presence.status === 'online' && !player.user.bot) ||
+          (player.presence.status === 'idle' && !player.user.bot) ||
+          (player.presence.status === 'dnd' && !player.user.bot),
+      )
+      .map((player) => ({
+        name: player.nickname ? player.nickname : player.displayName,
+        discordId: player.id,
+      }));
 
     if (process.env.NODE_ENV.includes('production')) {
-      onlinePlayerList = onlinePlayerList.concat(discordOnlinePlayers)
-        .filter((player, index, array) =>
-          index === array.findIndex(p => (
-            p.discordId === player.discordId
-          ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
+      onlinePlayerList = onlinePlayerList
+        .concat(discordOnlinePlayers)
+        .filter(
+          (player, index, array) =>
+            index ===
+            array.findIndex(
+              (p) =>
+                p.discordId === player.discordId &&
+                discordOfflinePlayers.findIndex(
+                  (offlinePlayer) => offlinePlayer.discordId === player.discordId,
+                ) === -1,
+            ),
+        );
 
-      onlinePlayerList.forEach(player => discordOfflinePlayers.filter(offPlayer => offPlayer.discordId === player.discordId));
+      onlinePlayerList.forEach((player) =>
+        discordOfflinePlayers.filter((offPlayer) => offPlayer.discordId === player.discordId),
+      );
     }
 
     if (onlinePlayerList.length >= 50) {
-      console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
-      minTimer = ((Number(minimalTimer) + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
-      maxTimer = ((Number(maximumTimer) + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
+      console.log(`MinTimer: ${minTimer / 1000 / 60} - MaxTimer: ${maxTimer / 1000 / 60}`);
+      minTimer = (Number(minimalTimer) + Math.floor(onlinePlayerList.length / 50)) * 1000 * 60;
+      maxTimer = (Number(maximumTimer) + Math.floor(onlinePlayerList.length / 50)) * 1000 * 60;
     }
 
     onlinePlayerList.forEach((player, index) => {
@@ -148,7 +156,12 @@ const heartBeat = () => {
           delete player.timer;
         }, playerTimer);
       }
-      if (process.env.NODE_ENV.includes('production') && discordOnlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) === -1) {
+      if (
+        process.env.NODE_ENV.includes('production') &&
+        discordOnlinePlayers.findIndex(
+          (onlinePlayer) => onlinePlayer.discordId === player.discordId,
+        ) === -1
+      ) {
         onlinePlayerList.splice(index, 1);
       }
     });
@@ -205,7 +218,9 @@ discordBot.on('message', async (message) => {
       .then((reportResults) => {
         if (reportResults.positives > 0) {
           message.delete();
-          message.reply('This attachment has been flagged, if you believe this was a false-positive please contact one of the Admins.');
+          message.reply(
+            'This attachment has been flagged, if you believe this was a false-positive please contact one of the Admins.',
+          );
         }
       });
   }
@@ -216,7 +231,11 @@ discordBot.on('message', async (message) => {
 if (streamChannelId && process.env.NODE_ENV.includes('production')) {
   discordBot.on('presenceUpdate', (oldMember, newMember) => {
     if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game) {
-      newMember.guild.channels.cache.get(streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
+      newMember.guild.channels.cache
+        .get(streamChannelId)
+        .send(
+          `${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`,
+        );
     }
   });
 }
@@ -227,12 +246,14 @@ discordBot.on('guildMemberAdd', (member) => {
     return;
   }
 
-  channel.send(`Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${faqChannelId}> or PM me !help.`);
+  channel.send(
+    `Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${faqChannelId}> or PM me !help.`,
+  );
   welcomeLog.info(member);
 });
 
 discordBot.login(botLoginToken);
-console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
+console.log(`MinTimer: ${minTimer / 1000 / 60} - MaxTimer: ${maxTimer / 1000 / 60}`);
 
 new CronJob({
   cronTime: powerHourWarnTime,
@@ -241,7 +262,7 @@ new CronJob({
   },
   start: false,
   timeZone,
-  runOnInit: false
+  runOnInit: false,
 }).start();
 
 new CronJob({
@@ -251,7 +272,7 @@ new CronJob({
   },
   start: false,
   timeZone,
-  runOnInit: false
+  runOnInit: false,
 }).start();
 
 new CronJob({
@@ -261,7 +282,7 @@ new CronJob({
   },
   start: false,
   timeZone,
-  runOnInit: false
+  runOnInit: false,
 }).start();
 
 // Leaderboard Channel Updates
@@ -272,7 +293,7 @@ new CronJob({
   },
   start: false,
   timeZone,
-  runOnInit: false
+  runOnInit: false,
 }).start();
 
 module.exports = discordBot;

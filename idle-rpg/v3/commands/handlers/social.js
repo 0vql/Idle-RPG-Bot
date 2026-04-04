@@ -1,5 +1,5 @@
-const enumHelper = require('../../../utils/enumHelper');
 const { ChannelType } = require('discord.js');
+const enumHelper = require('../../../utils/enumHelper');
 const { setImportantMessage } = require('../../utils/messageHelpers');
 const { formatLeaderboards } = require('../../utils/formatters');
 const maps = require('../../../game/data/maps');
@@ -15,7 +15,7 @@ const typeMap = {
   events: { events: -1 },
   bounty: { currentBounty: -1 },
   'kills.player': { 'kills.player': -1 },
-  'deaths.mob': { 'deaths.mob': -1 }
+  'deaths.mob': { 'deaths.mob': -1 },
 };
 
 module.exports = [
@@ -57,7 +57,7 @@ module.exports = [
 !rank - See your rank
 !version - Shows bot version\`\`\``;
       return author.send(helpMsg);
-    }
+    },
   },
   {
     aliases: ['!top10'],
@@ -66,7 +66,7 @@ module.exports = [
     handler: async ({ game, bot, message, guildId, author }) => {
       const args = message.content.split(' ');
       const typeArg = args[1] ? args[1].toLowerCase() : 'level';
-      const type = typeMap[typeArg] || typeMap['level'];
+      const type = typeMap[typeArg] || typeMap.level;
       const fieldKey = Object.keys(type)[0];
       const isNested = fieldKey.includes('.');
       const fieldKeys = isNested ? fieldKey.split('.') : null;
@@ -74,7 +74,7 @@ module.exports = [
       if (!loadedTop10) return author.send('Could not load leaderboard data.');
       const subjectTitle = formatLeaderboards(fieldKey);
       const rankString = loadedTop10
-        .filter(player => {
+        .filter((player) => {
           const val = isNested ? player[fieldKeys[0]][fieldKeys[1]] : player[fieldKey];
           return val > 0;
         })
@@ -84,7 +84,7 @@ module.exports = [
         })
         .join('\n');
       return author.send(`\`\`\`Top 10 ${subjectTitle}:\n${rankString}\`\`\``);
-    }
+    },
   },
   {
     aliases: ['!rank'],
@@ -93,12 +93,12 @@ module.exports = [
     handler: async ({ game, bot, message, guildId, author }) => {
       const args = message.content.split(' ');
       const typeArg = args[1] ? args[1].toLowerCase() : 'level';
-      const type = typeMap[typeArg] || typeMap['level'];
+      const type = typeMap[typeArg] || typeMap.level;
       const player = await game.db.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
       if (!player) return author.send('You have not been born yet!');
       const rank = await game.db.loadCurrentRank(player, type);
       return author.send(`You're currently ranked ${rank + 1} in ${typeArg}!`);
-    }
+    },
   },
   {
     aliases: ['!bounty'],
@@ -106,11 +106,15 @@ module.exports = [
     channelOnly: true,
     handler: async ({ game, bot, message, guildId, author }) => {
       const mentionedUser = message.mentions.users.first();
-      if (!mentionedUser) return author.send('Please mention a player to check bounty. Usage: `!bounty @Player`');
-      const player = await game.db.loadPlayer(mentionedUser.id, { pastEvents: 0, pastPvpEvents: 0 });
+      if (!mentionedUser)
+        return author.send('Please mention a player to check bounty. Usage: `!bounty @Player`');
+      const player = await game.db.loadPlayer(mentionedUser.id, {
+        pastEvents: 0,
+        pastPvpEvents: 0,
+      });
       if (!player) return author.send('Player not found.');
       return author.send(`${player.name}'s current bounty is ${player.currentBounty} gold.`);
-    }
+    },
   },
   {
     aliases: ['!placebounty', '!pb'],
@@ -120,47 +124,63 @@ module.exports = [
       const args = message.content.split(' ');
       const mentionedUser = message.mentions.users.first();
       const amount = parseInt(args[args.length - 1]);
-      if (!mentionedUser) return author.send('Please mention a player. Usage: `!placeBounty @Player <amount>`');
+      if (!mentionedUser)
+        return author.send('Please mention a player. Usage: `!placeBounty @Player <amount>`');
       if (isNaN(amount) || amount <= 0) return author.send('Please specify a valid gold amount.');
       const bountyPlacer = await game.db.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
       if (!bountyPlacer) return author.send('You have not been born yet!');
-      if (bountyPlacer.gold.current < amount) return author.send('You need more gold to place this bounty.');
-      const bountyRecipient = await game.db.loadPlayer(mentionedUser.id, { pastEvents: 0, pastPvpEvents: 0 });
+      if (bountyPlacer.gold.current < amount)
+        return author.send('You need more gold to place this bounty.');
+      const bountyRecipient = await game.db.loadPlayer(mentionedUser.id, {
+        pastEvents: 0,
+        pastPvpEvents: 0,
+      });
       if (!bountyRecipient) return author.send('This player does not exist.');
       bountyPlacer.gold.current -= Number(amount);
       bountyRecipient.currentBounty += Number(amount);
-      const actionsChannel = bot.guilds.cache.get(bountyPlacer.guildId) && bot.guilds.cache.get(bountyPlacer.guildId).channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText);
+      const actionsChannel =
+        bot.guilds.cache.get(bountyPlacer.guildId) &&
+        bot.guilds.cache
+          .get(bountyPlacer.guildId)
+          .channels.cache.find(
+            (channel) => channel.name === 'actions' && channel.type === ChannelType.GuildText,
+          );
       await game.db.savePlayer(bountyPlacer);
       await game.db.savePlayer(bountyRecipient);
       if (actionsChannel) {
-        await actionsChannel.send(setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
+        await actionsChannel.send(
+          setImportantMessage(
+            `${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`,
+          ),
+        );
       }
       return author.send(`Bounty of ${amount} placed on ${bountyRecipient.name}'s head!`);
-    }
+    },
   },
   {
     aliases: ['!version'],
     operatorOnly: false,
     channelOnly: false,
-    handler: async ({ game, bot, message, guildId, author }) => {
-      return author.send(`Idle-RPG Bot v${pkg.version || '3.0.0'}`);
-    }
+    handler: async ({ game, bot, message, guildId, author }) =>
+      author.send(`Idle-RPG Bot v${pkg.version || '3.0.0'}`),
   },
   {
     aliases: ['!patreon'],
     operatorOnly: false,
     channelOnly: false,
-    handler: async ({ game, bot, message, guildId, author }) => {
-      return author.send('If you would like to show your support you can become a patron!\nKeep in mind that you gain no advantage over the others, this is purely to show your support to the developer!\n<https://www.patreon.com/sizzlorox>');
-    }
+    handler: async ({ game, bot, message, guildId, author }) =>
+      author.send(
+        'If you would like to show your support you can become a patron!\nKeep in mind that you gain no advantage over the others, this is purely to show your support to the developer!\n<https://www.patreon.com/sizzlorox>',
+      ),
   },
   {
     aliases: ['!invite'],
     operatorOnly: false,
     channelOnly: false,
-    handler: async ({ game, bot, message, guildId, author }) => {
-      return author.send('Official Server: <https://discord.gg/nAEBTcj>\nInvite Bot Link: <https://discordapp.com/oauth2/authorize?client_id=385539681460420612&scope=bot&permissions=27664>\n1. You\'ll need `Manage Server` Permission in order to see the server within the invite dropbox.\n2. Once invited the bot will create the leaderboards, command, actions, move channel once joining.\n3. Since multiple bots use ! as their command prefix do not forget to change your prefix if you want. (eg. !prefix ?)');
-    }
+    handler: async ({ game, bot, message, guildId, author }) =>
+      author.send(
+        "Official Server: <https://discord.gg/nAEBTcj>\nInvite Bot Link: <https://discordapp.com/oauth2/authorize?client_id=385539681460420612&scope=bot&permissions=27664>\n1. You'll need `Manage Server` Permission in order to see the server within the invite dropbox.\n2. Once invited the bot will create the leaderboards, command, actions, move channel once joining.\n3. Since multiple bots use ! as their command prefix do not forget to change your prefix if you want. (eg. !prefix ?)",
+      ),
   },
   {
     aliases: ['!bugreport', '!br'],
@@ -170,10 +190,14 @@ module.exports = [
       const args = message.content.split(/ (.+)/);
       const report = args[1] ? args[1].trim() : null;
       if (!report) {
-        return author.send('You must have a message included in the bugreport. Usage: `!bugreport <message>`\nAlternatively, open an issue directly at <https://github.com/sizzlorox/Idle-RPG-Bot/issues>');
+        return author.send(
+          'You must have a message included in the bugreport. Usage: `!bugreport <message>`\nAlternatively, open an issue directly at <https://github.com/sizzlorox/Idle-RPG-Bot/issues>',
+        );
       }
-      return author.send('Please open an issue directly at <https://github.com/sizzlorox/Idle-RPG-Bot/issues>');
-    }
+      return author.send(
+        'Please open an issue directly at <https://github.com/sizzlorox/Idle-RPG-Bot/issues>',
+      );
+    },
   },
   {
     aliases: ['!prizepool'],
@@ -184,8 +208,10 @@ module.exports = [
       if (!player) return author.send('You have not been born yet!');
       const lotteryPlayers = await game.db.loadLotteryPlayers(player.guildId);
       const guildConfig = await game.db.loadGame(player.guildId);
-      return author.send(`There are ${lotteryPlayers.length} contestants for a prize pool of ${guildConfig.dailyLottery.prizePool} gold!`);
-    }
+      return author.send(
+        `There are ${lotteryPlayers.length} contestants for a prize pool of ${guildConfig.dailyLottery.prizePool} gold!`,
+      );
+    },
   },
   {
     aliases: ['!lore'],
@@ -194,10 +220,12 @@ module.exports = [
     handler: async ({ game, bot, message, guildId, author }) => {
       const args = message.content.split(/ (.+)/);
       if (!args[1]) {
-        return author.send('You must enter a map name to retrieve its lore. Usage: `!lore <Map Name>`');
+        return author.send(
+          'You must enter a map name to retrieve its lore. Usage: `!lore <Map Name>`',
+        );
       }
       const mapName = args[1].trim().toLowerCase();
-      const matchedMap = maps.find(m => m.name.toLowerCase() === mapName);
+      const matchedMap = maps.find((m) => m.name.toLowerCase() === mapName);
       if (!matchedMap) {
         return author.send(`${args[1].trim()} was not found. Did you type the map name correctly?`);
       }
@@ -205,6 +233,6 @@ module.exports = [
         return author.send(`\`\`\`${matchedMap.name}: No lore available for this location.\`\`\``);
       }
       return author.send(`\`\`\`${matchedMap.name}: ${matchedMap.lore}\`\`\``);
-    }
-  }
+    },
+  },
 ];

@@ -3,13 +3,16 @@ const enumHelper = require('../../utils/enumHelper');
 const BaseHelper = require('../../v2/Base/Helper');
 
 class Item extends BaseHelper {
-
   generateItem(updatedPlayer, mob) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.round(this.randomBetween(0, 99) - (updatedPlayer.level / 6));
-      const randomMaterialChance = Math.round(this.randomBetween(0, 99) - (updatedPlayer.level / 6));
-      const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
-      const itemMaterialList = items.material.filter(materialRarity => materialRarity.rarity >= randomMaterialChance);
+      const randomRarityChance = Math.round(this.randomBetween(0, 99) - updatedPlayer.level / 6);
+      const randomMaterialChance = Math.round(this.randomBetween(0, 99) - updatedPlayer.level / 6);
+      const itemRarityList = items.rarity.filter(
+        (itemRarity) => itemRarity.rarity >= randomRarityChance,
+      );
+      const itemMaterialList = items.material.filter(
+        (materialRarity) => materialRarity.rarity >= randomMaterialChance,
+      );
 
       const randomRarityIndex = this.randomBetween(0, itemRarityList.length - 1);
       const randomMaterialIndex = this.randomBetween(0, itemMaterialList.length - 1);
@@ -22,8 +25,9 @@ class Item extends BaseHelper {
         do {
           // console.log('generating relic item');
           randomTypeIndex = this.randomBetween(0, items.type[3].length - 1);
-          if (items.type[3][randomTypeIndex].droppedBy.includes(mobName)
-            && items.type[3][randomTypeIndex].isDroppable
+          if (
+            items.type[3][randomTypeIndex].droppedBy.includes(mobName) &&
+            items.type[3][randomTypeIndex].isDroppable
           ) {
             itemType = items.type[3][randomTypeIndex];
           }
@@ -34,7 +38,10 @@ class Item extends BaseHelper {
           randomEquipmentIndex = this.randomBetween(0, items.type.length - 1);
           randomTypeIndex = this.randomBetween(0, items.type[randomEquipmentIndex].length - 1);
 
-          if (items.type[randomEquipmentIndex][randomTypeIndex].position !== enumHelper.equipment.types.relic.position) {
+          if (
+            items.type[randomEquipmentIndex][randomTypeIndex].position !==
+            enumHelper.equipment.types.relic.position
+          ) {
             itemType = items.type[randomEquipmentIndex][randomTypeIndex];
           }
         } while (itemType === undefined);
@@ -61,8 +68,9 @@ class Item extends BaseHelper {
           luk: itemLuk,
           holiday: itemType.holiday,
           rating: itemRating,
-          gold: Number((itemRarityList[randomRarityIndex].gold
-            * itemType.gold).toFixed()) * itemType.power
+          gold:
+            Number((itemRarityList[randomRarityIndex].gold * itemType.gold).toFixed()) *
+            itemType.power,
         };
       } else if (itemType.position === enumHelper.inventory.position) {
         itemObj = {
@@ -70,20 +78,33 @@ class Item extends BaseHelper {
           position: itemType.position,
           holiday: itemType.holiday,
           power: itemRarityList[randomRarityIndex].power + itemType.power,
-          gold: Number((itemRarityList[randomRarityIndex].gold
-            * itemMaterialList[randomMaterialIndex].gold
-            * itemType.gold).toFixed()) * itemType.power
+          gold:
+            Number(
+              (
+                itemRarityList[randomRarityIndex].gold *
+                itemMaterialList[randomMaterialIndex].gold *
+                itemType.gold
+              ).toFixed(),
+            ) * itemType.power,
         };
       } else {
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
           position: itemType.position,
           holiday: itemType.holiday,
-          power: itemRarityList[randomRarityIndex].power + itemMaterialList[randomMaterialIndex].power + itemType.power,
+          power:
+            itemRarityList[randomRarityIndex].power +
+            itemMaterialList[randomMaterialIndex].power +
+            itemType.power,
           attackType: itemType.attackType,
-          gold: Number((itemRarityList[randomRarityIndex].gold
-            * itemMaterialList[randomMaterialIndex].gold
-            * itemType.gold).toFixed()) * itemType.power
+          gold:
+            Number(
+              (
+                itemRarityList[randomRarityIndex].gold *
+                itemMaterialList[randomMaterialIndex].gold *
+                itemType.gold
+              ).toFixed(),
+            ) * itemType.power,
         };
       }
 
@@ -93,19 +114,17 @@ class Item extends BaseHelper {
 
   // EVENT ITEM
   generateSnowflake(updatedPlayer) {
-    const snowFlake = items.type[3].find(item => item.name === 'Snowflake');
-    const randomRarityChance = Math.round(this.randomBetween(0, 99) - (updatedPlayer.level / 6));
-    const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
+    const snowFlake = items.type[3].find((item) => item.name === 'Snowflake');
+    const randomRarityChance = Math.round(this.randomBetween(0, 99) - updatedPlayer.level / 6);
+    const itemRarityList = items.rarity.filter(
+      (itemRarity) => itemRarity.rarity >= randomRarityChance,
+    );
     const randomRarityIndex = this.randomBetween(0, itemRarityList.length - 1);
 
-    const itemStr = Math.round((itemRarityList[randomRarityIndex].power
-      + snowFlake.stats.str) / 4);
-    const itemDex = Math.round((itemRarityList[randomRarityIndex].power
-      + snowFlake.stats.dex) / 4);
-    const itemEnd = Math.round((itemRarityList[randomRarityIndex].power
-      + snowFlake.stats.end) / 4);
-    const itemInt = Math.round((itemRarityList[randomRarityIndex].power
-      + snowFlake.stats.int) / 4);
+    const itemStr = Math.round((itemRarityList[randomRarityIndex].power + snowFlake.stats.str) / 4);
+    const itemDex = Math.round((itemRarityList[randomRarityIndex].power + snowFlake.stats.dex) / 4);
+    const itemEnd = Math.round((itemRarityList[randomRarityIndex].power + snowFlake.stats.end) / 4);
+    const itemInt = Math.round((itemRarityList[randomRarityIndex].power + snowFlake.stats.int) / 4);
     const itemLuk = Math.round((randomRarityIndex + snowFlake.stats.luk) / 5);
 
     const itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
@@ -120,8 +139,8 @@ class Item extends BaseHelper {
       luk: itemLuk,
       holiday: snowFlake.holiday,
       rating: itemRating,
-      gold: Number((itemRarityList[randomRarityIndex].gold
-        * snowFlake.gold).toFixed()) * itemRating
+      gold:
+        Number((itemRarityList[randomRarityIndex].gold * snowFlake.gold).toFixed()) * itemRating,
     };
   }
 
@@ -129,6 +148,5 @@ class Item extends BaseHelper {
   get items() {
     return items.type;
   }
-
 }
 module.exports = Item;

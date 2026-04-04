@@ -11,7 +11,7 @@ const { infoLog } = require('../../utils/logger');
 
 const commands = [
   // RPG COMMANDS
-  help = {
+  (help = {
     command: ['!help', '!h'],
     operatorOnly: false,
     function: (params) => {
@@ -54,11 +54,11 @@ const commands = [
 !prefix <Command prefix to use> - Changes server command prefix (Must have Manage Guild permission to use) eg: !prefix ?
 !prefix <Server ID> <Command prefix to use> - Changes server command prefix (Must have Manage Guild permission to use) eg: !prefix 1111 ?`;
       messageObj.author.send(helpMsg, { split: true });
-    }
-  },
+    },
+  }),
 
   // Lists titles
-  titles = {
+  (titles = {
     command: ['!t', '!titles'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -66,13 +66,13 @@ const commands = [
       const { Game, messageObj } = params;
       return Game.fetchCommand({
         command: 'listTitles',
-        author: messageObj.author
+        author: messageObj.author,
       });
-    }
-  },
+    },
+  }),
 
   // Set title
-  setTitle = {
+  (setTitle = {
     command: ['!st', '!settitle'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -86,12 +86,12 @@ const commands = [
       return Game.fetchCommand({
         command: 'setTitle',
         author: messageObj.author,
-        value: titleToSet
+        value: titleToSet,
       });
-    }
-  },
+    },
+  }),
 
-  character = {
+  (character = {
     command: ['!character', '!c', '!char'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -100,40 +100,43 @@ const commands = [
       if (messageObj.content.includes(' ')) {
         let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = await Bot.users.cache.filter(player => player.id === checkPlayer && !player.bot).array();
+        const playerObj = await Bot.users.cache
+          .filter((player) => player.id === checkPlayer && !player.bot)
+          .array();
         if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
           messageObj.author.send(`${checkPlayer} was not found!`);
           return;
-        } else if (process.env.NODE_ENV.includes('development')) {
+        }
+        if (process.env.NODE_ENV.includes('development')) {
           playerObj.push({
-            id: checkPlayer
+            id: checkPlayer,
           });
         }
 
         await Game.fetchCommand({
           command: 'playerStats',
           author: messageObj.author,
-          playerToCheck: playerObj[0]
+          playerToCheck: playerObj[0],
         });
         return Game.fetchCommand({
           command: 'playerEquipment',
           author: messageObj.author,
-          playerToCheck: playerObj[0]
+          playerToCheck: playerObj[0],
         });
       }
 
       await Game.fetchCommand({
         command: 'playerStats',
-        author: messageObj.author
+        author: messageObj.author,
       });
       return Game.fetchCommand({
         command: 'playerEquipment',
-        author: messageObj.author
+        author: messageObj.author,
       });
-    }
-  },
+    },
+  }),
 
-  inventory = {
+  (inventory = {
     command: ['!inventory', '!inv', '!i'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -142,46 +145,53 @@ const commands = [
       if (messageObj.content.includes(' ')) {
         let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = Bot.users.cache.filter(player => player.id === checkPlayer && !player.bot).array();
+        const playerObj = Bot.users.cache
+          .filter((player) => player.id === checkPlayer && !player.bot)
+          .array();
         if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
           messageObj.author.send(`${checkPlayer} was not found!`);
           return;
-        } else if (process.env.NODE_ENV.includes('development')) {
+        }
+        if (process.env.NODE_ENV.includes('development')) {
           playerObj.push({
-            id: checkPlayer
+            id: checkPlayer,
           });
         }
 
         return Game.fetchCommand({
           command: 'playerInventory',
-          author: playerObj[0]
-        })
-          .then((playerInventory) => {
-            if (!playerInventory) {
-              return messageObj.author.send('This players inventory was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
-            }
+          author: playerObj[0],
+        }).then((playerInventory) => {
+          if (!playerInventory) {
+            return messageObj.author.send(
+              'This players inventory was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.',
+            );
+          }
 
-            return Game.generateInventoryString(playerInventory)
-              .then(inv => messageObj.author.send(inv.replace('Here is your inventory!', `Here is ${playerInventory.name}s inventory!`)));
-          });
+          return Game.generateInventoryString(playerInventory).then((inv) =>
+            messageObj.author.send(
+              inv.replace('Here is your inventory!', `Here is ${playerInventory.name}s inventory!`),
+            ),
+          );
+        });
       }
 
       Game.fetchCommand({
         command: 'playerInventory',
-        author: messageObj.author
-      })
-        .then((playerInventory) => {
-          if (!playerInventory) {
-            return messageObj.author.send('Your inventory was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
-          }
+        author: messageObj.author,
+      }).then((playerInventory) => {
+        if (!playerInventory) {
+          return messageObj.author.send(
+            'Your inventory was not found! You probably were not born yet. Please be patient until destiny has chosen you.',
+          );
+        }
 
-          Game.generateInventoryString(playerInventory)
-            .then(inv => messageObj.author.send(inv));
-        });
-    }
-  },
+        Game.generateInventoryString(playerInventory).then((inv) => messageObj.author.send(inv));
+      });
+    },
+  }),
 
-  resetQuest = {
+  (resetQuest = {
     command: ['!newquest', '!nq'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -189,13 +199,13 @@ const commands = [
       const { Game, messageObj } = params;
       const result = await Game.fetchCommand({
         command: 'resetQuest',
-        author: messageObj.author
+        author: messageObj.author,
       });
       return messageObj.author.send(result);
-    }
-  },
+    },
+  }),
 
-  stats = {
+  (stats = {
     command: ['!stats', '!s'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -217,12 +227,12 @@ const commands = [
       return Game.fetchCommand({
         command: 'playerStats',
         author: messageObj.author,
-        playerToCheck: playerObj
+        playerToCheck: playerObj,
       });
-    }
-  },
+    },
+  }),
 
-  equip = {
+  (equip = {
     command: ['!equip', '!e'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -244,12 +254,12 @@ const commands = [
       return Game.fetchCommand({
         command: 'playerEquipment',
         author: messageObj.author,
-        playerToCheck: playerObj
+        playerToCheck: playerObj,
       });
-    }
-  },
+    },
+  }),
 
-  spellbook = {
+  (spellbook = {
     command: ['!spellbook', '!sb'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -271,12 +281,12 @@ const commands = [
       return Game.fetchCommand({
         command: 'playerSpellBook',
         author: messageObj.author,
-        playerToCheck: playerObj
+        playerToCheck: playerObj,
       });
-    }
-  },
+    },
+  }),
 
-  lottery = {
+  (lottery = {
     command: ['!lottery'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -285,12 +295,12 @@ const commands = [
       return Game.fetchCommand({
         command: 'joinLottery',
         author: messageObj.author,
-        Bot
+        Bot,
       });
-    }
-  },
+    },
+  }),
 
-  prizePool = {
+  (prizePool = {
     command: ['!prizepool'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -298,34 +308,36 @@ const commands = [
       const { Game, messageObj } = params;
       return Game.fetchCommand({
         command: 'prizePool',
-        author: messageObj.author
+        author: messageObj.author,
       });
-    }
-  },
+    },
+  }),
 
-  patreon = {
+  (patreon = {
     command: ['!patreon'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
       const { messageObj } = params;
-      messageObj.author.send('If you would like to show your support you can become a patron!\
+      messageObj.author.send(
+        'If you would like to show your support you can become a patron!\
       \nKeep in mind that you gain no advantage from the others, this is purely to show your support to the developer!\
-      \n<https://www.patreon.com/sizzlorox>');
-    }
-  },
+      \n<https://www.patreon.com/sizzlorox>',
+      );
+    },
+  }),
 
-  multi = {
+  (multi = {
     command: ['!multiplier', '!multi'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, messageObj } = params;
       return Game.fetchCommand({ command: 'checkMultiplier', author: messageObj.author });
-    }
-  },
+    },
+  }),
 
-  setServer = {
+  (setServer = {
     command: ['!setserver'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -340,15 +352,17 @@ const commands = [
           author: messageObj.author,
           Bot,
           value,
-          confirmation
+          confirmation,
         });
       }
 
-      return messageObj.author.send('Please input server ID after the command. (ex: !setserver 11111111)');
-    }
-  },
+      return messageObj.author.send(
+        'Please input server ID after the command. (ex: !setserver 11111111)',
+      );
+    },
+  }),
 
-  map = {
+  (map = {
     command: ['!map', '!m'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -360,10 +374,10 @@ const commands = [
       });
 
       messageObj.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
-    }
-  },
+    },
+  }),
 
-  lore = {
+  (lore = {
     command: '!lore',
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -371,21 +385,26 @@ const commands = [
       const { messageObj } = params;
       if (messageObj.content.includes(' ')) {
         const splitMessage = messageObj.content.split(/ (.+)/)[1].toLowerCase();
-        const requestedMap = maps.filter(map => map.name.toLowerCase() === splitMessage)
-          .map(map => map.lore);
+        const requestedMap = maps
+          .filter((map) => map.name.toLowerCase() === splitMessage)
+          .map((map) => map.lore);
 
         if (requestedMap.length === 0) {
-          return messageObj.author.send(`${splitMessage} was not found. Did you type the map correctly?`);
+          return messageObj.author.send(
+            `${splitMessage} was not found. Did you type the map correctly?`,
+          );
         }
 
         return messageObj.author.send(`\`\`\`${splitMessage}: ${requestedMap[0]}\`\`\``);
       }
 
-      return messageObj.author.send('You must enter a map to retrieve its lore. Check `!help` for more info.');
-    }
-  },
+      return messageObj.author.send(
+        'You must enter a map to retrieve its lore. Check `!help` for more info.',
+      );
+    },
+  }),
 
-  bugreport = {
+  (bugreport = {
     command: '!bugreport',
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -394,12 +413,14 @@ const commands = [
       if (messageObj.content.includes(' ')) {
         const report = messageObj.content.split(/ (.+)/)[1];
         const mainServer = Bot.guilds.cache.get('390509935097675777');
-        if (mainServer.members.find(member => member.id === messageObj.author.id)) {
-          return messageObj.author.send('Just send this in the bug reports channel. You\'re already in the official server');
+        if (mainServer.members.find((member) => member.id === messageObj.author.id)) {
+          return messageObj.author.send(
+            "Just send this in the bug reports channel. You're already in the official server",
+          );
         }
 
         return mainServer.channels
-          .find(channel => channel.id === '392360791245848586')
+          .find((channel) => channel.id === '392360791245848586')
           .send(`Bug Report:\n${report}`)
           .then((message) => {
             const guild = message.guild ? message.guild.name : '';
@@ -410,23 +431,27 @@ const commands = [
       }
 
       return messageObj.author.send('You must have a message included in the bugreport.');
-    }
-  },
+    },
+  }),
 
-  top10 = {
+  (top10 = {
     command: '!top10',
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, messageObj, guildId, Bot } = params;
-      switch ((messageObj.content.split(/ (.+)/)[1] === undefined) ? 'level' : messageObj.content.split(/ (.+)/)[1].toLowerCase()) {
+      switch (
+        messageObj.content.split(/ (.+)/)[1] === undefined
+          ? 'level'
+          : messageObj.content.split(/ (.+)/)[1].toLowerCase()
+      ) {
         case 'gambles':
           Game.fetchCommand({
             command: 'top10',
             author: messageObj.author,
             type: { gambles: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'stolen':
@@ -435,7 +460,7 @@ const commands = [
             author: messageObj.author,
             type: { stolen: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'stole':
@@ -444,7 +469,7 @@ const commands = [
             author: messageObj.author,
             type: { stole: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'gold':
@@ -453,7 +478,7 @@ const commands = [
             author: messageObj.author,
             type: { 'gold.current': -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'spells':
@@ -462,7 +487,7 @@ const commands = [
             author: messageObj.author,
             type: { spellCast: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'events':
@@ -471,7 +496,7 @@ const commands = [
             author: messageObj.author,
             type: { events: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'bounty':
@@ -480,7 +505,7 @@ const commands = [
             author: messageObj.author,
             type: { currentBounty: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         default:
@@ -489,27 +514,31 @@ const commands = [
             author: messageObj.author,
             type: { level: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
       }
-    }
-  },
+    },
+  }),
 
-  rank = {
+  (rank = {
     command: '!rank',
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, messageObj, guildId, Bot } = params;
-      switch ((messageObj.content.split(/ (.+)/)[1] === undefined) ? 'level' : messageObj.content.split(/ (.+)/)[1].toLowerCase()) {
+      switch (
+        messageObj.content.split(/ (.+)/)[1] === undefined
+          ? 'level'
+          : messageObj.content.split(/ (.+)/)[1].toLowerCase()
+      ) {
         case 'gambles':
           Game.fetchCommand({
             command: 'getRank',
             author: messageObj.author,
             type: { gambles: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'stolen':
@@ -518,7 +547,7 @@ const commands = [
             author: messageObj.author,
             type: { stolen: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'stole':
@@ -527,7 +556,7 @@ const commands = [
             author: messageObj.author,
             type: { stole: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'gold':
@@ -536,7 +565,7 @@ const commands = [
             author: messageObj.author,
             type: { 'gold.current': -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'spells':
@@ -545,7 +574,7 @@ const commands = [
             author: messageObj.author,
             type: { spellCast: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'events':
@@ -554,7 +583,7 @@ const commands = [
             author: messageObj.author,
             type: { events: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         case 'bounty':
@@ -563,7 +592,7 @@ const commands = [
             author: messageObj.author,
             type: { currentBounty: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
         default:
@@ -572,14 +601,14 @@ const commands = [
             author: messageObj.author,
             type: { level: -1 },
             guildId,
-            Bot
+            Bot,
           });
           break;
       }
-    }
-  },
+    },
+  }),
 
-  castSpell = {
+  (castSpell = {
     command: ['!castspell', '!cs'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -592,18 +621,24 @@ const commands = [
           command: 'castSpell',
           author: messageObj.author,
           Bot,
-          amount: amount ? amount : 1,
-          spell: messageObj.content.split(' ')[1].toLowerCase()
+          amount: amount || 1,
+          spell: messageObj.content.split(' ')[1].toLowerCase(),
         });
       }
       let spellsString = '```List of Spells:\n  ';
-      spellsString = spellsString.concat(Object.keys(spells).map(spell => `${spell} - ${spells[spell].spellCost} gold - ${spells[spell].description}`).join('\n  '));
+      spellsString = spellsString.concat(
+        Object.keys(spells)
+          .map(
+            (spell) => `${spell} - ${spells[spell].spellCost} gold - ${spells[spell].description}`,
+          )
+          .join('\n  '),
+      );
 
       return messageObj.author.send(spellsString.concat('```'));
-    }
-  },
+    },
+  }),
 
-  changeServerPrefix = {
+  (changeServerPrefix = {
     command: ['!prefix'],
     operatorOnly: false,
     serverOperatorOnly: true,
@@ -619,12 +654,14 @@ const commands = [
           newPrefix = splitArray[2];
         } else if (splitArray.length === 2) {
           if (messageObj.channel.type === 'dm') {
-            return messageObj.author.send('You need to provide the guild id and a prefix in DM\'s');
+            return messageObj.author.send("You need to provide the guild id and a prefix in DM's");
           }
           guildId = messageObj.guild.id;
           newPrefix = splitArray[1];
         } else {
-          return messageObj.author.send('Invalid amount of arguments. Check the help for more info.');
+          return messageObj.author.send(
+            'Invalid amount of arguments. Check the help for more info.',
+          );
         }
 
         const guildToUpdate = Bot.guilds.cache.get(guildId);
@@ -638,7 +675,9 @@ const commands = [
         }
 
         if (!memberToCheckPermission.hasPermission('MANAGE_GUILD')) {
-          return messageObj.author.send('You do not have the permission to change the prefix for this guild');
+          return messageObj.author.send(
+            'You do not have the permission to change the prefix for this guild',
+          );
         }
 
         if (newPrefix === '') {
@@ -654,7 +693,7 @@ const commands = [
           command: 'modifyServerPrefix',
           author: messageObj.author,
           guildId: guildToUpdate.id,
-          value: newPrefix
+          value: newPrefix,
         });
         if (result) {
           Game.getGuildCommandPrefix(guildToUpdate.id).prefix = newPrefix;
@@ -662,13 +701,13 @@ const commands = [
           messageObj.author.send('An error occurred while updating the prefix');
         }
       }
-    }
-  },
+    },
+  }),
 
   /**
    * places a bounty on a specific player for a specific amount should work with @playername and then a gold amount
    */
-  placeBounty = {
+  (placeBounty = {
     command: ['!bounty', '!b'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -689,22 +728,24 @@ const commands = [
           return messageObj.author.send('Please add a bounty to a player.');
         }
         if (recipient === messageObj.author.id) {
-          return messageObj.author.send('You can\'t give yourself a bounty.');
+          return messageObj.author.send("You can't give yourself a bounty.");
         }
         return Game.fetchCommand({
           command: 'placeBounty',
           author: messageObj.author,
           Bot,
           recipient,
-          amount: Number(amount)
+          amount: Number(amount),
         });
       }
 
-      return messageObj.author.send('Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head');
-    }
-  },
+      return messageObj.author.send(
+        'Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head',
+      );
+    },
+  }),
 
-  eventLog = {
+  (eventLog = {
     command: ['!eventlog', '!el'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -715,28 +756,32 @@ const commands = [
         const result = await Game.fetchCommand({
           command: 'playerEventLog',
           author: splitCommand[1].replace(/([\<\@\!\>])/g, ''),
-          amount: 15
+          amount: 15,
         });
         if (!result || result.length === 0) {
           return messageObj.author.send('This player has not activated any Events yet.');
         }
-        return messageObj.author.send(`\`\`\`${result}\`\`\``, { split: { prepend: '\`\`\`', append: '\`\`\`' } });
+        return messageObj.author.send(`\`\`\`${result}\`\`\``, {
+          split: { prepend: '\`\`\`', append: '\`\`\`' },
+        });
       }
 
       const result = await Game.fetchCommand({
         command: 'playerEventLog',
         author: messageObj.author.id,
-        amount: 15
+        amount: 15,
       });
       if (!result || result.length === 0) {
         return messageObj.author.send('You have not activated any Events yet.');
       }
 
-      return messageObj.author.send(`\`\`\`${result}\`\`\``, { split: { prepend: '\`\`\`', append: '\`\`\`' } });
-    }
-  },
+      return messageObj.author.send(`\`\`\`${result}\`\`\``, {
+        split: { prepend: '\`\`\`', append: '\`\`\`' },
+      });
+    },
+  }),
 
-  pvpLog = {
+  (pvpLog = {
     command: ['!pvplog', '!pl'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -747,31 +792,35 @@ const commands = [
         const result = await Game.fetchCommand({
           command: 'playerPvpLog',
           author: splitCommand[1].replace(/([\<\@\!\>])/g, ''),
-          amount: 15
+          amount: 15,
         });
         if (!result || result.length === 0) {
           return messageObj.author.send('This player has not had any PvP Events yet.');
         }
-        return messageObj.author.send(`\`\`\`${result}\`\`\``, { split: { prepend: '\`\`\`', append: '\`\`\`' } });
+        return messageObj.author.send(`\`\`\`${result}\`\`\``, {
+          split: { prepend: '\`\`\`', append: '\`\`\`' },
+        });
       }
 
       const result = await Game.fetchCommand({
         command: 'playerPvpLog',
         author: messageObj.author.id,
-        amount: 15
+        amount: 15,
       });
       if (!result || result.length === 0) {
         return messageObj.author.send('You have not had any PvP Events yet.');
       }
 
-      return messageObj.author.send(`\`\`\`${result}\`\`\``, { split: { prepend: '\`\`\`', append: '\`\`\`' } });
-    }
-  },
+      return messageObj.author.send(`\`\`\`${result}\`\`\``, {
+        split: { prepend: '\`\`\`', append: '\`\`\`' },
+      });
+    },
+  }),
 
   /**
    * Subscribe to PM messages
    */
-  privateMessage = {
+  (privateMessage = {
     command: '!pm',
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -786,7 +835,7 @@ const commands = [
             return Game.fetchCommand({
               command: 'modifyPM',
               author: messageObj.author,
-              value: splitCommand[1].toLowerCase()
+              value: splitCommand[1].toLowerCase(),
             });
         }
       }
@@ -796,13 +845,13 @@ const commands = [
       off - You won't be pmed in events that include you
       filtered - You will be pmed certain important events that include you
       \`\`\``);
-    }
-  },
+    },
+  }),
 
   /**
    * Modify if player will be @Mentioned in events
    */
-  modifyMention = {
+  (modifyMention = {
     command: '!mention',
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -820,7 +869,7 @@ const commands = [
             return Game.fetchCommand({
               command: 'modifyMention',
               author: messageObj.author,
-              value: splitCommand[1].toLowerCase()
+              value: splitCommand[1].toLowerCase(),
             });
         }
       }
@@ -831,13 +880,13 @@ const commands = [
         action - You will be tagged in action events that include you
         move - You will be tagged in move events that include you
         \`\`\``);
-    }
-  },
+    },
+  }),
 
   /**
    * Modify player's gender
    */
-  modifyGender = {
+  (modifyGender = {
     command: '!gender',
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -855,7 +904,7 @@ const commands = [
             return Game.fetchCommand({
               command: 'modifyGender',
               author: messageObj.author,
-              value: splitCommand[1]
+              value: splitCommand[1],
             });
         }
       }
@@ -866,10 +915,10 @@ const commands = [
         neutral
         neuter
         \`\`\``);
-    }
-  },
+    },
+  }),
 
-  getStolenEquip = {
+  (getStolenEquip = {
     command: ['!stolenequip', '!se'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
@@ -880,7 +929,9 @@ const commands = [
       let header;
       if (messageObj.content.includes(' ') && splitArray.length === 2) {
         const playerId = splitArray[1].replace(/([\<\@\!\>])/g, '');
-        const playerObj = await Bot.users.cache.filter(player => player.id === playerId && !player.bot).array();
+        const playerObj = await Bot.users.cache
+          .filter((player) => player.id === playerId && !player.bot)
+          .array();
         if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
           return messageObj.author.send(`${playerId} was not found!`);
         }
@@ -892,17 +943,19 @@ const commands = [
       }
       const stolenEquip = await Game.fetchCommand({
         command: 'getStolenEquip',
-        recipient
+        recipient,
       });
       if (stolenEquip) {
         return messageObj.author.send(`\`\`\`${header}\n${stolenEquip}\`\`\``);
       }
-      return messageObj.author.send(`${messageObj.author.id === recipient.discordId ? 'You have' : `${recipient.name} has`} no stolen equipment.`);
-    }
-  },
+      return messageObj.author.send(
+        `${messageObj.author.id === recipient.discordId ? 'You have' : `${recipient.name} has`} no stolen equipment.`,
+      );
+    },
+  }),
 
   // Bot Operator commands
-  setPlayerBounty = {
+  (setPlayerBounty = {
     command: '!setbounty',
     operatorOnly: true,
     channelOnlyId: commandChannel,
@@ -915,14 +968,14 @@ const commands = [
         Game.fetchCommand({
           command: 'setPlayerBounty',
           recipient,
-          amount: Number(amount)
+          amount: Number(amount),
         });
         return messageObj.author.send('Done');
       }
-    }
-  },
+    },
+  }),
 
-  setPlayerGold = {
+  (setPlayerGold = {
     command: '!setgold',
     operatorOnly: true,
     channelOnlyId: commandChannel,
@@ -935,20 +988,20 @@ const commands = [
         Game.fetchCommand({
           command: 'setPlayerGold',
           recipient,
-          amount: Number(amount)
+          amount: Number(amount),
         });
         return messageObj.author.send('Done');
       }
-    }
-  },
+    },
+  }),
 
-  holidaysCommands = {
+  (holidaysCommands = {
     command: '!holiday',
     operatorOnly: true,
     function: (params) => {
       const { Game, Bot, messageObj } = params;
       if (messageObj.content.includes(' ')) {
-        const splitCommand = messageObj.content.split(' ').map(e => e.toLowerCase());
+        const splitCommand = messageObj.content.split(' ').map((e) => e.toLowerCase());
         switch (splitCommand[2]) {
           case 'true':
           case 'false':
@@ -957,7 +1010,7 @@ const commands = [
               Bot,
               author: messageObj.author,
               whichHoliday: splitCommand[1],
-              isStarting: splitCommand[2] === 'true'
+              isStarting: splitCommand[2] === 'true',
             });
           default:
             return Game.fetchCommand({
@@ -965,15 +1018,15 @@ const commands = [
               Bot,
               author: messageObj.author,
               whichHoliday: splitCommand[1],
-              whichMessage: splitCommand[2]
+              whichMessage: splitCommand[2],
             });
         }
       }
-    }
-  },
+    },
+  }),
 
   // Doesn't work for now.
-  activateBlizzard = {
+  (activateBlizzard = {
     command: '!blizzard',
     operatorOnly: true,
     function: (params) => {
@@ -983,17 +1036,21 @@ const commands = [
         const blizzardBoolean = Game.blizzardSwitch(splitCommand[1]);
         switch (splitCommand) {
           case 'on':
-            messageObj.author.send(blizzardBoolean ? 'Blizzard is already activated!' : 'Blizzard activated.');
+            messageObj.author.send(
+              blizzardBoolean ? 'Blizzard is already activated!' : 'Blizzard activated.',
+            );
             break;
           case 'off':
-            messageObj.author.send(!blizzardBoolean ? 'Blizzard is already deactivated!' : 'Blizzard deactivated.');
+            messageObj.author.send(
+              !blizzardBoolean ? 'Blizzard is already deactivated!' : 'Blizzard deactivated.',
+            );
             break;
         }
       }
-    }
-  },
+    },
+  }),
 
-  giveGold = {
+  (giveGold = {
     command: '!givegold',
     operatorOnly: true,
     channelOnlyId: commandChannel,
@@ -1004,14 +1061,14 @@ const commands = [
         Game.fetchCommand({
           command: 'giveGold',
           recipient: splitCommand[1],
-          amount: splitCommand[2]
+          amount: splitCommand[2],
         });
         return messageObj.author.send('Done.');
       }
-    }
-  },
+    },
+  }),
 
-  resetPlayer = {
+  (resetPlayer = {
     command: '!resetplayer',
     operatorOnly: true,
     channelOnlyId: commandChannel,
@@ -1020,14 +1077,14 @@ const commands = [
       if (messageObj.content.includes(' ')) {
         Game.fetchCommand({
           command: 'deletePlayer',
-          recipient: messageObj.content.split(/ (.+)/)[1]
+          recipient: messageObj.content.split(/ (.+)/)[1],
         });
         messageObj.author.send('Done.');
       }
-    }
-  },
+    },
+  }),
 
-  resetLottery = {
+  (resetLottery = {
     command: '!resetLottery',
     operatorOnly: true,
     function: (params) => {
@@ -1042,10 +1099,10 @@ const commands = [
           guild,
         });
       }
-    }
-  },
+    },
+  }),
 
-  removeLotteryPlayers = {
+  (removeLotteryPlayers = {
     command: '!resetLotteryPlayers',
     operatorOnly: true,
     function: (params) => {
@@ -1060,10 +1117,10 @@ const commands = [
           guild,
         });
       }
-    }
-  },
+    },
+  }),
 
-  resetAll = {
+  (resetAll = {
     command: '!resetall',
     channelOnlyId: commandChannel,
     function: async (params) => {
@@ -1074,48 +1131,59 @@ const commands = [
         if (!guild) {
           return messageObj.author.send('This guild does not exist.');
         }
-        if (!process.env.DISCORD_BOT_OPERATORS_ID.includes(messageObj.author.id) && guild.owner.id !== messageObj.author.id) {
-          return messageObj.author.send('You\'re not the owner of this server. You do not have permission to reset this servers stats');
+        if (
+          !process.env.DISCORD_BOT_OPERATORS_ID.includes(messageObj.author.id) &&
+          guild.owner.id !== messageObj.author.id
+        ) {
+          return messageObj.author.send(
+            "You're not the owner of this server. You do not have permission to reset this servers stats",
+          );
         }
         return Game.fetchCommand({
           command: 'resetPlayers',
           author: messageObj.author,
           Bot,
-          guildId: guildID
+          guildId: guildID,
         });
       }
       return message.author.send('You must specify a guild id to reset.');
-    }
-  },
+    },
+  }),
 
-  aprilFools = {
+  (aprilFools = {
     command: '!aprilfools',
     operatorOnly: true,
     function: (params) => {
       const { Bot } = params;
-      const aprilfools = Bot.guilds.cache.get(process.env.GUILD_ID).members
-        .filter(player => player.presence.status === 'online' && !player.user.bot
-          || player.presence.status === 'idle' && !player.user.bot
-          || player.presence.status === 'dnd' && !player.user.bot);
-      aprilfools.forEach(player => player.send('Found a Mythical Alien Relic in Topscros Path'));
-    }
-  },
+      const aprilfools = Bot.guilds.cache
+        .get(process.env.GUILD_ID)
+        .members.filter(
+          (player) =>
+            (player.presence.status === 'online' && !player.user.bot) ||
+            (player.presence.status === 'idle' && !player.user.bot) ||
+            (player.presence.status === 'dnd' && !player.user.bot),
+        );
+      aprilfools.forEach((player) => player.send('Found a Mythical Alien Relic in Topscros Path'));
+    },
+  }),
 
-  invite = {
+  (invite = {
     command: '!invite',
     operatorOnly: false,
     function: (params) => {
       const { messageObj } = params;
-      messageObj.author.send('Official Server: <https://discord.gg/nAEBTcj>\
+      messageObj.author.send(
+        "Official Server: <https://discord.gg/nAEBTcj>\
 \nInvite Bot Link: <https://discordapp.com/oauth2/authorize?client_id=385539681460420612&scope=bot&permissions=27664>\
-\n1. You\'ll need `Manage Server` Permission in order to see the server within the invite dropbox.\
+\n1. You'll need `Manage Server` Permission in order to see the server within the invite dropbox.\
 \n2. Once invited the bot will create the leaderboards, command, actions, move channel once joining.\
-\n3. Since multiple bots use ! as their command prefix do not forget to change your prefix if you want. (eg. !prefix ?)');
-    }
-  },
+\n3. Since multiple bots use ! as their command prefix do not forget to change your prefix if you want. (eg. !prefix ?)",
+      );
+    },
+  }),
 
   // MODULE COMMANDS
-  giveEquipmentToPlayer = {
+  (giveEquipmentToPlayer = {
     command: '!giveplayer',
     operatorOnly: true,
     function: async (params) => {
@@ -1130,18 +1198,20 @@ const commands = [
         await Game.savePlayer(player);
         messageObj.author.send('Done.');
       }
-    }
-  },
+    },
+  }),
 
-  randomRepo = {
+  (randomRepo = {
     command: '!ranrepo',
     function: async (params) => {
       const { Game, messageObj } = params;
       const repoList = await GitHub.randomRepo();
       const randomRepo = Game.randomChoice(repoList);
-      messageObj.reply(`\nRepo: ${randomRepo.name}\nOwner: ${randomRepo.owner.login}\n${randomRepo.url.replace('api.', '').replace('/repos', '')}`);
-    }
-  },
+      messageObj.reply(
+        `\nRepo: ${randomRepo.name}\nOwner: ${randomRepo.owner.login}\n${randomRepo.url.replace('api.', '').replace('/repos', '')}`,
+      );
+    },
+  }),
 
   // nextLaunch = {
   //   command: '!nextlaunch',
@@ -1225,7 +1295,7 @@ const commands = [
   //   }
   // },
 
-  urban = {
+  (urban = {
     command: '!urban',
     operatorOnly: false,
     function: async (params) => {
@@ -1238,16 +1308,24 @@ const commands = [
         }
 
         let definition = 'Urban Dictionary Definition of ****\n```';
-        const wordDefinition = result.list.sort((item1, item2) => {
-          return item2.thumbs_up - item1.thumbs_up;
-        })[0];
-        definition = definition.replace('****', `\`${Game.capitalizeFirstLetter(wordDefinition.word).replace(/%20/g, ' ')}\``);
+        const wordDefinition = result.list.sort(
+          (item1, item2) => item2.thumbs_up - item1.thumbs_up,
+        )[0];
+        definition = definition.replace(
+          '****',
+          `\`${Game.capitalizeFirstLetter(wordDefinition.word).replace(/%20/g, ' ')}\``,
+        );
 
-        return messageObj.reply(definition.concat(`Definition:\n${wordDefinition.definition}\n\nExample:\n${wordDefinition.example}\`\`\`\n[:thumbsup::${wordDefinition.thumbs_up} / :thumbsdown::${wordDefinition.thumbs_down}]`), { split: true });
+        return messageObj.reply(
+          definition.concat(
+            `Definition:\n${wordDefinition.definition}\n\nExample:\n${wordDefinition.example}\`\`\`\n[:thumbsup::${wordDefinition.thumbs_up} / :thumbsdown::${wordDefinition.thumbs_down}]`,
+          ),
+          { split: true },
+        );
       }
 
       return messageObj.reply('Please specify a word to look up.');
-    }
-  }
+    },
+  }),
 ];
 module.exports = commands;

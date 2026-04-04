@@ -1,14 +1,13 @@
 const fs = require('fs');
 const seedrandom = require('seedrandom');
-const enumHelper = require('../utils/enumHelper');
-const { moveLog, actionLog, errorLog, infoLog } = require('../utils/logger');
+const enumHelper = require('./enumHelper');
+const { moveLog, actionLog, errorLog, infoLog } = require('./logger');
 const { battleDebug, eventDebug, guildID } = require('../../settings');
 const messages = require('../game/data/messages');
 
 const RNG = seedrandom();
 
 class Helper {
-
   printBattleDebug(debugMsg) {
     if (battleDebug) {
       console.log(debugMsg);
@@ -25,7 +24,7 @@ class Helper {
     // Adding + 1 to max due to trunc
     max += 1;
     // https://stackoverflow.com/questions/15594332/unbiased-random-range-generator-in-javascript
-    if (arguments.length < 2) return (RNG() >= 0.5);
+    if (arguments.length < 2) return RNG() >= 0.5;
 
     let factor = 1;
     let result;
@@ -33,7 +32,7 @@ class Helper {
       factor = decimal ** 10;
     }
     do {
-      result = (RNG() * (max - min)) + min;
+      result = RNG() * (max - min) + min;
       result = Math.trunc(result * factor) / factor;
     } while (result === exclude);
     return result;
@@ -49,8 +48,7 @@ class Helper {
   }
 
   capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase()
-      .concat(string.slice(1));
+    return string.charAt(0).toUpperCase().concat(string.slice(1));
   }
 
   getTimePassed(timeStamp) {
@@ -62,9 +60,9 @@ class Helper {
     const seconds = date.getUTCSeconds();
     const minutes = date.getUTCMinutes();
     const hours = date.getUTCHours();
-    const days = (date.getUTCDate() - 1);
+    const days = date.getUTCDate() - 1;
 
-    const dayString = (date.getUTCDate() - 1) === 0 ? '' : `${days}d `;
+    const dayString = date.getUTCDate() - 1 === 0 ? '' : `${days}d `;
     const hourString = date.getUTCHours() === 0 ? '' : `${hours}h `;
     const minuteString = date.getUTCMinutes() === 0 ? '' : `${minutes}m `;
     const secondString = date.getUTCSeconds() === 0 ? '' : `${seconds}s`;
@@ -77,7 +75,7 @@ class Helper {
     const secNum = parseInt(duration, 10); // don't forget the second param
     let days = Math.floor(secNum / 86400);
     let hours = Math.floor(secNum / 3600) % 24;
-    let minutes = Math.floor((secNum - (hours * 3600)) / 60) % 60;
+    let minutes = Math.floor((secNum - hours * 3600) / 60) % 60;
     let seconds = secNum % 60;
 
     days = days < 10 ? `0${days}` : days;
@@ -94,7 +92,7 @@ class Helper {
           Database.loadMoveLog(selectedPlayer.discordId)
             .then((playerMoveLog) => {
               if (!playerMoveLog.log) {
-                playerMoveLog.log = []
+                playerMoveLog.log = [];
               }
               if (playerMoveLog.log.length > 25) {
                 playerMoveLog.log.shift();
@@ -102,12 +100,12 @@ class Helper {
 
               playerMoveLog.log.push({
                 event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
-                timeStamp: new Date().getTime()
+                timeStamp: new Date().getTime(),
               });
 
               return playerMoveLog;
             })
-            .then(playerMoveLog => Database.saveMoveLog(selectedPlayer.discordId, playerMoveLog))
+            .then((playerMoveLog) => Database.saveMoveLog(selectedPlayer.discordId, playerMoveLog))
             .catch((err) => {
               errorLog.error(err);
             });
@@ -117,7 +115,7 @@ class Helper {
           Database.loadActionLog(selectedPlayer.discordId)
             .then((playerActionLog) => {
               if (!playerActionLog.log) {
-                playerActionLog.log = []
+                playerActionLog.log = [];
               }
               if (playerActionLog.log.length > 25) {
                 playerActionLog.log.shift();
@@ -125,19 +123,21 @@ class Helper {
 
               playerActionLog.log.push({
                 event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
-                timeStamp: new Date().getTime()
+                timeStamp: new Date().getTime(),
               });
 
               return playerActionLog;
             })
-            .then(playerActionLog => Database.saveActionLog(selectedPlayer.discordId, playerActionLog));
+            .then((playerActionLog) =>
+              Database.saveActionLog(selectedPlayer.discordId, playerActionLog),
+            );
           break;
 
         case enumHelper.logTypes.pvp:
           Database.loadPvpLog(selectedPlayer.discordId)
             .then((playerPvpLog) => {
               if (!playerPvpLog.log) {
-                playerPvpLog.log = []
+                playerPvpLog.log = [];
               }
               if (playerPvpLog.log.length > 25) {
                 playerPvpLog.log.shift();
@@ -145,12 +145,12 @@ class Helper {
 
               playerPvpLog.log.push({
                 event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
-                timeStamp: new Date().getTime()
+                timeStamp: new Date().getTime(),
               });
 
               return playerPvpLog;
             })
-            .then(playerPvpLog => Database.savePvpLog(selectedPlayer.discordId, playerPvpLog));
+            .then((playerPvpLog) => Database.savePvpLog(selectedPlayer.discordId, playerPvpLog));
           break;
       }
 
@@ -165,12 +165,12 @@ class Helper {
           return resolve();
         }
 
-        return discordHook.discordBot.guilds.cache.get(guildID)
-          .members.get(player.discordId).send(msg)
-          .then(() => {
-            return resolve();
-          })
-          .catch(err => errorLog.error(err));
+        return discordHook.discordBot.guilds.cache
+          .get(guildID)
+          .members.get(player.discordId)
+          .send(msg)
+          .then(() => resolve())
+          .catch((err) => errorLog.error(err));
       }
 
       return resolve();
@@ -184,16 +184,18 @@ class Helper {
       }
 
       if (isMovement) {
-        return discordHook.movementHook.send(msg)
-          .then(debugMsg => moveLog.info(this.formatLog(debugMsg)))
+        return discordHook.movementHook
+          .send(msg)
+          .then((debugMsg) => moveLog.info(this.formatLog(debugMsg)))
           .then(resolve())
-          .catch(err => console.log(err));
+          .catch((err) => console.log(err));
       }
 
-      return discordHook.actionHook.send(msg)
-        .then(debugMsg => actionLog.info(this.formatLog(debugMsg)))
+      return discordHook.actionHook
+        .send(msg)
+        .then((debugMsg) => actionLog.info(this.formatLog(debugMsg)))
         .then(resolve())
-        .catch(err => console.log(err));
+        .catch((err) => console.log(err));
     });
   }
 
@@ -229,15 +231,15 @@ class Helper {
   }
 
   countDirectoryFiles(directory) {
-    return new Promise((resolve, reject) => {
-      return fs.readdir(directory, (err, files) => {
+    return new Promise((resolve, reject) =>
+      fs.readdir(directory, (err, files) => {
         if (err) {
           return reject(err);
         }
 
         return resolve(files.length);
-      });
-    });
+      }),
+    );
   }
 
   calculateItemRating(player, item) {
@@ -248,16 +250,23 @@ class Helper {
 
       switch (item.attackType) {
         case 'melee':
-          return Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)));
+          return Math.ceil(
+            this.sumPlayerTotalStrength(player) + item.power + this.sumPlayerTotalDexterity(player),
+          );
 
         case 'range':
-          return Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)));
+          return Math.ceil(
+            this.sumPlayerTotalDexterity(player) +
+              item.power +
+              this.sumPlayerTotalDexterity(player),
+          );
 
         case 'magic':
-          return Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)));
+          return Math.ceil(
+            this.sumPlayerTotalIntelligence(player) +
+              item.power +
+              this.sumPlayerTotalDexterity(player),
+          );
       }
     }
 
@@ -265,28 +274,23 @@ class Helper {
   }
 
   sumPlayerTotalStrength(player) {
-    return player.stats.str
-      + player.equipment.relic.str;
+    return player.stats.str + player.equipment.relic.str;
   }
 
   sumPlayerTotalDexterity(player) {
-    return player.stats.dex
-      + player.equipment.relic.dex;
+    return player.stats.dex + player.equipment.relic.dex;
   }
 
   sumPlayerTotalEndurance(player) {
-    return player.stats.end
-      + player.equipment.relic.end;
+    return player.stats.end + player.equipment.relic.end;
   }
 
   sumPlayerTotalIntelligence(player) {
-    return player.stats.int
-      + player.equipment.relic.int;
+    return player.stats.int + player.equipment.relic.int;
   }
 
   sumPlayerTotalLuck(player) {
-    return player.stats.luk
-      + player.equipment.relic.luk;
+    return player.stats.luk + player.equipment.relic.luk;
   }
 
   async checkExperience(Database, playerObj, eventMsg, eventLog) {
@@ -294,9 +298,13 @@ class Helper {
       if (playerObj.experience.current >= playerObj.level * 15) {
         playerObj.level++;
         playerObj.experience.current = 0;
-        playerObj.health = 100 + (playerObj.level * 5);
-        playerObj.mana = 50 + (playerObj.level * 5);
-        eventMsg.push(this.setImportantMessage(`${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} is now level ${playerObj.level}!`));
+        playerObj.health = 100 + playerObj.level * 5;
+        playerObj.mana = 50 + playerObj.level * 5;
+        eventMsg.push(
+          this.setImportantMessage(
+            `${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} is now level ${playerObj.level}!`,
+          ),
+        );
         eventLog.push(`Leveled up to level ${playerObj.level}`);
         for (let i = 0; i < 4; i++) {
           const randomStat = this.randomBetween(0, 3);
@@ -317,14 +325,16 @@ class Helper {
         }
         const oldClass = playerObj.class;
 
-        const playerStats = Object.keys(playerObj.stats).map((key) => {
-          if (['str', 'dex', 'int'].includes(key)) {
-            return {
-              key,
-              value: playerObj.stats[key]
-            };
-          }
-        }).filter(obj => obj !== undefined)
+        const playerStats = Object.keys(playerObj.stats)
+          .map((key) => {
+            if (['str', 'dex', 'int'].includes(key)) {
+              return {
+                key,
+                value: playerObj.stats[key],
+              };
+            }
+          })
+          .filter((obj) => obj !== undefined)
           .sort((stat1, stat2) => stat2.value - stat1.value);
 
         switch (playerStats[0].key) {
@@ -340,7 +350,11 @@ class Helper {
         }
 
         if (playerObj.class !== oldClass) {
-          eventMsg.push(this.setImportantMessage(`${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} has decided to become a ${playerObj.class}!`));
+          eventMsg.push(
+            this.setImportantMessage(
+              `${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} has decided to become a ${playerObj.class}!`,
+            ),
+          );
           eventLog.push(`You have become a ${playerObj.class}`);
         }
         await this.logEvent(playerObj, Database, eventLog, enumHelper.logTypes.action);
@@ -348,7 +362,7 @@ class Helper {
         return {
           updatedPlayer: playerObj,
           msg: eventMsg,
-          pm: eventLog
+          pm: eventLog,
         };
       }
 
@@ -377,16 +391,30 @@ class Helper {
     return playerObj;
   }
 
-  async checkHealth(Database, MapClass, playerObj, attackerObj, eventMsg, eventLog, otherPlayerPmMsg) {
+  async checkHealth(
+    Database,
+    MapClass,
+    playerObj,
+    attackerObj,
+    eventMsg,
+    eventLog,
+    otherPlayerPmMsg,
+  ) {
     try {
       if (playerObj.health <= 0) {
         const expLoss = Math.ceil(playerObj.experience.current / 8);
         const goldLoss = Math.ceil(playerObj.gold.current / 12);
-        eventMsg.push(this.setImportantMessage(`${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`));
-        eventLog.push(`You died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}. Game over man... Game over.`);
+        eventMsg.push(
+          this.setImportantMessage(
+            `${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`,
+          ),
+        );
+        eventLog.push(
+          `You died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}. Game over man... Game over.`,
+        );
         let bountyEventLog;
-        playerObj.health = 100 + (playerObj.level * 5);
-        playerObj.mana = 50 + (playerObj.level * 5);
+        playerObj.health = 100 + playerObj.level * 5;
+        playerObj.mana = 50 + playerObj.level * 5;
         playerObj.map = await MapClass.getRandomTown();
         playerObj.experience.current -= expLoss;
         playerObj.experience.lost += expLoss;
@@ -394,7 +422,7 @@ class Helper {
         playerObj.gold.lost += goldLoss;
         playerObj.inventory = {
           equipment: [],
-          items: []
+          items: [],
         };
 
         const breakChance = this.randomBetween(0, 99);
@@ -403,34 +431,46 @@ class Helper {
           switch (randomEquip) {
             case 0:
               if (playerObj.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
-                eventMsg.push(this.setImportantMessage(`${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''}'s ${playerObj.equipment.helmet.name} just broke!`));
+                eventMsg.push(
+                  this.setImportantMessage(
+                    `${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''}'s ${playerObj.equipment.helmet.name} just broke!`,
+                  ),
+                );
                 eventLog.push(`Your ${playerObj.equipment.helmet.name} just broke!`);
                 await this.setPlayerEquipment(
                   playerObj,
                   enumHelper.equipment.types.helmet.position,
-                  enumHelper.equipment.empty.helmet
+                  enumHelper.equipment.empty.helmet,
                 );
               }
               break;
             case 1:
               if (playerObj.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
-                eventMsg.push(this.setImportantMessage(`${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''}'s ${playerObj.equipment.armor.name} just broke!`));
+                eventMsg.push(
+                  this.setImportantMessage(
+                    `${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''}'s ${playerObj.equipment.armor.name} just broke!`,
+                  ),
+                );
                 eventLog.push(`Your ${playerObj.equipment.armor.name} just broke!`);
                 await this.setPlayerEquipment(
                   playerObj,
                   enumHelper.equipment.types.armor.position,
-                  enumHelper.equipment.empty.armor
+                  enumHelper.equipment.empty.armor,
                 );
               }
               break;
             case 2:
               if (playerObj.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-                eventMsg.push(this.setImportantMessage(`${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''}'s ${playerObj.equipment.weapon.name} just broke!`));
+                eventMsg.push(
+                  this.setImportantMessage(
+                    `${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''}'s ${playerObj.equipment.weapon.name} just broke!`,
+                  ),
+                );
                 eventLog.push(`Your ${playerObj.equipment.weapon.name} just broke!`);
                 await this.setPlayerEquipment(
                   playerObj,
                   enumHelper.equipment.types.weapon.position,
-                  enumHelper.equipment.empty.weapon
+                  enumHelper.equipment.empty.weapon,
                 );
               }
               break;
@@ -450,9 +490,17 @@ class Helper {
             attackerObj.gold.current += Number(bountyGain);
             attackerObj.gold.total += Number(bountyGain);
             playerObj.currentBounty = 0;
-            eventMsg.push(this.setImportantMessage(`${attackerObj.name}${attackerObj.titles.current !== 'None' ? ` the ${attackerObj.titles.current}` : ''} just claimed ${bountyGain} gold as a reward for killing ${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''}!`));
-            eventLog.push(`You just claimed ${bountyGain} gold as a reward for killing ${playerObj.name}!`)
-            otherPlayerPmMsg.push(`${attackerObj.name}${attackerObj.titles.current !== 'None' ? ` the ${attackerObj.titles.current}` : ''} just claimed ${bountyGain} gold as a reward for killing you!`);
+            eventMsg.push(
+              this.setImportantMessage(
+                `${attackerObj.name}${attackerObj.titles.current !== 'None' ? ` the ${attackerObj.titles.current}` : ''} just claimed ${bountyGain} gold as a reward for killing ${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''}!`,
+              ),
+            );
+            eventLog.push(
+              `You just claimed ${bountyGain} gold as a reward for killing ${playerObj.name}!`,
+            );
+            otherPlayerPmMsg.push(
+              `${attackerObj.name}${attackerObj.titles.current !== 'None' ? ` the ${attackerObj.titles.current}` : ''} just claimed ${bountyGain} gold as a reward for killing you!`,
+            );
             await this.logEvent(attackerObj, Database, bountyEventLog, enumHelper.logTypes.action);
           }
 
@@ -467,7 +515,7 @@ class Helper {
           msg: eventMsg,
           pm: eventLog,
           attackerObj,
-          otherPlayerPmMsg
+          otherPlayerPmMsg,
         };
       }
 
@@ -478,7 +526,7 @@ class Helper {
   }
 
   generateSpellBookString(player) {
-    let spellBookString = '\`\`\`Here\'s your spellbook!\n';
+    let spellBookString = "\`\`\`Here's your spellbook!\n";
     player.spells.forEach((spell) => {
       spellBookString = spellBookString.concat(`    ${spell.name} - ${spell.description}\n`);
     });
@@ -498,7 +546,7 @@ class Helper {
       Current: ${player.experience.current}
       Lost: ${player.experience.lost}
       Total: ${player.experience.total}
-      TNL: ${(player.level * 15) - player.experience.current} / ${(player.level * 15)}
+      TNL: ${player.level * 15 - player.experience.current} / ${player.level * 15}
     Class: ${player.class}
     Gender: ${player.gender}
     Gold:
@@ -568,9 +616,9 @@ class Helper {
    */
   generatePlayerName(player, isAction) {
     if (
-      player.isMentionInDiscord === 'off'
-      || player.isMentionInDiscord === 'action' && !isAction
-      || player.isMentionInDiscord === 'move' && isAction
+      player.isMentionInDiscord === 'off' ||
+      (player.isMentionInDiscord === 'action' && !isAction) ||
+      (player.isMentionInDiscord === 'move' && isAction)
     ) {
       return player.titles.current !== 'None'
         ? `\`${player.name} the ${player.titles.current}\``
@@ -629,15 +677,14 @@ class Helper {
   }
 
   generateInventoryString(player) {
-    return this.generateInventoryEquipmentString(player)
-      .then((equipment) => {
-        return `\`\`\`Here is your inventory!
+    return this.generateInventoryEquipmentString(player).then(
+      (equipment) => `\`\`\`Here is your inventory!
         Equipment:
           ${equipment}
 
         Items:
-          ${player.inventory.items.map(item => item.name).join('\n      ')}\`\`\``;
-      });
+          ${player.inventory.items.map((item) => item.name).join('\n      ')}\`\`\``,
+    );
   }
 
   generateEquipmentsString(player) {
@@ -682,7 +729,10 @@ class Helper {
       } else {
         eventText = log[i].event[0];
       }
-      logResult += `${eventText} [${this.getTimePassed(log[i].timeStamp)} ago]\n      `.replace(/`/g, '');
+      logResult += `${eventText} [${this.getTimePassed(log[i].timeStamp)} ago]\n      `.replace(
+        /`/g,
+        '',
+      );
       logCount++;
     }
 
@@ -701,22 +751,34 @@ class Helper {
         break;
       }
 
-      logResult = logResult.concat(`${player.log[i].event} [${this.getTimePassed(player.log[i].timeStamp)} ago]\n      `);
+      logResult = logResult.concat(
+        `${player.log[i].event} [${this.getTimePassed(player.log[i].timeStamp)} ago]\n      `,
+      );
       logCount++;
     }
 
     return logResult;
   }
 
-  generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item, luckGambleGold, victimPlayer, otherPlayerLog) {
+  generateMessageWithNames(
+    eventMsg,
+    eventLog,
+    selectedPlayer,
+    item,
+    luckGambleGold,
+    victimPlayer,
+    otherPlayerLog,
+  ) {
     // TODO: Maybe change these ^^^^^ into an array???
-    eventMsg = eventMsg.replace(/(\$\$)/g, selectedPlayer.map.name)
+    eventMsg = eventMsg
+      .replace(/(\$\$)/g, selectedPlayer.map.name)
       .replace(/(##)/g, this.generatePlayerName(selectedPlayer, true))
       .replace(/(@@)/g, this.generateGenderString(selectedPlayer, 'him'))
       .replace(/(\^\^)/g, this.generateGenderString(selectedPlayer, 'his'))
       .replace(/(&&)/g, this.generateGenderString(selectedPlayer, 'he'));
 
-    eventLog = eventLog.replace('$$', selectedPlayer.map.name)
+    eventLog = eventLog
+      .replace('$$', selectedPlayer.map.name)
       .replace(/(##)/g, selectedPlayer.name)
       .replace(/(@@)/g, this.generateGenderString(selectedPlayer, 'him'))
       .replace(/(\^\^)/g, this.generateGenderString(selectedPlayer, 'his'))
@@ -757,13 +819,25 @@ class Helper {
       const randomEventInt = this.randomBetween(0, messages.event.gamble.win.length - 1);
       const { eventMsg, eventLog } = messages.event.gamble.win[randomEventInt];
 
-      return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
+      return this.generateMessageWithNames(
+        eventMsg,
+        eventLog,
+        selectedPlayer,
+        undefined,
+        luckGambleGold,
+      );
     }
 
     const randomEventInt = this.randomBetween(0, messages.event.gamble.lose.length - 1);
     const { eventMsg, eventLog } = messages.event.gamble.lose[randomEventInt];
 
-    return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
+    return this.generateMessageWithNames(
+      eventMsg,
+      eventLog,
+      selectedPlayer,
+      undefined,
+      luckGambleGold,
+    );
   }
 
   formatLeaderboards(subjectKey) {

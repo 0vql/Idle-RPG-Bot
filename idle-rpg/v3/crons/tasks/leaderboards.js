@@ -7,14 +7,26 @@ async function updateLeaderboards(bot, game) {
   for (const guild of bot.guilds.cache.values()) {
     try {
       const botGuildMember = guild.members.cache.get(bot.user.id);
-      if (!botGuildMember || !botGuildMember.permissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ManageChannels])) continue;
-      const leaderboardChannel = guild.channels.cache.find(channel => channel && channel.name === 'leaderboards' && channel.type === ChannelType.GuildText);
+      if (
+        !botGuildMember ||
+        !botGuildMember.permissions.has([
+          PermissionFlagsBits.ViewChannel,
+          PermissionFlagsBits.ManageChannels,
+        ])
+      )
+        continue;
+      const leaderboardChannel = guild.channels.cache.find(
+        (channel) =>
+          channel && channel.name === 'leaderboards' && channel.type === ChannelType.GuildText,
+      );
       if (!leaderboardChannel || !leaderboardChannel.manageable) continue;
 
       const fetched = await leaderboardChannel.messages.fetch({ limit: 10 });
       const msgs = [...fetched.values()].sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-      const top10Results = await Promise.all(types.map(type => game.db.loadTop10(type, guild.id, bot.user.id)));
+      const top10Results = await Promise.all(
+        types.map((type) => game.db.loadTop10(type, guild.id, bot.user.id)),
+      );
 
       for (let i = 0; i < types.length; i++) {
         const top10 = top10Results[i];
@@ -24,7 +36,7 @@ async function updateLeaderboards(bot, game) {
         const fieldParts = isNested ? fieldKey.split('.') : null;
         const subjectTitle = formatLeaderboards(fieldKey);
         const rankString = top10
-          .filter(player => {
+          .filter((player) => {
             const val = isNested ? player[fieldParts[0]][fieldParts[1]] : player[fieldKey];
             return val > 0;
           })

@@ -1,12 +1,19 @@
 const enumHelper = require('../../utils/enumHelper');
 const { getTimePassed } = require('./helpers');
-const { sumPlayerTotalStrength, sumPlayerTotalDexterity, sumPlayerTotalEndurance, sumPlayerTotalIntelligence, sumPlayerTotalLuck, calculateItemRating } = require('./battleHelpers');
+const {
+  sumPlayerTotalStrength,
+  sumPlayerTotalDexterity,
+  sumPlayerTotalEndurance,
+  sumPlayerTotalIntelligence,
+  sumPlayerTotalLuck,
+  calculateItemRating,
+} = require('./battleHelpers');
 
 function generatePlayerName(player, isAction) {
   if (
-    player.isMentionInDiscord === 'off'
-    || player.isMentionInDiscord === 'action' && !isAction
-    || player.isMentionInDiscord === 'move' && isAction
+    player.isMentionInDiscord === 'off' ||
+    (player.isMentionInDiscord === 'action' && !isAction) ||
+    (player.isMentionInDiscord === 'move' && isAction)
   ) {
     return player.titles.current !== 'None'
       ? `\`${player.name} the ${player.titles.current}\``
@@ -43,7 +50,7 @@ function generateStatsString(player) {
       Current: ${player.experience.current}
       Lost: ${player.experience.lost} (${((player.experience.lost / player.experience.total) * 100).toFixed(2)}%)
       Total: ${player.experience.total}
-      TNL: ${(player.level * 15) - player.experience.current} / ${(player.level * 15)}
+      TNL: ${player.level * 15 - player.experience.current} / ${player.level * 15}
     Class: ${player.class}
     Gender: ${player.gender}
     Gold:
@@ -155,11 +162,11 @@ function generateInventoryString(player) {
           ${equipment}
 
         Items:
-          ${player.inventory.items.map(item => item.name).join('\n      ')}\`\`\``;
+          ${player.inventory.items.map((item) => item.name).join('\n      ')}\`\`\``;
 }
 
 function generateSpellBookString(player) {
-  const lines = ['```Here\'s your spellbook!'];
+  const lines = ["```Here's your spellbook!"];
   player.spells.forEach((spell) => {
     lines.push(`    ${spell.name} - ${spell.description}`);
   });
@@ -211,5 +218,5 @@ module.exports = {
   generateInventoryString,
   generateSpellBookString,
   generateLog,
-  formatLeaderboards
+  formatLeaderboards,
 };

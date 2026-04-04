@@ -1,7 +1,7 @@
+const { ChannelType } = require('discord.js');
 const globalSpells = require('../../../game/data/globalSpells');
 const maps = require('../../../game/data/maps');
 const enumHelper = require('../../../utils/enumHelper');
-const { ChannelType } = require('discord.js');
 const { setImportantMessage } = require('../../utils/messageHelpers');
 
 module.exports = [
@@ -205,7 +205,7 @@ module.exports = [
         !loadedPlayer.quest.questMob ||
         !loadedPlayer.quest.questMob.name
       ) {
-        let { updatedPlayer } = await game.events.retrieveNewQuest(loadedPlayer, true);
+        const { updatedPlayer } = await game.events.retrieveNewQuest(loadedPlayer, true);
         await game.db.savePlayer(updatedPlayer);
         return author.send(
           `You have been assigned a new quest: ${updatedPlayer.quest.questMob.name}\nCount: ${updatedPlayer.quest.questMob.count}`,

@@ -3,80 +3,80 @@ const { map } = require('../../utils/enumHelper');
 const type = {
   land: {
     id: 0,
-    name: 'Land'
+    name: 'Land',
   },
 
   town: {
     id: 2,
-    name: 'Town'
+    name: 'Town',
   },
 };
 
 const biome = {
   land: {
     id: 0,
-    name: map.biomes.land
+    name: map.biomes.land,
   },
 
   coast: {
     id: 1,
-    name: map.biomes.coast
+    name: map.biomes.coast,
   },
 
   town: {
     id: 2,
-    name: map.biomes.town
+    name: map.biomes.town,
   },
 
   haunted: {
     id: 3,
-    name: map.biomes.haunted
+    name: map.biomes.haunted,
   },
 
   forest: {
     id: 4,
-    name: map.biomes.forest
+    name: map.biomes.forest,
   },
 
   plains: {
     id: 5,
-    name: map.biomes.plains
+    name: map.biomes.plains,
   },
 
   mountains: {
     id: 6,
-    name: map.biomes.mountains
+    name: map.biomes.mountains,
   },
 
   swamp: {
     id: 7,
-    name: map.biomes.swamp
+    name: map.biomes.swamp,
   },
 
   grassland: {
     id: 8,
-    name: map.biomes.grassland
+    name: map.biomes.grassland,
   },
 
   caves: {
     id: 9,
-    name: map.biomes.caves
+    name: map.biomes.caves,
   },
 
   plateau: {
     id: 10,
-    name: map.biomes.plateau
+    name: map.biomes.plateau,
   },
 
   moors: {
     id: 11,
-    name: map.biomes.moors
+    name: map.biomes.moors,
   },
 
   desert: {
     id: 12,
-    name: map.biomes.desert
-  }
+    name: map.biomes.desert,
+  },
 };
 
 const maps = [
@@ -88,7 +88,7 @@ const maps = [
     type: type.land,
     biome: biome.coast,
     levelReq: 1,
-    lore: 'A few islands near Neataman Lake.'
+    lore: 'A few islands near Neataman Lake.',
   },
 
   {
@@ -99,7 +99,7 @@ const maps = [
     type: type.land,
     biome: biome.coast,
     levelReq: 1,
-    lore: ''
+    lore: '',
   },
 
   {
@@ -110,7 +110,7 @@ const maps = [
     type: type.town,
     biome: biome.town,
     levelReq: 1,
-    lore: 'A large sized city, holding 75,000 villagers, holding a first line of defence with thousands of mages and knights. The rain comes everyday in a dark luster which overruns the streets with vibrant specks of water.'
+    lore: 'A large sized city, holding 75,000 villagers, holding a first line of defence with thousands of mages and knights. The rain comes everyday in a dark luster which overruns the streets with vibrant specks of water.',
   },
 
   {
@@ -121,7 +121,7 @@ const maps = [
     type: type.land,
     biome: biome.haunted,
     levelReq: 1,
-    lore: 'Once inhabitted by the monks of the local religion it has fallen into disrepair. Plants grow through the stonework, and sections have collapsed of what was once a sprawling complex. Now monsters roam the dark forgotten halls.'
+    lore: 'Once inhabitted by the monks of the local religion it has fallen into disrepair. Plants grow through the stonework, and sections have collapsed of what was once a sprawling complex. Now monsters roam the dark forgotten halls.',
   },
 
   {
@@ -132,7 +132,7 @@ const maps = [
     type: type.land,
     biome: biome.forest,
     levelReq: 1,
-    lore: 'The tough lumberjacks make this timblerland their home. It seems no matter how many logs they send down the fast moving river there is still many more to cut. The lumber here is said to be some of the best in the land.'
+    lore: 'The tough lumberjacks make this timblerland their home. It seems no matter how many logs they send down the fast moving river there is still many more to cut. The lumber here is said to be some of the best in the land.',
   },
 
   {
@@ -143,18 +143,19 @@ const maps = [
     type: type.land,
     biome: biome.grassland,
     levelReq: 1,
-    lore: 'Quiet and sleepy. Never at threat of invasion as there is nothing worth invading. What few people who do live here are subsistence farmers or else wizarding types. It is said the school of wizardry for the continent is somewhere in the hills but any attempt to give directions to it seems to result in a radically different path each time.'
+    lore: 'Quiet and sleepy. Never at threat of invasion as there is nothing worth invading. What few people who do live here are subsistence farmers or else wizarding types. It is said the school of wizardry for the continent is somewhere in the hills but any attempt to give directions to it seems to result in a radically different path each time.',
   },
 
   {
     id: 6,
     coords: [0, 1],
-    image: 'https://cdn.discordapp.com/attachments/418132578030190594/418132614931808256/unknown.png',
+    image:
+      'https://cdn.discordapp.com/attachments/418132578030190594/418132614931808256/unknown.png',
     name: 'Opemdek Peak',
     type: type.land,
     biome: biome.mountains,
     levelReq: 1,
-    lore: 'A white, snowy mountain covered with evergreens. Paths running through the hills are known to be very vulnerable to bandit attacks...'
+    lore: 'A white, snowy mountain covered with evergreens. Paths running through the hills are known to be very vulnerable to bandit attacks...',
   },
 
   {
@@ -165,7 +166,7 @@ const maps = [
     type: type.land,
     biome: biome.grassland,
     levelReq: 1,
-    lore: 'The people residing in Appleview having been farming since before written record. It is said that their fruit and vegetables can cure illness and exorcise demons. Very secret of their techniques but rather friendly in other contexts.'
+    lore: 'The people residing in Appleview having been farming since before written record. It is said that their fruit and vegetables can cure illness and exorcise demons. Very secret of their techniques but rather friendly in other contexts.',
   },
 
   {
@@ -176,7 +177,7 @@ const maps = [
     type: type.land,
     biome: biome.swamp,
     levelReq: 1,
-    lore: 'Mud. Muck. Sticky dirt that requires wading through. No one wants to be there, not even the monsters that go there to feed.'
+    lore: 'Mud. Muck. Sticky dirt that requires wading through. No one wants to be there, not even the monsters that go there to feed.',
   },
 
   {
@@ -187,7 +188,7 @@ const maps = [
     type: type.land,
     biome: biome.forest,
     levelReq: 1,
-    lore: 'No matter what warnings are given there are always those who find themselves attracted to this closely packed dark forest. Trees do not look healthy but grow dense enough to obscure much of the light. The forest round is home to a number creatures that hate the light. Many stories use this as a location of evil.'
+    lore: 'No matter what warnings are given there are always those who find themselves attracted to this closely packed dark forest. Trees do not look healthy but grow dense enough to obscure much of the light. The forest round is home to a number creatures that hate the light. Many stories use this as a location of evil.',
   },
 
   {
@@ -198,7 +199,7 @@ const maps = [
     type: type.land,
     biome: biome.forest,
     levelReq: 1,
-    lore: ''
+    lore: '',
   },
 
   {
@@ -209,7 +210,7 @@ const maps = [
     type: type.land,
     biome: biome.plains,
     levelReq: 1,
-    lore: ''
+    lore: '',
   },
 
   {
@@ -220,7 +221,7 @@ const maps = [
     type: type.land,
     biome: biome.coast,
     levelReq: 1,
-    lore: ''
+    lore: '',
   },
 
   {
@@ -231,7 +232,7 @@ const maps = [
     type: type.land,
     biome: biome.grassland,
     levelReq: 1,
-    lore: 'A beautiful blue lake surrounded by high weeds. The depth is said to be unknowable, only becoming darker closer to the center. Nothing lost in Rosepond is ever recovered. The name comes from the crop of choice in the area a unique blue rose rumored to bring health when prepared right.'
+    lore: 'A beautiful blue lake surrounded by high weeds. The depth is said to be unknowable, only becoming darker closer to the center. Nothing lost in Rosepond is ever recovered. The name comes from the crop of choice in the area a unique blue rose rumored to bring health when prepared right.',
   },
 
   {
@@ -242,7 +243,7 @@ const maps = [
     type: type.land,
     biome: biome.mountains,
     levelReq: 1,
-    lore: 'A tall set of snow tipped peaks, many paths have been chiseled out of the rock by unknown ancient people.'
+    lore: 'A tall set of snow tipped peaks, many paths have been chiseled out of the rock by unknown ancient people.',
   },
 
   {
@@ -253,7 +254,7 @@ const maps = [
     type: type.land,
     biome: biome.mountains,
     levelReq: 1,
-    lore: 'High peeks covered in snow the majority of the year. The altitude deters most people, and the remoteness most others. Rumored to be filled with yetis and other fierce creatures.'
+    lore: 'High peeks covered in snow the majority of the year. The altitude deters most people, and the remoteness most others. Rumored to be filled with yetis and other fierce creatures.',
   },
 
   {
@@ -264,7 +265,7 @@ const maps = [
     type: type.land,
     biome: biome.caves,
     levelReq: 1,
-    lore: ''
+    lore: '',
   },
 
   {
@@ -275,7 +276,7 @@ const maps = [
     type: type.town,
     biome: biome.town,
     levelReq: 1,
-    lore: ''
+    lore: '',
   },
 
   {
@@ -286,7 +287,7 @@ const maps = [
     type: type.town,
     biome: biome.town,
     levelReq: 1,
-    lore: 'A larger city, though not the largest of the continent. Stone buildings, and an extensive dock system characterize this city. Never are you far from a place to drink away troubles and gamble away money.'
+    lore: 'A larger city, though not the largest of the continent. Stone buildings, and an extensive dock system characterize this city. Never are you far from a place to drink away troubles and gamble away money.',
   },
 
   {
@@ -297,7 +298,7 @@ const maps = [
     type: type.land,
     biome: biome.grassland,
     levelReq: 1,
-    lore: 'So much blood has been shed on the Damascus Fields that the plants growing in it have become red. The battlegrounds of the Kingdom of Olohaseth it is where the soldiers fight and protect the kingdoms inhabitants. Scoured by treasure hunters in search of unfound weapons, armor, and other artifacts which could command a high price inside the city. It has been said that a profitable iron mine could be made with the discarded chunks of debris alone.'
+    lore: 'So much blood has been shed on the Damascus Fields that the plants growing in it have become red. The battlegrounds of the Kingdom of Olohaseth it is where the soldiers fight and protect the kingdoms inhabitants. Scoured by treasure hunters in search of unfound weapons, armor, and other artifacts which could command a high price inside the city. It has been said that a profitable iron mine could be made with the discarded chunks of debris alone.',
   },
 
   {
@@ -308,7 +309,7 @@ const maps = [
     type: type.land,
     biome: biome.plateau,
     levelReq: 1,
-    lore: 'A nearly peramently frozen lake located high up on a plateau. Once a year it defrosts allowing the creatures that reside bellow the ice to begin their mating season. These fish are a local delicacy and sell for quite a pretty penny.'
+    lore: 'A nearly peramently frozen lake located high up on a plateau. Once a year it defrosts allowing the creatures that reside bellow the ice to begin their mating season. These fish are a local delicacy and sell for quite a pretty penny.',
   },
 
   {
@@ -319,7 +320,7 @@ const maps = [
     type: type.land,
     biome: biome.mountains,
     levelReq: 1,
-    lore: 'Renowned to be one of the highest peaks in the world. Many young warriors train here by climbing up its steps in perserverance.'
+    lore: 'Renowned to be one of the highest peaks in the world. Many young warriors train here by climbing up its steps in perserverance.',
   },
 
   {
@@ -330,7 +331,7 @@ const maps = [
     type: type.land,
     biome: biome.grassland,
     levelReq: 1,
-    lore: 'Not a dreadful place to be lost in. The basis for many local tales of fairies, and other little folk. Catching a meal is easy with the abundant wildlife.'
+    lore: 'Not a dreadful place to be lost in. The basis for many local tales of fairies, and other little folk. Catching a meal is easy with the abundant wildlife.',
   },
 
   {
@@ -341,7 +342,7 @@ const maps = [
     type: type.land,
     biome: biome.plains,
     levelReq: 1,
-    lore: ''
+    lore: '',
   },
 
   {
@@ -352,7 +353,7 @@ const maps = [
     type: type.land,
     biome: biome.coast,
     levelReq: 1,
-    lore: ''
+    lore: '',
   },
 
   {
@@ -363,7 +364,7 @@ const maps = [
     type: type.town,
     biome: biome.town,
     levelReq: 1,
-    lore: 'There have been good kings and evil kings. They are just men temporary. The Kingdom of Olohaseth seems to be eternal. No successful invasion has ever taken place and the high walls around the land keep the residents safe. Roads stretch from it, and if you can find it somewhere in the continent it is likely bought and sold inside the kingdom walls.'
+    lore: 'There have been good kings and evil kings. They are just men temporary. The Kingdom of Olohaseth seems to be eternal. No successful invasion has ever taken place and the high walls around the land keep the residents safe. Roads stretch from it, and if you can find it somewhere in the continent it is likely bought and sold inside the kingdom walls.',
   },
 
   {
@@ -374,7 +375,7 @@ const maps = [
     type: type.land,
     biome: biome.grassland,
     levelReq: 1,
-    lore: 'It\'s rumored that a mighty kraken resides in the lake. Adventurers travel from all over to visit the lake.'
+    lore: "It's rumored that a mighty kraken resides in the lake. Adventurers travel from all over to visit the lake.",
   },
 
   {
@@ -385,7 +386,7 @@ const maps = [
     type: type.land,
     biome: biome.forest,
     levelReq: 1,
-    lore: 'Named for the large amount of bones to be found in the dense forest. The powerful creatures hidden in the mists are the cause of the death. No full maps exist of the forest and some say such a task is impossible due to a constantly shifting nature.'
+    lore: 'Named for the large amount of bones to be found in the dense forest. The powerful creatures hidden in the mists are the cause of the death. No full maps exist of the forest and some say such a task is impossible due to a constantly shifting nature.',
   },
 
   {
@@ -396,7 +397,7 @@ const maps = [
     type: type.land,
     biome: biome.moors,
     levelReq: 1,
-    lore: 'Dry and deserted. It is hard to survive in is just a few inches of rain a year above a desert. Occasionally the bones of great beasts that seem like odd forms of dragons will be unearthed in these loose soils.'
+    lore: 'Dry and deserted. It is hard to survive in is just a few inches of rain a year above a desert. Occasionally the bones of great beasts that seem like odd forms of dragons will be unearthed in these loose soils.',
   },
 
   {
@@ -407,7 +408,7 @@ const maps = [
     type: type.land,
     biome: biome.desert,
     levelReq: 1,
-    lore: ''
+    lore: '',
   },
 
   {
@@ -418,7 +419,7 @@ const maps = [
     type: type.land,
     biome: biome.coast,
     levelReq: 1,
-    lore: ''
+    lore: '',
   },
 
   {
@@ -429,7 +430,7 @@ const maps = [
     type: type.land,
     biome: biome.plateau,
     levelReq: 1,
-    lore: ''
+    lore: '',
   },
 
   {
@@ -440,7 +441,7 @@ const maps = [
     type: type.land,
     biome: biome.grassland,
     levelReq: 1,
-    lore: 'A medium sized hill topped with trees. The howls that emanate from this place at night keep all but the brave away.'
+    lore: 'A medium sized hill topped with trees. The howls that emanate from this place at night keep all but the brave away.',
   },
 
   {
@@ -451,7 +452,7 @@ const maps = [
     type: type.town,
     biome: biome.town,
     levelReq: 1,
-    lore: 'A quiet farming town that was once more populous before the troubles begin nearby. The people are generally friendly unless provoked but wary of strangers.'
+    lore: 'A quiet farming town that was once more populous before the troubles begin nearby. The people are generally friendly unless provoked but wary of strangers.',
   },
 
   {
@@ -462,7 +463,7 @@ const maps = [
     type: type.land,
     biome: biome.plains,
     levelReq: 1,
-    lore: 'Named after an old farm that used to stand on the field. Flat and featureless except for tall grass on both sides of the one road that runs through. The rustling of it could just be the wind or could be the elves sneaking up for a kill.'
+    lore: 'Named after an old farm that used to stand on the field. Flat and featureless except for tall grass on both sides of the one road that runs through. The rustling of it could just be the wind or could be the elves sneaking up for a kill.',
   },
 
   {
@@ -473,7 +474,7 @@ const maps = [
     type: type.land,
     biome: biome.desert,
     levelReq: 1,
-    lore: ''
-  }
+    lore: '',
+  },
 ];
 module.exports = maps;

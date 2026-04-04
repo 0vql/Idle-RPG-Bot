@@ -4,12 +4,12 @@ const actionLog = mongoose.Schema({
   playerId: String,
   type: {
     type: String,
-    default: 'ACTION'
+    default: 'ACTION',
   },
   log: {
     type: Array,
-    default: []
-  }
+    default: [],
+  },
 });
 
 actionLog.set('autoIndex', false);

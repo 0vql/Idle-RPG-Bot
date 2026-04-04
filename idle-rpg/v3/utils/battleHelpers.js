@@ -5,7 +5,7 @@ function _enchantBonus(player, stat) {
   let bonus = 0;
   const slots = ['weapon', 'armor', 'helmet'];
   for (const slot of slots) {
-    const enchant = player.equipment[slot].enchant;
+    const { enchant } = player.equipment[slot];
     if (enchant && enchant.stat === stat) bonus += enchant.bonus || 0;
   }
   return bonus;
@@ -44,7 +44,9 @@ function calculateItemRating(player, item) {
       case 'range':
         return Math.ceil(item.power + sumPlayerTotalDexterity(player) + luk * 0.5 + enchantBonus);
       case 'magic':
-        return Math.ceil(item.power + sumPlayerTotalIntelligence(player) + luk * 0.5 + enchantBonus);
+        return Math.ceil(
+          item.power + sumPlayerTotalIntelligence(player) + luk * 0.5 + enchantBonus,
+        );
     }
   }
   return Math.ceil(item.str + item.dex + item.end + item.int + item.luk);
@@ -61,5 +63,5 @@ module.exports = {
   sumPlayerTotalIntelligence,
   sumPlayerTotalLuck,
   calculateItemRating,
-  printBattleDebug
+  printBattleDebug,
 };

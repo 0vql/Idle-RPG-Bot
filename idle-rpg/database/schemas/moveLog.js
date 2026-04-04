@@ -4,12 +4,12 @@ const moveLog = mongoose.Schema({
   playerId: String,
   type: {
     type: String,
-    default: 'MOVE'
+    default: 'MOVE',
   },
   log: {
     type: Array,
-    default: []
-  }
+    default: [],
+  },
 });
 
 moveLog.set('autoIndex', false);

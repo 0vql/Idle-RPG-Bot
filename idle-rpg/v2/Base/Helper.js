@@ -22,7 +22,7 @@ class Helper {
   randomBetween(min, max, decimal, exclude) {
     // Adding + 1 to max due to trunc
     max += 1;
-    if (arguments.length < 2) return (RNG() >= 0.5);
+    if (arguments.length < 2) return RNG() >= 0.5;
 
     let factor = 1;
     let result;
@@ -30,7 +30,7 @@ class Helper {
       factor = decimal ** 10;
     }
     do {
-      result = (RNG() * (max - min)) + min;
+      result = RNG() * (max - min) + min;
       result = Math.trunc(result * factor) / factor;
     } while (result === exclude);
     return result;
@@ -57,7 +57,7 @@ class Helper {
       Current: ${player.experience.current}
       Lost: ${player.experience.lost} (${((player.experience.lost / player.experience.total) * 100).toFixed(2)}%)
       Total: ${player.experience.total}
-      TNL: ${(player.level * 15) - player.experience.current} / ${(player.level * 15)}
+      TNL: ${player.level * 15 - player.experience.current} / ${player.level * 15}
     Class: ${player.class}
     Gender: ${player.gender}
     Gold:
@@ -140,15 +140,14 @@ class Helper {
   }
 
   generateInventoryString(player) {
-    return this.generateInventoryEquipmentString(player)
-      .then((equipment) => {
-        return `\`\`\`Here is your inventory!
+    return this.generateInventoryEquipmentString(player).then(
+      (equipment) => `\`\`\`Here is your inventory!
         Equipment:
           ${equipment}
 
         Items:
-          ${player.inventory.items.map(item => item.name).join('\n      ')}\`\`\``;
-      });
+          ${player.inventory.items.map((item) => item.name).join('\n      ')}\`\`\``,
+    );
   }
 
   generateInventoryEquipmentString(player) {
@@ -188,7 +187,7 @@ class Helper {
   }
 
   generateSpellBookString(player) {
-    let spellBookString = '\`\`\`Here\'s your spellbook!\n';
+    let spellBookString = "\`\`\`Here's your spellbook!\n";
     player.spells.forEach((spell) => {
       spellBookString += `    ${spell.name} - ${spell.description}\n`;
     });
@@ -221,9 +220,9 @@ class Helper {
    */
   generatePlayerName(player, isAction) {
     if (
-      player.isMentionInDiscord === 'off'
-      || player.isMentionInDiscord === 'action' && !isAction
-      || player.isMentionInDiscord === 'move' && isAction
+      player.isMentionInDiscord === 'off' ||
+      (player.isMentionInDiscord === 'action' && !isAction) ||
+      (player.isMentionInDiscord === 'move' && isAction)
     ) {
       return player.titles.current !== 'None'
         ? `\`${player.name} the ${player.titles.current}\``
@@ -264,7 +263,7 @@ class Helper {
     let questGoldGain = 0;
 
     results.defender.forEach((mob) => {
-      let infoList = mobListInfo.mobs.findIndex(arrayMob => arrayMob.mob === mob.name);
+      let infoList = mobListInfo.mobs.findIndex((arrayMob) => arrayMob.mob === mob.name);
       if (infoList !== -1) {
         mobListInfo.mobs[infoList].totalCount++;
       } else {
@@ -274,15 +273,15 @@ class Helper {
           event: {
             killed: 0,
             fled: 0,
-            survived: 0
-          }
+            survived: 0,
+          },
         });
       }
-      infoList = mobListInfo.mobs.findIndex(arrayMob => arrayMob.mob === mob.name);
-      expGain += Math.ceil(((mob.experience) + (mob.dmgDealt / 4)) / 6) * multiplier;
+      infoList = mobListInfo.mobs.findIndex((arrayMob) => arrayMob.mob === mob.name);
+      expGain += Math.ceil((mob.experience + mob.dmgDealt / 4) / 6) * multiplier;
 
       if (mob.health <= 0) {
-        goldGain += Math.floor((mob.gold * multiplier));
+        goldGain += Math.floor(mob.gold * multiplier);
         mobListInfo.mobs[infoList].event.killed++;
       } else if (mob.health > 0 && updatedPlayer.health > 0) {
         mobListInfo.mobs[infoList].event.fled++;
@@ -291,7 +290,11 @@ class Helper {
         mobListInfo.mobs[infoList].event.survived++;
       }
 
-      if (!updatedPlayer.quest.questMob.name.includes('None') && mob.name.includes(updatedPlayer.quest.questMob.name) && mob.health <= 0) {
+      if (
+        !updatedPlayer.quest.questMob.name.includes('None') &&
+        mob.name.includes(updatedPlayer.quest.questMob.name) &&
+        mob.health <= 0
+      ) {
         updatedPlayer.quest.questMob.killCount++;
         if (updatedPlayer.quest.questMob.killCount >= updatedPlayer.quest.questMob.count) {
           isQuestCompleted = true;
@@ -305,24 +308,33 @@ class Helper {
         updatedPlayer.quest.updated_at = new Date();
       }
 
-      if (Math.floor(results.defenderDamage / (results.defender.length)) > 0) {
-        mobListResult.push(`  ${mob.name}'s ${mob.equipment.weapon.name} did ${mob.dmgDealt} damage.`);
+      if (Math.floor(results.defenderDamage / results.defender.length) > 0) {
+        mobListResult.push(
+          `  ${mob.name}'s ${mob.equipment.weapon.name} did ${mob.dmgDealt} damage.`,
+        );
       }
-      mobListResult.push(`  ${mob.health <= 0 ? `${mob.name} took ${mob.dmgReceived} dmg and died.` : `${mob.name} took ${mob.dmgReceived} dmg and has ${mob.health} / ${mob.maxHealth} HP left.`}`);
+      mobListResult.push(
+        `  ${mob.health <= 0 ? `${mob.name} took ${mob.dmgReceived} dmg and died.` : `${mob.name} took ${mob.dmgReceived} dmg and has ${mob.health} / ${mob.maxHealth} HP left.`}`,
+      );
     });
     let battleResult = `\`\`\`Battle Results:
   You have ${updatedPlayer.health} / ${playerMaxHealth} HP left.
 ${mobListResult.join('\n')}\`\`\``;
 
     if (updatedPlayer.health <= 0) {
-      battleResult = battleResult.replace(`  You have ${updatedPlayer.health} / ${playerMaxHealth} HP left.`, '');
-      const killerMob = results.defender.reduce((list, mob) => {
-        if (!mob.dmgDealt > 0) {
-          return list;
-        }
+      battleResult = battleResult.replace(
+        `  You have ${updatedPlayer.health} / ${playerMaxHealth} HP left.`,
+        '',
+      );
+      const killerMob = results.defender
+        .reduce((list, mob) => {
+          if (!mob.dmgDealt > 0) {
+            return list;
+          }
 
-        return list.concat(mob.name);
-      }, []).join(', ');
+          return list.concat(mob.name);
+        }, [])
+        .join(', ');
       eventMsg.push(`| ${killerMob} just killed ${this.generatePlayerName(updatedPlayer, true)}!`);
       eventLog.push(`${killerMob} just killed you!`);
     }
@@ -330,31 +342,63 @@ ${mobListResult.join('\n')}\`\`\``;
 
     mobListInfo.mobs.forEach((mobInfo, i) => {
       const totalCount = mobInfo.event.killed + mobInfo.event.fled + mobInfo.event.survived;
-      mobCountString = i > 0 ? mobCountString.concat(`, ${totalCount}x \`${mobInfo.mob}\``) : mobCountString.concat(`${totalCount}x \`${mobInfo.mob}\``);
+      mobCountString =
+        i > 0
+          ? mobCountString.concat(`, ${totalCount}x \`${mobInfo.mob}\``)
+          : mobCountString.concat(`${totalCount}x \`${mobInfo.mob}\``);
       if (mobInfo.event.killed > 0) {
-        mobKillCountString = mobKillCountString !== '' ? mobKillCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``) : mobKillCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
+        mobKillCountString =
+          mobKillCountString !== ''
+            ? mobKillCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``)
+            : mobKillCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
       }
       if (mobInfo.event.fled > 0 && mobInfo.event.killed === 0) {
-        mobFleeCountString = mobKillCountString !== '' ? mobFleeCountString.concat(`, ${mobInfo.event.fled}x \`${mobInfo.mob}\``) : mobFleeCountString.concat(`${mobInfo.event.fled}x \`${mobInfo.mob}\``);
+        mobFleeCountString =
+          mobKillCountString !== ''
+            ? mobFleeCountString.concat(`, ${mobInfo.event.fled}x \`${mobInfo.mob}\``)
+            : mobFleeCountString.concat(`${mobInfo.event.fled}x \`${mobInfo.mob}\``);
       } else if (mobInfo.event.fled > 0) {
         mobFleeCountString = mobFleeCountString.concat(`${mobInfo.event.fled}x \`${mobInfo.mob}\``);
       }
     });
 
     if (mobFleeCountString) {
-      eventMsg.push(results.attackerDamage > results.defenderDamage
-        ? `${mobFleeCountString} just fled from ${this.generatePlayerName(results.attacker, true)}!`.replace(/1x /g, '')
-        : `${this.generatePlayerName(results.attacker, true)} just fled from ${mobFleeCountString}!`.replace(/1x /g, ''));
-      eventLog.push(results.attackerDamage > results.defenderDamage
-        ? `${mobFleeCountString} fled from you! [${expGain} exp]`.replace(/1x /g, '')
-        : `You fled from ${mobFleeCountString}! [${expGain} exp]`.replace(/1x /g, ''));
+      eventMsg.push(
+        results.attackerDamage > results.defenderDamage
+          ? `${mobFleeCountString} just fled from ${this.generatePlayerName(results.attacker, true)}!`.replace(
+              /1x /g,
+              '',
+            )
+          : `${this.generatePlayerName(results.attacker, true)} just fled from ${mobFleeCountString}!`.replace(
+              /1x /g,
+              '',
+            ),
+      );
+      eventLog.push(
+        results.attackerDamage > results.defenderDamage
+          ? `${mobFleeCountString} fled from you! [${expGain} exp]`.replace(/1x /g, '')
+          : `You fled from ${mobFleeCountString}! [${expGain} exp]`.replace(/1x /g, ''),
+      );
     }
 
     if (mobKillCountString) {
-      eventMsg.push(`${this.generatePlayerName(updatedPlayer, true)}'s \`${updatedPlayer.equipment.weapon.name}\` just killed ${mobKillCountString}`.replace(/1x /g, ''));
-      eventLog.push(`You killed ${mobKillCountString}! [\`${expGain}\` exp${goldGain === 0 ? '' : ` / \`${goldGain}\` gold`}]`.replace(/1x /g, '').replace(/\n$/g, ''));
+      eventMsg.push(
+        `${this.generatePlayerName(updatedPlayer, true)}'s \`${updatedPlayer.equipment.weapon.name}\` just killed ${mobKillCountString}`.replace(
+          /1x /g,
+          '',
+        ),
+      );
+      eventLog.push(
+        `You killed ${mobKillCountString}! [\`${expGain}\` exp${goldGain === 0 ? '' : ` / \`${goldGain}\` gold`}]`
+          .replace(/1x /g, '')
+          .replace(/\n$/g, ''),
+      );
     }
-    const attackedMsg = `Attacked ${mobCountString.replace(/`/g, '')} with \`${updatedPlayer.equipment.weapon.name}\` in \`${updatedPlayer.map.name}\` `.replace(/1x /g, '');
+    const attackedMsg =
+      `Attacked ${mobCountString.replace(/`/g, '')} with \`${updatedPlayer.equipment.weapon.name}\` in \`${updatedPlayer.map.name}\` `.replace(
+        /1x /g,
+        '',
+      );
     eventMsg.push(eventMsgResults);
     eventLog.push(attackedMsg.replace(/1x /g, '').concat(battleResult));
     eventMsg.splice(0, 2, eventMsg[0] + eventMsg[1]);
@@ -367,7 +411,7 @@ ${mobListResult.join('\n')}\`\`\``;
       questGoldGain,
       eventMsg,
       eventLog,
-      isQuestCompleted
+      isQuestCompleted,
     };
   }
 
@@ -385,16 +429,23 @@ ${mobListResult.join('\n')}\`\`\``;
 
       switch (item.attackType) {
         case 'melee':
-          return Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)));
+          return Math.ceil(
+            this.sumPlayerTotalStrength(player) + item.power + this.sumPlayerTotalDexterity(player),
+          );
 
         case 'range':
-          return Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)));
+          return Math.ceil(
+            this.sumPlayerTotalDexterity(player) +
+              item.power +
+              this.sumPlayerTotalDexterity(player),
+          );
 
         case 'magic':
-          return Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)));
+          return Math.ceil(
+            this.sumPlayerTotalIntelligence(player) +
+              item.power +
+              this.sumPlayerTotalDexterity(player),
+          );
       }
     }
 
@@ -407,48 +458,43 @@ ${mobListResult.join('\n')}\`\`\``;
    * @returns Number
    */
   sumPlayerTotalStrength(player) {
-    return player.stats.str
-      + player.equipment.relic.str;
+    return player.stats.str + player.equipment.relic.str;
   }
 
   /**
-  * Returns sum of players dexterity
-  * @param {Object} player
-  * @returns Number
-  */
+   * Returns sum of players dexterity
+   * @param {Object} player
+   * @returns Number
+   */
   sumPlayerTotalDexterity(player) {
-    return player.stats.dex
-      + player.equipment.relic.dex;
+    return player.stats.dex + player.equipment.relic.dex;
   }
 
   /**
-  * Returns sum of players endurance
-  * @param {Object} player
-  * @returns Number
-  */
+   * Returns sum of players endurance
+   * @param {Object} player
+   * @returns Number
+   */
   sumPlayerTotalEndurance(player) {
-    return player.stats.end
-      + player.equipment.relic.end;
+    return player.stats.end + player.equipment.relic.end;
   }
 
   /**
-  * Returns sum of players intelligence
-  * @param {Object} player
-  * @returns Number
-  */
+   * Returns sum of players intelligence
+   * @param {Object} player
+   * @returns Number
+   */
   sumPlayerTotalIntelligence(player) {
-    return player.stats.int
-      + player.equipment.relic.int;
+    return player.stats.int + player.equipment.relic.int;
   }
 
   /**
-  * Returns sum of players luck
-  * @param {Object} player
-  * @returns Number
-  */
+   * Returns sum of players luck
+   * @param {Object} player
+   * @returns Number
+   */
   sumPlayerTotalLuck(player) {
-    return player.stats.luk
-      + player.equipment.relic.luk;
+    return player.stats.luk + player.equipment.relic.luk;
   }
 
   /*
@@ -465,7 +511,7 @@ ${mobListResult.join('\n')}\`\`\``;
     const secNum = parseInt(duration, 10); // don't forget the second param
     let days = Math.floor(secNum / 86400);
     let hours = Math.floor(secNum / 3600) % 24;
-    let minutes = Math.floor((secNum - (hours * 3600)) / 60) % 60;
+    let minutes = Math.floor((secNum - hours * 3600) / 60) % 60;
     let seconds = secNum % 60;
 
     days = days < 10 ? `0${days}` : days;
@@ -543,10 +589,10 @@ ${mobListResult.join('\n')}\`\`\``;
           Database.loadMoveLog(selectedPlayer.discordId)
             .then((playerMoveLog) => {
               if (!playerMoveLog) {
-                playerMoveLog = { log: [] }
+                playerMoveLog = { log: [] };
               }
               if (!playerMoveLog.log) {
-                playerMoveLog.log = []
+                playerMoveLog.log = [];
               }
               if (playerMoveLog.log.length > 25) {
                 playerMoveLog.log.shift();
@@ -554,12 +600,12 @@ ${mobListResult.join('\n')}\`\`\``;
 
               playerMoveLog.log.push({
                 event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
-                timeStamp: new Date().getTime()
+                timeStamp: new Date().getTime(),
               });
 
               return playerMoveLog;
             })
-            .then(playerMoveLog => Database.saveMoveLog(selectedPlayer.discordId, playerMoveLog))
+            .then((playerMoveLog) => Database.saveMoveLog(selectedPlayer.discordId, playerMoveLog))
             .catch((err) => {
               errorLog.error(err);
             });
@@ -569,10 +615,10 @@ ${mobListResult.join('\n')}\`\`\``;
           Database.loadActionLog(selectedPlayer.discordId)
             .then((playerActionLog) => {
               if (!playerActionLog) {
-                playerActionLog = { log: [] }
+                playerActionLog = { log: [] };
               }
               if (!playerActionLog.log) {
-                playerActionLog.log = []
+                playerActionLog.log = [];
               }
               if (playerActionLog.log.length > 25) {
                 playerActionLog.log.shift();
@@ -580,19 +626,21 @@ ${mobListResult.join('\n')}\`\`\``;
 
               playerActionLog.log.push({
                 event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
-                timeStamp: new Date().getTime()
+                timeStamp: new Date().getTime(),
               });
 
               return playerActionLog;
             })
-            .then(playerActionLog => Database.saveActionLog(selectedPlayer.discordId, playerActionLog));
+            .then((playerActionLog) =>
+              Database.saveActionLog(selectedPlayer.discordId, playerActionLog),
+            );
           break;
 
         case enumHelper.logTypes.pvp:
           Database.loadPvpLog(selectedPlayer.discordId)
             .then((playerPvpLog) => {
               if (!playerPvpLog.log) {
-                playerPvpLog.log = []
+                playerPvpLog.log = [];
               }
               if (playerPvpLog.log.length > 25) {
                 playerPvpLog.log.shift();
@@ -600,12 +648,12 @@ ${mobListResult.join('\n')}\`\`\``;
 
               playerPvpLog.log.push({
                 event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
-                timeStamp: new Date().getTime()
+                timeStamp: new Date().getTime(),
               });
 
               return playerPvpLog;
             })
-            .then(playerPvpLog => Database.savePvpLog(selectedPlayer.discordId, playerPvpLog));
+            .then((playerPvpLog) => Database.savePvpLog(selectedPlayer.discordId, playerPvpLog));
           break;
       }
 
@@ -630,22 +678,35 @@ ${mobListResult.join('\n')}\`\`\``;
       } else {
         eventText = log[i].event[0];
       }
-      logResult += `${eventText} [${this.getTimePassed(log[i].timeStamp)} ago]\n      `.replace(/`/g, '');
+      logResult += `${eventText} [${this.getTimePassed(log[i].timeStamp)} ago]\n      `.replace(
+        /`/g,
+        '',
+      );
       logCount++;
     }
 
     return logResult;
   }
 
-  generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item, luckGambleGold, victimPlayer, otherPlayerLog) {
+  generateMessageWithNames(
+    eventMsg,
+    eventLog,
+    selectedPlayer,
+    item,
+    luckGambleGold,
+    victimPlayer,
+    otherPlayerLog,
+  ) {
     // TODO: Maybe change these ^^^^^ into an array???
-    eventMsg = eventMsg.replace(/(\$\$)/g, selectedPlayer.map.name)
+    eventMsg = eventMsg
+      .replace(/(\$\$)/g, selectedPlayer.map.name)
       .replace(/(##)/g, this.generatePlayerName(selectedPlayer, true))
       .replace(/(@@)/g, this.generateGenderString(selectedPlayer, 'him'))
       .replace(/(\^\^)/g, this.generateGenderString(selectedPlayer, 'his'))
       .replace(/(&&)/g, this.generateGenderString(selectedPlayer, 'he'));
 
-    eventLog = eventLog.replace('$$', selectedPlayer.map.name)
+    eventLog = eventLog
+      .replace('$$', selectedPlayer.map.name)
       .replace(/(##)/g, selectedPlayer.name)
       .replace(/(@@)/g, this.generateGenderString(selectedPlayer, 'him'))
       .replace(/(\^\^)/g, this.generateGenderString(selectedPlayer, 'his'))
@@ -686,13 +747,25 @@ ${mobListResult.join('\n')}\`\`\``;
       const randomEventInt = this.randomBetween(0, messages.event.gamble.win.length - 1);
       const { eventMsg, eventLog } = messages.event.gamble.win[randomEventInt];
 
-      return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
+      return this.generateMessageWithNames(
+        eventMsg,
+        eventLog,
+        selectedPlayer,
+        undefined,
+        luckGambleGold,
+      );
     }
 
     const randomEventInt = this.randomBetween(0, messages.event.gamble.lose.length - 1);
     const { eventMsg, eventLog } = messages.event.gamble.lose[randomEventInt];
 
-    return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
+    return this.generateMessageWithNames(
+      eventMsg,
+      eventLog,
+      selectedPlayer,
+      undefined,
+      luckGambleGold,
+    );
   }
 
   formatLeaderboards(subjectKey) {

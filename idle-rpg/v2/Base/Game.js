@@ -6,7 +6,6 @@ const enumHelper = require('../../utils/enumHelper');
 const { errorLog, infoLog } = require('../../utils/logger');
 
 class Game {
-
   /**
    * Returns updatedPlayerObject with updated health and mana
    * @param {PlayerObj} player
@@ -44,18 +43,24 @@ class Game {
    * @returns {Object} playerObj
    */
   checkHealth(Database, MapClass, playerObj, attackerObj, eventMsg, eventLog, otherPlayerPmMsg) {
-    const updatedPlayer = Object.assign({}, playerObj);
-    const updatedAttacker = Object.assign({}, attackerObj);
+    const updatedPlayer = { ...playerObj };
+    const updatedAttacker = { ...attackerObj };
 
     try {
       if (updatedPlayer.health <= 0) {
         const expLoss = Math.ceil(updatedPlayer.experience.current / 8);
         const goldLoss = Math.ceil(updatedPlayer.gold.current / 12);
-        eventMsg.push(this.setImportantMessage(`${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`));
-        eventLog.push(`You died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}. Game over man... Game over.`);
+        eventMsg.push(
+          this.setImportantMessage(
+            `${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`,
+          ),
+        );
+        eventLog.push(
+          `You died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}. Game over man... Game over.`,
+        );
         let bountyEventLog;
-        updatedPlayer.health = 100 + (updatedPlayer.level * 5);
-        updatedPlayer.mana = 50 + (updatedPlayer.level * 5);
+        updatedPlayer.health = 100 + updatedPlayer.level * 5;
+        updatedPlayer.mana = 50 + updatedPlayer.level * 5;
         updatedPlayer.map = MapClass.getRandomTown();
         updatedPlayer.experience.current -= expLoss;
         updatedPlayer.experience.lost += expLoss;
@@ -63,7 +68,7 @@ class Game {
         updatedPlayer.gold.lost += goldLoss;
         updatedPlayer.inventory = {
           equipment: [],
-          items: []
+          items: [],
         };
 
         const breakChance = this.randomBetween(0, 99);
@@ -72,34 +77,46 @@ class Game {
           switch (randomEquip) {
             case 0:
               if (updatedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
-                eventMsg.push(this.setImportantMessage(`${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}'s ${updatedPlayer.equipment.helmet.name} just broke!`));
+                eventMsg.push(
+                  this.setImportantMessage(
+                    `${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}'s ${updatedPlayer.equipment.helmet.name} just broke!`,
+                  ),
+                );
                 eventLog.push(`Your ${updatedPlayer.equipment.helmet.name} just broke!`);
                 this.setPlayerEquipment(
                   updatedPlayer,
                   enumHelper.equipment.types.helmet.position,
-                  enumHelper.equipment.empty.helmet
+                  enumHelper.equipment.empty.helmet,
                 );
               }
               break;
             case 1:
               if (updatedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
-                eventMsg.push(this.setImportantMessage(`${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}'s ${updatedPlayer.equipment.armor.name} just broke!`));
+                eventMsg.push(
+                  this.setImportantMessage(
+                    `${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}'s ${updatedPlayer.equipment.armor.name} just broke!`,
+                  ),
+                );
                 eventLog.push(`Your ${updatedPlayer.equipment.armor.name} just broke!`);
                 this.setPlayerEquipment(
                   updatedPlayer,
                   enumHelper.equipment.types.armor.position,
-                  enumHelper.equipment.empty.armor
+                  enumHelper.equipment.empty.armor,
                 );
               }
               break;
             case 2:
               if (updatedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-                eventMsg.push(this.setImportantMessage(`${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}'s ${updatedPlayer.equipment.weapon.name} just broke!`));
+                eventMsg.push(
+                  this.setImportantMessage(
+                    `${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}'s ${updatedPlayer.equipment.weapon.name} just broke!`,
+                  ),
+                );
                 eventLog.push(`Your ${updatedPlayer.equipment.weapon.name} just broke!`);
                 this.setPlayerEquipment(
                   updatedPlayer,
                   enumHelper.equipment.types.weapon.position,
-                  enumHelper.equipment.empty.weapon
+                  enumHelper.equipment.empty.weapon,
                 );
               }
               break;
@@ -119,9 +136,17 @@ class Game {
             updatedAttacker.gold.current += Number(bountyGain);
             updatedAttacker.gold.total += Number(bountyGain);
             updatedPlayer.currentBounty = 0;
-            eventMsg.push(this.setImportantMessage(`${updatedAttacker.name}${updatedAttacker.titles.current !== 'None' ? ` the ${updatedAttacker.titles.current}` : ''} just claimed ${bountyGain} gold as a reward for killing ${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}!`));
-            eventLog.push(`You just claimed ${bountyGain} gold as a reward for killing ${updatedPlayer.name}!`)
-            otherPlayerPmMsg.push(`${updatedAttacker.name}${updatedAttacker.titles.current !== 'None' ? ` the ${updatedAttacker.titles.current}` : ''} just claimed ${bountyGain} gold as a reward for killing you!`);
+            eventMsg.push(
+              this.setImportantMessage(
+                `${updatedAttacker.name}${updatedAttacker.titles.current !== 'None' ? ` the ${updatedAttacker.titles.current}` : ''} just claimed ${bountyGain} gold as a reward for killing ${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}!`,
+              ),
+            );
+            eventLog.push(
+              `You just claimed ${bountyGain} gold as a reward for killing ${updatedPlayer.name}!`,
+            );
+            otherPlayerPmMsg.push(
+              `${updatedAttacker.name}${updatedAttacker.titles.current !== 'None' ? ` the ${updatedAttacker.titles.current}` : ''} just claimed ${bountyGain} gold as a reward for killing you!`,
+            );
             // this.logEvent(updatedAttacker, Database, bountyEventLog, enumHelper.logTypes.action);
           }
 
@@ -137,7 +162,7 @@ class Game {
           msg: eventMsg,
           pm: eventLog,
           updatedAttacker,
-          otherPlayerPmMsg
+          otherPlayerPmMsg,
         };
       }
 
@@ -156,15 +181,17 @@ class Game {
    * @returns {Object} playerObj
    */
   async checkExperience(playerObj, eventMsg, eventLog) {
-    const updatedPlayer = await Object.assign({}, playerObj);
+    const updatedPlayer = await { ...playerObj };
 
     try {
       if (updatedPlayer.experience.current >= updatedPlayer.level * 15) {
         updatedPlayer.level++;
         updatedPlayer.experience.current = 0;
-        updatedPlayer.health = 100 + (updatedPlayer.level * 5);
-        updatedPlayer.mana = 50 + (updatedPlayer.level * 5);
-        eventMsg.push(`\`\`\`css\n${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''} is now level ${updatedPlayer.level}!\`\`\``);
+        updatedPlayer.health = 100 + updatedPlayer.level * 5;
+        updatedPlayer.mana = 50 + updatedPlayer.level * 5;
+        eventMsg.push(
+          `\`\`\`css\n${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''} is now level ${updatedPlayer.level}!\`\`\``,
+        );
         eventLog.push(`Leveled up to level ${updatedPlayer.level}`);
         for (let i = 0; i < 4; i++) {
           const randomStat = this.randomBetween(0, 3);
@@ -185,14 +212,16 @@ class Game {
         }
         const oldClass = updatedPlayer.class;
 
-        const playerStats = await Object.keys(updatedPlayer.stats).map((key) => {
-          if (['str', 'dex', 'int'].includes(key)) {
-            return {
-              key,
-              value: updatedPlayer.stats[key]
-            };
-          }
-        }).filter(obj => obj !== undefined)
+        const playerStats = await Object.keys(updatedPlayer.stats)
+          .map((key) => {
+            if (['str', 'dex', 'int'].includes(key)) {
+              return {
+                key,
+                value: updatedPlayer.stats[key],
+              };
+            }
+          })
+          .filter((obj) => obj !== undefined)
           .sort((stat1, stat2) => stat2.value - stat1.value);
 
         switch (playerStats[0].key) {
@@ -208,7 +237,9 @@ class Game {
         }
 
         if (updatedPlayer.class !== oldClass) {
-          eventMsg.push(`\`\`\`css\n${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''} has decided to become a ${updatedPlayer.class}!\`\`\``);
+          eventMsg.push(
+            `\`\`\`css\n${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''} has decided to become a ${updatedPlayer.class}!\`\`\``,
+          );
           eventLog.push(`You have become a ${updatedPlayer.class}`);
         }
         // TODO: add this once logging events have been rewritten
@@ -217,7 +248,7 @@ class Game {
         return {
           updatedPlayer,
           msg: eventMsg,
-          pm: eventLog
+          pm: eventLog,
         };
       }
 
@@ -235,7 +266,7 @@ class Game {
    * @returns {Object} updatedPlayer
    */
   setPlayerEquipment(playerObj, equipment, item) {
-    const updatedPlayer = Object.assign({}, playerObj);
+    const updatedPlayer = { ...playerObj };
 
     updatedPlayer.equipment[equipment].name = item.name;
     if (equipment !== enumHelper.equipment.types.relic.position) {
@@ -257,14 +288,20 @@ class Game {
 
   // TODO: Maybe clean this up later?
   manageTitles(eventResults, title) {
-    if (!eventResults.updatedPlayer.titles.unlocked.includes(eventResults.updatedPlayer.titles.current)) {
+    if (
+      !eventResults.updatedPlayer.titles.unlocked.includes(
+        eventResults.updatedPlayer.titles.current,
+      )
+    ) {
       eventResults.updatedPlayer.titles.current = 'None';
     }
 
     if (titles[title].stat.includes('.')) {
       const statSplit = titles[title].stat.split('.');
-      if (eventResults.updatedPlayer[statSplit[0]][statSplit[1]] >= titles[title].requirements
-        && !eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name)) {
+      if (
+        eventResults.updatedPlayer[statSplit[0]][statSplit[1]] >= titles[title].requirements &&
+        !eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name)
+      ) {
         if (eventResults.updatedPlayer.titles.current === 'None') {
           eventResults.updatedPlayer.titles.current = titles[title].name;
         }
@@ -274,12 +311,17 @@ class Game {
         } else {
           eventResults.pm = [`You've just unlocked the ${titles[title].name} title!`];
         }
-      } else if (eventResults.updatedPlayer[statSplit[0]][statSplit[1]] < titles[title].requirements
-        && eventResults.updatedPlayer.titles.current === titles[title].name
-        || eventResults.updatedPlayer[statSplit[0]][statSplit[1]] < titles[title].requirements
-        && eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name)) {
+      } else if (
+        (eventResults.updatedPlayer[statSplit[0]][statSplit[1]] < titles[title].requirements &&
+          eventResults.updatedPlayer.titles.current === titles[title].name) ||
+        (eventResults.updatedPlayer[statSplit[0]][statSplit[1]] < titles[title].requirements &&
+          eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name))
+      ) {
         eventResults.updatedPlayer.titles.current = 'None';
-        eventResults.updatedPlayer.titles.unlocked.splice(eventResults.updatedPlayer.titles.unlocked.indexOf(titles[title].name), 1);
+        eventResults.updatedPlayer.titles.unlocked.splice(
+          eventResults.updatedPlayer.titles.unlocked.indexOf(titles[title].name),
+          1,
+        );
         if (eventResults.pm) {
           eventResults.pm.push(`You've just lost the ${titles[title].name} title!`);
         } else {
@@ -289,8 +331,10 @@ class Game {
 
       return eventResults.updatedPlayer;
     }
-    if (eventResults.updatedPlayer[titles[title].stat] >= titles[title].requirements
-      && !eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name)) {
+    if (
+      eventResults.updatedPlayer[titles[title].stat] >= titles[title].requirements &&
+      !eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name)
+    ) {
       if (eventResults.updatedPlayer.titles.current === 'None') {
         eventResults.updatedPlayer.titles.current = titles[title].name;
       }
@@ -300,12 +344,17 @@ class Game {
       } else {
         eventResults.pm = [`You've just unlocked the ${titles[title].name} title!`];
       }
-    } else if (eventResults.updatedPlayer[titles[title].stat] < titles[title].requirements
-      && eventResults.updatedPlayer.titles.current === titles[title].name
-      || eventResults.updatedPlayer[titles[title].stat] < titles[title].requirements
-      && eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name)) {
+    } else if (
+      (eventResults.updatedPlayer[titles[title].stat] < titles[title].requirements &&
+        eventResults.updatedPlayer.titles.current === titles[title].name) ||
+      (eventResults.updatedPlayer[titles[title].stat] < titles[title].requirements &&
+        eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name))
+    ) {
       eventResults.updatedPlayer.titles.current = 'None';
-      eventResults.updatedPlayer.titles.unlocked.splice(eventResults.updatedPlayer.titles.unlocked.indexOf(titles[title].name), 1);
+      eventResults.updatedPlayer.titles.unlocked.splice(
+        eventResults.updatedPlayer.titles.unlocked.indexOf(titles[title].name),
+        1,
+      );
       if (eventResults.pm) {
         eventResults.pm.push(`You've just lost the ${titles[title].name} title!`);
       } else {
@@ -315,6 +364,5 @@ class Game {
 
     return eventResults.updatedPlayer;
   }
-
 }
 module.exports = Game;

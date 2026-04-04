@@ -2,7 +2,6 @@ const { CronJob } = require('cron');
 const { cronLog } = require('../../utils/logger');
 
 class Crons {
-
   constructor(params) {
     const { Discord } = params;
     this.Discord = Discord;
@@ -19,69 +18,68 @@ class Crons {
     new CronJob({
       cronTime: this.powerHourWarnTime,
       onTick: () => {
-        cronLog.info("CronJob powerHourWarnTime ran");
+        cronLog.info('CronJob powerHourWarnTime ran');
         this.Discord.powerHourBegin();
       },
       start: false,
       timeZone: this.timeZone,
-      runOnInit: false
+      runOnInit: false,
     }).start();
 
     new CronJob({
       cronTime: this.disableJoinLotteryTime,
       onTick: () => {
-        cronLog.info("CronJob disableJoinLotteryTime ran");
+        cronLog.info('CronJob disableJoinLotteryTime ran');
         this.Discord.disableJoinLottery();
       },
       start: false,
       timeZone: this.timeZone,
-      runOnInit: false
+      runOnInit: false,
     }).start();
 
     new CronJob({
       cronTime: this.dailyLotteryTime,
       onTick: () => {
-        cronLog.info("CronJob dailyLotteryTime ran");
+        cronLog.info('CronJob dailyLotteryTime ran');
         this.Discord.dailyLottery();
       },
       start: false,
       timeZone: this.timeZone,
-      runOnInit: false
+      runOnInit: false,
     }).start();
 
     new CronJob({
       cronTime: this.enableJoinLotteryTime,
       onTick: () => {
-        cronLog.info("CronJob enableJoinLotteryTime ran");
+        cronLog.info('CronJob enableJoinLotteryTime ran');
         this.Discord.enableJoinLottery();
       },
       start: false,
       timeZone: this.timeZone,
-      runOnInit: false
+      runOnInit: false,
     }).start();
 
     new CronJob({
       cronTime: this.blizzardRandomTime,
       onTick: () => {
-        cronLog.info("CronJob blizzardRandomTime ran");
+        cronLog.info('CronJob blizzardRandomTime ran');
         this.Discord.blizzardRandom();
       },
       start: false,
       timeZone: this.timeZone,
-      runOnInit: false
+      runOnInit: false,
     }).start();
 
     new CronJob({
       cronTime: this.leadboardUpdateTime,
       onTick: () => {
-        cronLog.info("CronJob updateLeaderboards ran");
+        cronLog.info('CronJob updateLeaderboards ran');
         this.Discord.updateLeaderboards();
       },
       start: false,
       timeZone: this.timeZone,
-      runOnInit: false
+      runOnInit: false,
     }).start();
   }
-
 }
 module.exports = Crons;

@@ -14,8 +14,8 @@ module.exports = [
       }
       const logString = generateLog(playerLog.log, amount);
       const response = `\`\`\`${logString}\`\`\``;
-      return author.send(response.length > 1950 ? response.slice(0, 1947) + '...' : response);
-    }
+      return author.send(response.length > 1950 ? `${response.slice(0, 1947)}...` : response);
+    },
   },
   {
     aliases: ['!pvplog', '!pl'],
@@ -30,8 +30,8 @@ module.exports = [
       }
       const logString = generateLog(playerLog.log, amount);
       const response = `\`\`\`${logString}\`\`\``;
-      return author.send(response.length > 1950 ? response.slice(0, 1947) + '...' : response);
-    }
+      return author.send(response.length > 1950 ? `${response.slice(0, 1947)}...` : response);
+    },
   },
   {
     aliases: ['!movelog', '!ml'],
@@ -46,8 +46,8 @@ module.exports = [
       }
       const logString = generateLog(playerLog.log, amount);
       const response = `\`\`\`${logString}\`\`\``;
-      return author.send(response.length > 1950 ? response.slice(0, 1947) + '...' : response);
-    }
+      return author.send(response.length > 1950 ? `${response.slice(0, 1947)}...` : response);
+    },
   },
   {
     aliases: ['!clearlog', '!cl'],
@@ -58,6 +58,6 @@ module.exports = [
       await game.db.savePvpLog(author.id, { log: [] });
       await game.db.saveMoveLog(author.id, { log: [] });
       return author.send('All your logs have been cleared.');
-    }
-  }
+    },
+  },
 ];

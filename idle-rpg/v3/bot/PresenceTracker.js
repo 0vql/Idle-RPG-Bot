@@ -1,7 +1,6 @@
 const { Collection } = require('discord.js');
 
 class PresenceTracker {
-
   constructor() {
     this._collection = new Collection();
   }
@@ -32,7 +31,6 @@ class PresenceTracker {
   get size() {
     return this._collection.size;
   }
-
 }
 
 module.exports = PresenceTracker;

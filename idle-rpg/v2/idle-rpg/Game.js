@@ -4,8 +4,8 @@ const BaseGame = require('../Base/Game');
 const BaseHelper = require('../Base/Helper');
 
 // DATA
-const { newQuest } = require('../../../idle-rpg/database/schemas/quest');
-const Commands = require('../idle-rpg/data/Commands');
+const { newQuest } = require('../../database/schemas/quest');
+const Commands = require('./data/Commands');
 const Events = require('./data/events/Events');
 const Monster = require('../../game/utils/Monster');
 const Item = require('../../game/utils/Item');
@@ -18,7 +18,6 @@ const Database = require('../../database/Database');
 const { errorLog } = require('../../utils/logger');
 
 class Game extends aggregation(BaseGame, BaseHelper) {
-
   constructor() {
     super();
     this.activeSpells = [];
@@ -31,14 +30,14 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       Map: this.Map,
       Database: this.Database,
       ItemManager: this.ItemManager,
-      MonsterManager: this.MonsterManager
+      MonsterManager: this.MonsterManager,
     });
     this.Commands = new Commands({
       Database: this.Database,
       Events: this.Events,
       MapManager: this.Map,
       ItemManager: this.ItemManager,
-      MonsterManager: this.MonsterManager
+      MonsterManager: this.MonsterManager,
     });
     this.Database.resetPersonalMultipliers();
     this.guildCommandPrefixs = [];
@@ -49,13 +48,19 @@ class Game extends aggregation(BaseGame, BaseHelper) {
     try {
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
       if (!loadedPlayer) {
-        const newPlayer = await this.Database.createNewPlayer(player.discordId, player.guildId, player.name);
+        const newPlayer = await this.Database.createNewPlayer(
+          player.discordId,
+          player.guildId,
+          player.name,
+        );
 
         return await this.updatePlayer({
           type: 'actions',
           updatedPlayer: newPlayer,
-          msg: [`${this.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`],
-          pm: ['You were born.']
+          msg: [
+            `${this.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`,
+          ],
+          pm: ['You were born.'],
         });
       }
       if (loadedPlayer.guildId !== guildId) {
@@ -70,7 +75,11 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       }
 
       const loadedGuildConfig = await this.Database.loadGame(player.guildId);
-      await this.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
+      await this.passiveRegen(
+        loadedPlayer,
+        (5 * loadedPlayer.level) / 4 + loadedPlayer.stats.end / 8,
+        (5 * loadedPlayer.level) / 4 + loadedPlayer.stats.int / 8,
+      );
       let eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);
       eventResults = await this.setPlayerTitles(eventResults);
       const msgResults = await this.updatePlayer(eventResults);
@@ -90,7 +99,11 @@ class Game extends aggregation(BaseGame, BaseHelper) {
         case 1:
           return this.Events.attackEvent(loadedPlayer, onlinePlayers, loadedGuildConfig.multiplier);
         case 2:
-          return this.Events.luckEvent(loadedPlayer, loadedGuildConfig.events, loadedGuildConfig.multiplier);
+          return this.Events.luckEvent(
+            loadedPlayer,
+            loadedGuildConfig.events,
+            loadedGuildConfig.multiplier,
+          );
       }
     } catch (err) {
       errorLog.error(err);
@@ -108,12 +121,16 @@ class Game extends aggregation(BaseGame, BaseHelper) {
   }
 
   getGuildCommandPrefix(guildId) {
-    return this.guildCommandPrefixs.find(guild => guild.id === guildId);
+    return this.guildCommandPrefixs.find((guild) => guild.id === guildId);
   }
 
   async loadGuildConfig(guildId) {
     const loadedConfig = await this.Database.loadGame(guildId);
-    if ((loadedConfig.multiplier === 1 && loadedConfig.spells.activeBless === 1) || loadedConfig.multiplier <= 0 || (loadedConfig.multiplier > 1 && loadedConfig.spells.activeBless === 0)) {
+    if (
+      (loadedConfig.multiplier === 1 && loadedConfig.spells.activeBless === 1) ||
+      loadedConfig.multiplier <= 0 ||
+      (loadedConfig.multiplier > 1 && loadedConfig.spells.activeBless === 0)
+    ) {
       loadedConfig.multiplier = 1;
       loadedConfig.spells.activeBless = 0;
       await this.Database.updateGame(guildId, loadedConfig);
@@ -126,29 +143,39 @@ class Game extends aggregation(BaseGame, BaseHelper) {
     Command Prefix:${loadedConfig.commandPrefix}
     Blizard:${loadedConfig.events.isBlizzardActive}\n`);
     if (guildId !== '390509935097675777') {
-      this.guildCommandPrefixs.push({ id: loadedConfig.guildId, prefix: loadedConfig.commandPrefix });
+      this.guildCommandPrefixs.push({
+        id: loadedConfig.guildId,
+        prefix: loadedConfig.commandPrefix,
+      });
     } else {
       this.guildCommandPrefixs.push({ id: loadedConfig.guildId, prefix: '!' });
     }
     if (loadedConfig.events.isBlizzardActive) {
-      setTimeout(() => {
-        loadedConfig.events.isBlizzardActive = false;
-        this.dbClass().updateGame(guildId, loadedConfig);
-      }, this.randomBetween(7200000, 72000000)); // 2-20hrs
+      setTimeout(
+        () => {
+          loadedConfig.events.isBlizzardActive = false;
+          this.dbClass().updateGame(guildId, loadedConfig);
+        },
+        this.randomBetween(7200000, 72000000),
+      ); // 2-20hrs
     }
     for (let i = 0; i < loadedConfig.spells.activeBless; i++) {
-      setTimeout(async () => {
-        const newLoadedConfig = await this.Database.loadGame(guildId);
-        newLoadedConfig.spells.activeBless--;
-        newLoadedConfig.multiplier--;
-        newLoadedConfig.spells.multiplier = newLoadedConfig.spells.multiplier <= 0 ? 1 : newLoadedConfig.spells.multiplier;
-        await this.Database.updateGame(guildId, newLoadedConfig);
-      }, 1800000 + (5000 * i));
+      setTimeout(
+        async () => {
+          const newLoadedConfig = await this.Database.loadGame(guildId);
+          newLoadedConfig.spells.activeBless--;
+          newLoadedConfig.multiplier--;
+          newLoadedConfig.spells.multiplier =
+            newLoadedConfig.spells.multiplier <= 0 ? 1 : newLoadedConfig.spells.multiplier;
+          await this.Database.updateGame(guildId, newLoadedConfig);
+        },
+        1800000 + 5000 * i,
+      );
     }
   }
 
   async setPlayerTitles(eventResults) {
-    if (roamingNpcs.find(npc => npc.discordId === eventResults.updatedPlayer.discordId)) {
+    if (roamingNpcs.find((npc) => npc.discordId === eventResults.updatedPlayer.discordId)) {
       return eventResults;
     }
 
@@ -160,7 +187,7 @@ class Game extends aggregation(BaseGame, BaseHelper) {
   }
 
   fetchCommand(params) {
-    return this.Commands[params.command](Object.assign({}, params, { canJoinLottery: this.canJoinLottery }));
+    return this.Commands[params.command]({ ...params, canJoinLottery: this.canJoinLottery });
   }
 
   disableJoinLottery() {
@@ -177,6 +204,5 @@ class Game extends aggregation(BaseGame, BaseHelper) {
   async fetchPlayerData(discordId) {
     return this.Database.loadPlayer(discordId);
   }
-
 }
 module.exports = Game;
