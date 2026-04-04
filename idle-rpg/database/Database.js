@@ -99,8 +99,10 @@ class Database {
 
   async expireBless(guildId, expiresAt, count = 1) {
     try {
+      const multiplier = Math.max(1, 1 - count);
+      const activeBless = Math.max(0, 0 - count);
       return await Game.updateOne({ guildId }, {
-        $inc: { multiplier: -count, 'spells.activeBless': -count },
+        $inc: { multiplier, 'spells.activeBless': activeBless },
         $pull: { 'spells.blessExpiries': expiresAt }
       });
     } catch (err) {
