@@ -19,6 +19,11 @@ services:
       - 27017:27017
     volumes:
       - mongo:/data/db
+    command: ['--replSet', 'rs0', '--bind_ip_all']
+    healthcheck:
+      test: mongosh --eval "try { rs.status().ok } catch(e) { rs.initiate({ _id:'rs0', members:[{_id:0,host:'localhost:27017'}] }).ok }" --quiet
+      interval: 10s
+      start_period: 5s
 
 volumes:
   mongo:
