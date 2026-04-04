@@ -19,16 +19,12 @@ const PvpLog = mongoose.model('PvpLog', pvpLogSchema);
 process.on('close', () => {
   console.log('Database disconnecting on app termination');
   if (mongoose.connection.readyState === 1) {
-    mongoose.connection.close(() => {
-      process.exit(0);
-    });
+    mongoose.connection.close().then(() => process.exit(0));
   }
 });
 
 process.on('SIGINT', () => {
-  mongoose.connection.close(() => {
-    process.exit(0);
-  });
+  mongoose.connection.close().then(() => process.exit(0));
 });
 
 function connect() {
