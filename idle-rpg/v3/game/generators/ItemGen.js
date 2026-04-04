@@ -22,7 +22,6 @@ class ItemGen {
 
     const randomRarityIndex = randomBetween(0, itemRarityList.length - 1);
     const randomMaterialIndex = randomBetween(0, itemMaterialList.length - 1);
-    const levelBonus = Math.floor(updatedPlayer.level / 10);
 
     const mobName = mob ? mob.name.replace(' ', '_').split('_')[1] : undefined;
     let itemType;
@@ -70,7 +69,7 @@ class ItemGen {
         gold: Number((itemRarityList[randomRarityIndex].gold * itemMaterialList[randomMaterialIndex].gold * itemType.gold).toFixed()) * itemType.power
       };
     } else {
-      const basePower = itemRarityList[randomRarityIndex].power + itemMaterialList[randomMaterialIndex].power + itemType.power + levelBonus;
+      const basePower = itemRarityList[randomRarityIndex].power + itemMaterialList[randomMaterialIndex].power + itemType.power;
       itemObj = {
         name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
         position: itemType.position,
