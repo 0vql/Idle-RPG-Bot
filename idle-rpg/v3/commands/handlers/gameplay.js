@@ -45,8 +45,7 @@ module.exports = [
               castBy: player.discordId,
               guildId: player.guildId,
               count: calcAmount,
-              // expiresAt: Date.now() + 1800000 * 2,
-              expiresAt: Date.now() + 30000 * 2,
+              expiresAt: Date.now() + 1800000 * 2,
             };
             const result = await game.db.castBless(blessConfig, globalSpells.bless.spellCost);
             if (!result) {
