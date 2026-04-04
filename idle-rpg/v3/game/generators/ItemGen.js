@@ -4,14 +4,6 @@ const { randomBetween } = require('../../utils/helpers');
 
 const snowflakeTemplate = items.type[3].find(item => item.name === 'Snowflake');
 
-const ENCHANT_SUFFIXES = [
-  { name: 'of Might', stat: 'str' },
-  { name: 'of Swiftness', stat: 'dex' },
-  { name: 'of Fortitude', stat: 'end' },
-  { name: 'of Wisdom', stat: 'int' },
-  { name: 'of Fortune', stat: 'luk' }
-];
-
 class ItemGen {
 
   async generateItem(updatedPlayer, mob) {
@@ -78,13 +70,6 @@ class ItemGen {
         attackType: itemType.attackType,
         gold: Number((itemRarityList[randomRarityIndex].gold * itemMaterialList[randomMaterialIndex].gold * itemType.gold).toFixed()) * itemType.power
       };
-      // 40% chance to add an enchant suffix
-      if (randomBetween(0, 99) < 40) {
-        const suffix = ENCHANT_SUFFIXES[randomBetween(0, ENCHANT_SUFFIXES.length - 1)];
-        const bonus = Math.max(1, Math.round(itemRarityList[randomRarityIndex].power * 0.75));
-        itemObj.name += ` ${suffix.name}`;
-        itemObj.enchant = { stat: suffix.stat, bonus };
-      }
     }
 
     return itemObj;
