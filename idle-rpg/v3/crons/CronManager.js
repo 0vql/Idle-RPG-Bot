@@ -124,7 +124,7 @@ class CronManager {
       },
       start: false,
       timeZone: this.timeZone,
-      runOnInit: false,
+      runOnInit: true,
     }).start();
 
     // Bless
