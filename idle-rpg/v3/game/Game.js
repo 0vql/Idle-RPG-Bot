@@ -1,7 +1,7 @@
 const { newQuest } = require('../../database/schemas/quest');
 const titles = require('../../v2/idle-rpg/data/titles');
 const { roamingNpcs } = require('../../utils/enumHelper');
-const roamingNpcIds = new Set(roamingNpcs.map(npc => npc.discordId));
+const roamingNpcIds = new Set(roamingNpcs.map((npc) => npc.discordId));
 const titleKeys = Object.keys(titles);
 const Database = require('../../database/Database');
 const { errorLog } = require('../../utils/logger');
@@ -18,7 +18,6 @@ const BattleEngine = require('./BattleEngine');
 const EventEngine = require('./EventEngine');
 
 class Game {
-
   constructor() {
     this.db = new Database();
     this.map = new MapNavigator();
@@ -32,7 +31,7 @@ class Game {
       map: this.map,
       inventory: this.inventory,
       itemGen: this.itemGen,
-      player: this.player
+      player: this.player,
     });
     this.events = new EventEngine({
       db: this.db,
@@ -42,7 +41,7 @@ class Game {
       spellGen: this.spellGen,
       inventory: this.inventory,
       player: this.player,
-      battle: this.battle
+      battle: this.battle,
     });
     this.guildConfigs = new Map();
     this.canJoinLottery = true;
@@ -54,12 +53,18 @@ class Game {
     try {
       const loadedPlayer = await this.db.loadPlayer(player.discordId);
       if (!loadedPlayer) {
-        const newPlayer = await this.db.createNewPlayer(player.discordId, player.guildId, player.name);
+        const newPlayer = await this.db.createNewPlayer(
+          player.discordId,
+          player.guildId,
+          player.name,
+        );
         return await this.updatePlayer({
           type: 'actions',
           updatedPlayer: newPlayer,
-          msg: [`${generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`],
-          pm: ['You were born.']
+          msg: [
+            `${generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`,
+          ],
+          pm: ['You were born.'],
         });
       }
       if (loadedPlayer.guildId !== guildId) return;
@@ -69,26 +74,48 @@ class Game {
         loadedPlayer.quest = newQuest;
       }
 
-      const loadedGuildConfig = this.guildConfigs.get(guildId) || await this.db.loadGame(guildId);
-      this.player.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
+      const loadedGuildConfig = this.guildConfigs.get(guildId) || (await this.db.loadGame(guildId));
+      this.player.passiveRegen(
+        loadedPlayer,
+        (5 * loadedPlayer.level) / 4 + loadedPlayer.stats.end / 8,
+        (5 * loadedPlayer.level) / 4 + loadedPlayer.stats.int / 8,
+      );
 
       const guildEvents = loadedGuildConfig.events || {};
       const weather = guildEvents.weather || {};
       const WEATHER_MULTIPLIERS = {
-        sandstorm: 0.8, heatwave: 0.8,
-        'warm sunshine': 1.2, rain: 1.1,
+        sandstorm: 0.8,
+        heatwave: 0.8,
+        'warm sunshine': 1.2,
+        rain: 1.1,
       };
-      const weatherMult = (weather.biome === loadedPlayer.map.biome.name && weather.type)
-        ? (WEATHER_MULTIPLIERS[weather.type] ?? 1.0)
-        : 1.0;
+      const weatherMult =
+        weather.biome === loadedPlayer.map.biome.name && weather.type
+          ? (WEATHER_MULTIPLIERS[weather.type] ?? 1.0)
+          : 1.0;
       const effectiveMultiplier = loadedGuildConfig.multiplier * weatherMult;
 
       const randomEvent = Math.floor(Math.random() * 3);
       let eventResults;
       switch (randomEvent) {
-        case 0: eventResults = await this.events.moveEvent(loadedPlayer); break;
-        case 1: eventResults = await this.events.attackEvent(loadedPlayer, onlinePlayers, effectiveMultiplier, guildEvents); break;
-        case 2: eventResults = await this.events.luckEvent(loadedPlayer, guildEvents, effectiveMultiplier); break;
+        case 0:
+          eventResults = await this.events.moveEvent(loadedPlayer);
+          break;
+        case 1:
+          eventResults = await this.events.attackEvent(
+            loadedPlayer,
+            onlinePlayers,
+            effectiveMultiplier,
+            guildEvents,
+          );
+          break;
+        case 2:
+          eventResults = await this.events.luckEvent(
+            loadedPlayer,
+            guildEvents,
+            effectiveMultiplier,
+          );
+          break;
       }
 
       eventResults = await this.setPlayerTitles(eventResults);
@@ -114,80 +141,67 @@ class Game {
 
   async loadGuildConfig(guildId) {
     const loadedConfig = await this.db.loadGame(guildId);
-    if ((loadedConfig.multiplier === 1 && loadedConfig.spells.activeBless === 1) || loadedConfig.multiplier <= 0 || (loadedConfig.multiplier > 1 && loadedConfig.spells.activeBless === 0)) {
-      loadedConfig.multiplier = 1;
-      loadedConfig.spells.activeBless = 0;
-      await this.db.updateGame(guildId, loadedConfig);
-    }
-    console.log(`\n    Config loaded for guild ${guildId}\n    Multiplier:${loadedConfig.multiplier}\n    Active Bless:${loadedConfig.spells.activeBless}\n    Prize Pool:${loadedConfig.dailyLottery.prizePool}\n    Command Prefix:${loadedConfig.commandPrefix}\n    Blizzard:${loadedConfig.events.isBlizzardActive}\n    Invasion:${loadedConfig.events.isInvasionActive} (${loadedConfig.events.invasionMobType})\n    Blood Moon:${loadedConfig.events.isBloodMoonActive}\n    Weather:${loadedConfig.events.weather ? loadedConfig.events.weather.type : 'none'} in ${loadedConfig.events.weather ? loadedConfig.events.weather.biome : ''}\n`);
+    console.log(
+      `\n    Config loaded for guild ${guildId}\n    Multiplier:${loadedConfig.multiplier}\n    Active Bless:${loadedConfig.spells.bless.reduce((prev, curr) => prev + curr.count, 0)}\n    Prize Pool:${loadedConfig.dailyLottery.prizePool}\n    Command Prefix:${loadedConfig.commandPrefix}\n    Blizzard:${loadedConfig.events.isBlizzardActive}\n    Invasion:${loadedConfig.events.isInvasionActive} (${loadedConfig.events.invasionMobType})\n    Blood Moon:${loadedConfig.events.isBloodMoonActive}\n    Weather:${loadedConfig.events.weather ? loadedConfig.events.weather.type : 'none'} in ${loadedConfig.events.weather ? loadedConfig.events.weather.biome : ''}\n`,
+    );
     this.guildConfigs.set(guildId, loadedConfig);
+    // TODO: Refactor
     if (loadedConfig.events.isBlizzardActive) {
-      setTimeout(() => {
-        loadedConfig.events.isBlizzardActive = false;
-        this.db.updateGame(guildId, loadedConfig);
-        this.guildConfigs.set(guildId, loadedConfig);
-      }, Math.floor(Math.random() * (72000000 - 7200000)) + 7200000);
+      setTimeout(
+        () => {
+          loadedConfig.events.isBlizzardActive = false;
+          this.db.updateGame(guildId, loadedConfig);
+          this.guildConfigs.set(guildId, loadedConfig);
+        },
+        Math.floor(Math.random() * (72000000 - 7200000)) + 7200000,
+      );
     }
+    // TODO: Refactor
     if (loadedConfig.events.isInvasionActive) {
-      setTimeout(() => {
-        loadedConfig.events.isInvasionActive = false;
-        loadedConfig.events.invasionMobType = '';
-        this.db.updateGame(guildId, loadedConfig);
-        this.guildConfigs.set(guildId, loadedConfig);
-      }, Math.floor(Math.random() * (28800000 - 10800000)) + 10800000);
+      setTimeout(
+        () => {
+          loadedConfig.events.isInvasionActive = false;
+          loadedConfig.events.invasionMobType = '';
+          this.db.updateGame(guildId, loadedConfig);
+          this.guildConfigs.set(guildId, loadedConfig);
+        },
+        Math.floor(Math.random() * (28800000 - 10800000)) + 10800000,
+      );
     }
+    // TODO: Refactor
     if (loadedConfig.events.isBloodMoonActive) {
-      setTimeout(() => {
-        loadedConfig.events.isBloodMoonActive = false;
-        this.db.updateGame(guildId, loadedConfig);
-        this.guildConfigs.set(guildId, loadedConfig);
-      }, Math.floor(Math.random() * (21600000 - 7200000)) + 7200000);
+      setTimeout(
+        () => {
+          loadedConfig.events.isBloodMoonActive = false;
+          this.db.updateGame(guildId, loadedConfig);
+          this.guildConfigs.set(guildId, loadedConfig);
+        },
+        Math.floor(Math.random() * (21600000 - 7200000)) + 7200000,
+      );
     }
+    // TODO: Refactor
     if (loadedConfig.events.weather && loadedConfig.events.weather.type) {
-      setTimeout(() => {
-        loadedConfig.events.weather = { biome: '', type: '' };
-        this.db.updateGame(guildId, loadedConfig);
-        this.guildConfigs.set(guildId, loadedConfig);
-      }, Math.floor(Math.random() * (21600000 - 7200000)) + 7200000);
-    }
-    const blessExpiries = loadedConfig.spells.blessExpiries || [];
-    const now = Date.now();
-    const { expiredBless, pendingBless } = blessExpiries.reduce((prev, t) => {
-      if (t <= now) {
-        prev.expiredBless.push(t);
-        return prev;
-      }
-      prev.pendingBless.push(t);
-      return prev;
-    }, { expiredBless: [], pendingBless: [] });
-    if (loadedConfig.spells.activeBless > 0 && blessExpiries.length === 0) {
-      loadedConfig.multiplier = 1;
-      loadedConfig.spells.activeBless = 0;
-      await this.db.updateGame(guildId, loadedConfig);
-      this.guildConfigs.set(guildId, loadedConfig);
-    } else if (expiredBless.length > 0) {
-      loadedConfig.spells.activeBless = Math.max(0, loadedConfig.spells.activeBless - expiredBless.length);
-      loadedConfig.multiplier = Math.max(1, loadedConfig.multiplier - expiredBless.length);
-      loadedConfig.spells.blessExpiries = pendingBless;
-      await this.db.updateGame(guildId, loadedConfig);
-      this.guildConfigs.set(guildId, loadedConfig);
-    }
-    for (const expiresAt of pendingBless) {
-      setTimeout(async () => {
-        await this.db.expireBless(guildId, expiresAt);
-        const updated = await this.db.loadGame(guildId);
-        this.guildConfigs.set(guildId, updated);
-      }, expiresAt - now);
+      setTimeout(
+        () => {
+          loadedConfig.events.weather = { biome: '', type: '' };
+          this.db.updateGame(guildId, loadedConfig);
+          this.guildConfigs.set(guildId, loadedConfig);
+        },
+        Math.floor(Math.random() * (21600000 - 7200000)) + 7200000,
+      );
     }
   }
 
-  disableJoinLottery() { this.canJoinLottery = false; }
-  enableJoinLottery() { this.canJoinLottery = true; }
+  disableJoinLottery() {
+    this.canJoinLottery = false;
+  }
+  enableJoinLottery() {
+    this.canJoinLottery = true;
+  }
 
   async fetchPlayerData(discordId) {
     return this.db.loadPlayer(discordId);
   }
-
 }
 
 module.exports = Game;

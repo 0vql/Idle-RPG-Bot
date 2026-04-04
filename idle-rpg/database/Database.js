@@ -49,7 +49,6 @@ mongoose.connection.on('error', (err) => {
 });
 
 class Database {
-
   constructor() {
     this.MapClass = new Map();
     connect();
@@ -64,11 +63,11 @@ class Database {
           guildId,
           multiplier: 1,
           spells: {
-            activeBless: 0
+            bless: [],
           },
           dailyLottery: {
-            prizePool: 1500
-          }
+            prizePool: 1500,
+          },
         });
       }
       return result;
@@ -85,28 +84,77 @@ class Database {
     }
   }
 
-  async castBless(guildId, expiresAt, count) {
+  async castBless(blessConfig, goldCost = 1500) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
-      const expiries = Array.from({ length: count }, () => expiresAt);
-      return await Game.updateOne({ guildId }, {
-        $inc: { multiplier: count, 'spells.activeBless': count },
-        $push: { 'spells.blessExpiries': { $each: expiries } }
-      });
+      await Player.updateOne(
+        { discordId: blessConfig.castBy },
+        {
+          $inc: {
+            spellCast: blessConfig.count,
+            'gold.current': -goldCost,
+          },
+        },
+      ).session(session);
+      const result = await Game.findOneAndUpdate(
+        { guildId: blessConfig.guildId },
+        {
+          $inc: { multiplier: blessConfig.count },
+          $push: {
+            'spells.bless': {
+              ...blessConfig,
+            },
+          },
+        },
+        { new: true },
+      ).session(session);
+      await session.commitTransaction();
+      return result;
     } catch (err) {
       errorLog.error(err);
+      await session.abortTransaction();
+    } finally {
+      session.endSession();
     }
   }
 
-  async expireBless(guildId, expiresAt, count = 1) {
+  async expireBless(guildId) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
-      const multiplier = Math.max(1, 1 - count);
-      const activeBless = Math.max(0, 0 - count);
-      return await Game.updateOne({ guildId }, {
-        $inc: { multiplier, 'spells.activeBless': activeBless },
-        $pull: { 'spells.blessExpiries': expiresAt }
-      });
+      const gameConfig = await Game.findOne({ guildId }).session(session);
+      const expiredBlesses = (gameConfig.spells.bless || []).filter(
+        (b) => b.expiresAt <= Date.now(),
+      );
+      console.log('Expired blesses:', expiredBlesses);
+      if (expiredBlesses.length === 0) {
+        await session.commitTransaction();
+        return;
+      }
+      const expiredCount = expiredBlesses.reduce((prev, curr) => prev + curr.count, 0);
+      const currentMultiplier = gameConfig.multiplier ?? 1;
+      const multiplierDec = Math.min(expiredCount, currentMultiplier - 1);
+
+      const updated = await Game.findOneAndUpdate(
+        { guildId, 'spells.bless.expiresAt': { $lte: Date.now() } },
+        {
+          $inc: { multiplier: -multiplierDec },
+          $pull: {
+            'spells.bless': {
+              expiresAt: { $lte: Date.now() },
+            },
+          },
+        },
+        { new: true },
+      ).session(session);
+      await session.commitTransaction();
+      return { expiredBlesses, updated, originalMultiplier: currentMultiplier };
     } catch (err) {
       errorLog.error(err);
+      await session.abortTransaction();
+    } finally {
+      session.endSession();
     }
   }
 
@@ -146,7 +194,7 @@ class Database {
       return await ActionLog.findOneAndUpdate(
         { playerId: discordId },
         { $push: { log: { $each: [{ event, timeStamp: Date.now() }], $slice: -25 } } },
-        { upsert: true }
+        { upsert: true },
       );
     } catch (err) {
       errorLog.error(err);
@@ -179,7 +227,7 @@ class Database {
       return await PvpLog.findOneAndUpdate(
         { playerId: discordId },
         { $push: { log: { $each: [{ event, timeStamp: Date.now() }], $slice: -25 } } },
-        { upsert: true }
+        { upsert: true },
       );
     } catch (err) {
       errorLog.error(err);
@@ -212,7 +260,7 @@ class Database {
       return await MoveLog.findOneAndUpdate(
         { playerId: discordId },
         { $push: { log: { $each: [{ event, timeStamp: Date.now() }], $slice: -25 } } },
-        { upsert: true }
+        { upsert: true },
       );
     } catch (err) {
       errorLog.error(err);
@@ -225,7 +273,7 @@ class Database {
         .where('discordId')
         .select({
           pastEvents: 0,
-          pastPvpEvents: 0
+          pastPvpEvents: 0,
         })
         .in(discordId);
     } catch (err) {
@@ -234,10 +282,10 @@ class Database {
   }
 
   async loadOnlinePlayerMaps(discordIds) {
-    const removeNpcs = enumHelper.mockPlayers.map(npc => npc.name);
+    const removeNpcs = enumHelper.mockPlayers.map((npc) => npc.name);
     try {
       return await Player.find({
-        name: { $nin: removeNpcs, $exists: true }
+        name: { $nin: removeNpcs, $exists: true },
       })
         .where('discordId')
         .select({
@@ -254,7 +302,7 @@ class Database {
   async removeLotteryPlayers(guildId) {
     const query = {
       'lottery.joined': true,
-      guildId
+      guildId,
     };
     try {
       return await Player.updateMany(query, { lottery: { joined: false } });
@@ -263,13 +311,16 @@ class Database {
     }
   }
 
-  async loadLotteryPlayers(guildId, selectFields = {
-    pastEvents: 0,
-    pastPvpEvents: 0
-  }) {
+  async loadLotteryPlayers(
+    guildId,
+    selectFields = {
+      pastEvents: 0,
+      pastPvpEvents: 0,
+    },
+  ) {
     const query = {
       guildId,
-      'lottery.joined': true
+      'lottery.joined': true,
     };
     try {
       return await Player.find(query).select(selectFields);
@@ -280,10 +331,10 @@ class Database {
 
   async loadTop10(type, guildId, botID) {
     const select = {
-      name: 1
+      name: 1,
     };
-    const removeNpcs = enumHelper.roamingNpcs.map(npc => npc.discordId).concat(botID);
-    enumHelper.mockPlayers.map(npc => npc.name).forEach(npc => removeNpcs.push(npc));
+    const removeNpcs = enumHelper.roamingNpcs.map((npc) => npc.discordId).concat(botID);
+    enumHelper.mockPlayers.map((npc) => npc.name).forEach((npc) => removeNpcs.push(npc));
 
     const fieldKey = Object.keys(type)[0];
     select[fieldKey] = 1;
@@ -295,22 +346,19 @@ class Database {
     }
     const query = {
       discordId: { $nin: removeNpcs, $exists: true },
-      guildId
+      guildId,
     };
 
     try {
-      return await Player.find(query)
-        .select(select)
-        .sort(sortType)
-        .limit(10);
+      return await Player.find(query).select(select).sort(sortType).limit(10);
     } catch (err) {
       errorLog.error(err);
     }
   }
 
   async loadCurrentRank(player, type) {
-    const removeNpcs = enumHelper.roamingNpcs.map(npc => npc.name);
-    enumHelper.mockPlayers.map(npc => npc.name).forEach(npc => removeNpcs.push(npc));
+    const removeNpcs = enumHelper.roamingNpcs.map((npc) => npc.name);
+    enumHelper.mockPlayers.map((npc) => npc.name).forEach((npc) => removeNpcs.push(npc));
 
     const fieldKey = Object.keys(type)[0];
     const playerValue = fieldKey.includes('.')
@@ -329,8 +377,7 @@ class Database {
 
   async loadPlayer(discordId, selectFields = {}) {
     try {
-      const player = await Player.findOne({ discordId })
-        .select(selectFields);
+      const player = await Player.findOne({ discordId }).select(selectFields);
 
       return player ? player._doc : undefined;
     } catch (err) {
@@ -454,7 +501,10 @@ class Database {
   }
 
   async getStolenEquip(player) {
-    const guildPlayers = await Player.find({ guildId: player.guildId, discordId: { $ne: player.discordId } });
+    const guildPlayers = await Player.find({
+      guildId: player.guildId,
+      discordId: { $ne: player.discordId },
+    });
     const slots = ['weapon', 'helmet', 'armor'];
     let stolenEquips = '';
 
@@ -478,6 +528,5 @@ class Database {
       errorLog.log(err);
     }
   }
-
 }
 module.exports = Database;

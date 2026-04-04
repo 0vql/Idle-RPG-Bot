@@ -5,55 +5,58 @@ const gameSchema = mongoose.Schema({
     type: String,
     index: {
       unique: true,
-      dropDups: true
-    }
+      dropDups: true,
+    },
   },
   commandPrefix: {
     type: String,
-    default: '!'
+    default: '!',
   },
   multiplier: {
     type: Number,
-    default: 1
+    default: 1,
   },
   spells: {
-    activeBless: {
-      type: Number,
-      default: 0
+    bless: {
+      type: [
+        {
+          castBy: String,
+          count: Number,
+          guildId: String,
+          expiresAt: Number,
+        },
+      ],
+      default: [],
     },
-    blessExpiries: {
-      type: [Number],
-      default: []
-    }
   },
   events: {
     isBlizzardActive: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isInvasionActive: {
       type: Boolean,
-      default: false
+      default: false,
     },
     invasionMobType: {
       type: String,
-      default: ''
+      default: '',
     },
     isBloodMoonActive: {
       type: Boolean,
-      default: false
+      default: false,
     },
     weather: {
       biome: { type: String, default: '' },
-      type: { type: String, default: '' }
-    }
+      type: { type: String, default: '' },
+    },
   },
   dailyLottery: {
     prizePool: {
       type: Number,
-      default: 1500
-    }
-  }
+      default: 1500,
+    },
+  },
 });
 
 gameSchema.set('autoIndex', false);

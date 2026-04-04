@@ -27,12 +27,27 @@ module.exports = [
       const guild = bot.guilds.cache.get(targetGuildId);
       if (!guild) return author.send('No guild with that id');
 
-      const defaultConfig = { multiplier: 1, spells: { activeBless: 0 }, dailyLottery: { prizePool: 1500 } };
+      const defaultConfig = {
+        multiplier: 1,
+        spells: { activeBless: 0, bless: [] },
+        dailyLottery: { prizePool: 1500 },
+      };
 
-      const leaderboardChannel = guild.channels.cache.find(channel => channel.name === 'leaderboards' && channel.type === ChannelType.GuildText);
-      const announcementChannel = guild.channels.cache.find(channel => channel.name === 'announcements' && (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildAnnouncement));
-      const actionChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText);
-      const movementChannel = guild.channels.cache.find(channel => channel.name === 'movement' && channel.type === ChannelType.GuildText);
+      const leaderboardChannel = guild.channels.cache.find(
+        (channel) => channel.name === 'leaderboards' && channel.type === ChannelType.GuildText,
+      );
+      const announcementChannel = guild.channels.cache.find(
+        (channel) =>
+          channel.name === 'announcements' &&
+          (channel.type === ChannelType.GuildText ||
+            channel.type === ChannelType.GuildAnnouncement),
+      );
+      const actionChannel = guild.channels.cache.find(
+        (channel) => channel.name === 'actions' && channel.type === ChannelType.GuildText,
+      );
+      const movementChannel = guild.channels.cache.find(
+        (channel) => channel.name === 'movement' && channel.type === ChannelType.GuildText,
+      );
 
       // Check permissions and fetch leaderboard messages before touching any data
       let leaderboardMsgs = null;
@@ -41,19 +56,27 @@ module.exports = [
       if (announcementChannel) {
         const canSend = announcementChannel.permissionsFor(botMember).has('SendMessages');
         if (!canSend) {
-          return author.send(`Cannot proceed: missing SendMessages permission in #${announcementChannel.name}. Reset aborted to avoid data loss.`);
+          return author.send(
+            `Cannot proceed: missing SendMessages permission in #${announcementChannel.name}. Reset aborted to avoid data loss.`,
+          );
         }
       }
 
       if (leaderboardChannel) {
-        const canRead = leaderboardChannel.permissionsFor(botMember).has(['ViewChannel', 'ReadMessageHistory']);
+        const canRead = leaderboardChannel
+          .permissionsFor(botMember)
+          .has(['ViewChannel', 'ReadMessageHistory']);
         const canDelete = leaderboardChannel.permissionsFor(botMember).has('ManageMessages');
         if (!canRead || !canDelete) {
-          return author.send(`Cannot proceed: missing ${!canRead ? 'ReadMessageHistory' : 'ManageMessages'} permission in #${leaderboardChannel.name}. Reset aborted to avoid data loss.`);
+          return author.send(
+            `Cannot proceed: missing ${!canRead ? 'ReadMessageHistory' : 'ManageMessages'} permission in #${leaderboardChannel.name}. Reset aborted to avoid data loss.`,
+          );
         }
         const fetched = await leaderboardChannel.messages.fetch({ limit: 10 });
         if (fetched.size > 0) {
-          leaderboardMsgs = [...fetched.values()].sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+          leaderboardMsgs = [...fetched.values()].sort(
+            (a, b) => a.createdTimestamp - b.createdTimestamp,
+          );
         }
       }
 
@@ -67,17 +90,21 @@ module.exports = [
       // Post announcement now that reset is committed
       if (announcementChannel) {
         const resetNotice = '\nServer has been reset! Good luck to all Idlers!';
-        const combined = leaderboardMsgs ? leaderboardMsgs.map(m => m.content).join('\n') + resetNotice : resetNotice.trim();
-        if (leaderboardMsgs) await Promise.all(leaderboardMsgs.map(m => m.delete()));
+        const combined = leaderboardMsgs
+          ? leaderboardMsgs.map((m) => m.content).join('\n') + resetNotice
+          : resetNotice.trim();
+        if (leaderboardMsgs) await Promise.all(leaderboardMsgs.map((m) => m.delete()));
         for (const chunk of chunkMessage(combined)) {
           await announcementChannel.send(chunk);
         }
       }
 
-      if (actionChannel) await actionChannel.send('```RESET -----------------------------------```');
-      if (movementChannel) await movementChannel.send('```RESET -----------------------------------```');
+      if (actionChannel)
+        await actionChannel.send('```RESET -----------------------------------```');
+      if (movementChannel)
+        await movementChannel.send('```RESET -----------------------------------```');
       return author.send('Reset complete...');
-    }
+    },
   },
   {
     aliases: ['!setgold'],
@@ -87,15 +114,19 @@ module.exports = [
       const mentionedUser = message.mentions.users.first();
       const args = message.content.split(' ');
       const amount = parseInt(args[args.length - 1]);
-      if (!mentionedUser) return author.send('Please mention a player. Usage: `!setgold @Player <amount>`');
+      if (!mentionedUser)
+        return author.send('Please mention a player. Usage: `!setgold @Player <amount>`');
       if (isNaN(amount)) return author.send('Please specify a valid amount.');
-      const player = await game.db.loadPlayer(mentionedUser.id, { pastEvents: 0, pastPvpEvents: 0 });
+      const player = await game.db.loadPlayer(mentionedUser.id, {
+        pastEvents: 0,
+        pastPvpEvents: 0,
+      });
       if (!player) return author.send('Player not found.');
       player.gold.current = Number(amount);
       player.gold.total += Number(amount);
       await game.db.savePlayer(player);
       return author.send(`Set ${player.name}'s gold to ${amount}.`);
-    }
+    },
   },
   {
     aliases: ['!updateholiday'],
@@ -108,19 +139,34 @@ module.exports = [
       if (!whichHoliday) return author.send('Usage: `!updateholiday <holiday> <start|end>`');
 
       if (isStarting) {
-        game.monsterGen.monsters.forEach((mob) => { if (mob.holiday === whichHoliday) mob.isSpawnable = true; });
-        game.itemGen.items.forEach((type) => { type.forEach((item) => { if (item.holiday === whichHoliday) item.isDroppable = true; }); });
+        game.monsterGen.monsters.forEach((mob) => {
+          if (mob.holiday === whichHoliday) mob.isSpawnable = true;
+        });
+        game.itemGen.items.forEach((type) => {
+          type.forEach((item) => {
+            if (item.holiday === whichHoliday) item.isDroppable = true;
+          });
+        });
       } else {
-        game.monsterGen.monsters.forEach((mob) => { if (mob.holiday === whichHoliday) mob.isSpawnable = false; });
-        game.itemGen.items.forEach((type) => { type.forEach((item) => { if (item.holiday === whichHoliday) item.isDroppable = false; }); });
+        game.monsterGen.monsters.forEach((mob) => {
+          if (mob.holiday === whichHoliday) mob.isSpawnable = false;
+        });
+        game.itemGen.items.forEach((type) => {
+          type.forEach((item) => {
+            if (item.holiday === whichHoliday) item.isDroppable = false;
+          });
+        });
       }
 
-      bot.guilds.cache.forEach(guild => {
-        const actionChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText);
-        if (actionChannel) actionChannel.send(`Holiday ${whichHoliday} has ${isStarting ? 'started' : 'ended'}!`);
+      bot.guilds.cache.forEach((guild) => {
+        const actionChannel = guild.channels.cache.find(
+          (channel) => channel.name === 'actions' && channel.type === ChannelType.GuildText,
+        );
+        if (actionChannel)
+          actionChannel.send(`Holiday ${whichHoliday} has ${isStarting ? 'started' : 'ended'}!`);
       });
       return author.send(`Holiday ${whichHoliday} ${isStarting ? 'start' : 'end'} processed.`);
-    }
+    },
   },
   {
     aliases: ['!prefix'],
@@ -135,7 +181,7 @@ module.exports = [
       await game.db.updateGame(guildId, loadedConfig);
       game.guildConfigs.set(guildId, loadedConfig);
       return author.send(`Changed server command prefix to ${value}.`);
-    }
+    },
   },
   {
     aliases: ['!additem'],
@@ -144,13 +190,16 @@ module.exports = [
     handler: async ({ game, bot, message, guildId, author }) => {
       const mentionedUser = message.mentions.users.first();
       if (!mentionedUser) return author.send('Please mention a player. Usage: `!additem @Player`');
-      const player = await game.db.loadPlayer(mentionedUser.id, { pastEvents: 0, pastPvpEvents: 0 });
+      const player = await game.db.loadPlayer(mentionedUser.id, {
+        pastEvents: 0,
+        pastPvpEvents: 0,
+      });
       if (!player) return author.send('Player not found.');
       const item = await game.itemGen.generateItem(player);
       player.inventory.equipment.push(item);
       await game.db.savePlayer(player);
       return author.send(`Added \`${item.name}\` to ${player.name}'s inventory.`);
-    }
+    },
   },
   {
     aliases: ['!addspell'],
@@ -159,12 +208,15 @@ module.exports = [
     handler: async ({ game, bot, message, guildId, author }) => {
       const mentionedUser = message.mentions.users.first();
       if (!mentionedUser) return author.send('Please mention a player. Usage: `!addspell @Player`');
-      const player = await game.db.loadPlayer(mentionedUser.id, { pastEvents: 0, pastPvpEvents: 0 });
+      const player = await game.db.loadPlayer(mentionedUser.id, {
+        pastEvents: 0,
+        pastPvpEvents: 0,
+      });
       if (!player) return author.send('Player not found.');
       const spell = game.spellGen.generateSpell(player);
       player.spells.push(spell);
       await game.db.savePlayer(player);
       return author.send(`Added spell \`${spell.name}\` to ${player.name}'s spellbook.`);
-    }
-  }
+    },
+  },
 ];
