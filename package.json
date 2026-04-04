@@ -1,6 +1,6 @@
 {
   "name": "idle-rpg-bot",
-  "version": "0.0.1",
+  "version": "3.0.0",
   "description": "An Idle-RPG Bot for Discord, Maybe twitch aswell in the future.",
   "main": "app.js",
   "scripts": {
@@ -8,7 +8,10 @@
     "start": "NODE_ENV=production node app.js",
     "heroku-postbuild": "cd web && npm install && npm run build",
     "test:windows": "SET NODE_ENV=development && node app.js",
-    "test": "NODE_ENV=development node app.js"
+    "test": "NODE_ENV=development node app.js",
+    "lint": "eslint idle-rpg --ext .js",
+    "lint:fix": "eslint idle-rpg --ext .js --fix",
+    "format": "prettier --write \"idle-rpg/**/*.js\""
   },
   "author": "Sunny Huang",
   "license": "ISC",
@@ -27,9 +30,12 @@
     "seedrandom": "^2.4.4"
   },
   "devDependencies": {
-    "eslint": "^4.19.1",
+    "eslint": "^8.57.1",
     "eslint-config-airbnb": "^16.1.0",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.17.3"
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.5",
+    "prettier": "^3.8.1"
   }
 }
