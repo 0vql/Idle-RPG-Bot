@@ -1,4 +1,4 @@
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DNS) {
   // eslint-disable-next-line global-require
   require('./instrument');
 }
