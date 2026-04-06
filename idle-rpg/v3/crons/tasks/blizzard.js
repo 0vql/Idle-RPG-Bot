@@ -9,7 +9,7 @@ async function blizzardRandom(bot, game) {
       if (blizzardDice > 15) {
         return;
       }
-      if (!guildConfig.events.blizzard.isActive) {
+      if (guildConfig.events.blizzard.isActive) {
         return;
       }
       const actionChannel = guild.channels.cache.find(
