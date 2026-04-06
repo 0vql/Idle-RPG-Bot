@@ -146,7 +146,7 @@ class EventEngine {
 
   async luckEvent(loadedPlayer, events, globalMultiplier) {
     const updatedPlayer = { ...loadedPlayer };
-    const { isBlizzardActive } = events || {};
+    const { blizzard } = events || {};
     try {
       const luckDice = randomBetween(0, 99);
       if (luckDice <= 3 + updatedPlayer.stats.luk / 4) return this.luck.godsEvent(updatedPlayer);
@@ -161,7 +161,7 @@ class EventEngine {
           return this.luck.questEvent(updatedPlayer, mobForQuest);
         }
       }
-      if (isBlizzardActive && luckDice <= 10 + updatedPlayer.stats.luk / 4) {
+      if (blizzard.isActive && luckDice <= 10 + updatedPlayer.stats.luk / 4) {
         const snowFlake = this.itemGen.generateSnowflake(updatedPlayer);
         return this.luck.catchSnowFlake(updatedPlayer, snowFlake);
       }

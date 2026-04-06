@@ -160,7 +160,7 @@ class Events extends BaseHelper {
 
   async luckEvent(loadedPlayer, events, globalMultiplier) {
     const updatedPlayer = { ...loadedPlayer };
-    const { isBlizzardActive } = events;
+    const { blizzard } = events;
     try {
       const luckDice = this.randomBetween(0, 99);
       if (luckDice <= 3 + updatedPlayer.stats.luk / 4) {
@@ -181,7 +181,7 @@ class Events extends BaseHelper {
         }
       }
 
-      if (isBlizzardActive && luckDice <= 10 + updatedPlayer.stats.luk / 4) {
+      if (blizzard.isActive && luckDice <= 10 + updatedPlayer.stats.luk / 4) {
         const snowFlake = await this.ItemManager.generateSnowflake(updatedPlayer);
         return this.LuckEvents.catchSnowFlake(updatedPlayer, snowFlake);
       }

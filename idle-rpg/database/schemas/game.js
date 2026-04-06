@@ -30,10 +30,18 @@ const gameSchema = mongoose.Schema({
     },
   },
   events: {
-    isBlizzardActive: {
-      type: Boolean,
-      default: false,
+    blizzard: {
+      isActive: {
+        type: Boolean,
+        default: false,
+      },
+      expiresAt: {
+        type: Number,
+        default: 0,
+      },
     },
+
+    // TODO: Refactor to follow blizzard
     isInvasionActive: {
       type: Boolean,
       default: false,

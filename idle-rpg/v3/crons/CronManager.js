@@ -8,6 +8,8 @@ const { invasionRandom } = require('./tasks/invasion');
 const { bloodMoonRandom } = require('./tasks/bloodMoon');
 const { weatherEventRandom } = require('./tasks/weatherEvent');
 const { checkHolidays } = require('./tasks/holidayManager');
+const { blessExpire } = require('./tasks/bless');
+const { expireBlizzard } = require('./tasks/blizzard');
 
 class CronManager {
   constructor({ bot, game }) {
@@ -127,12 +129,27 @@ class CronManager {
       runOnInit: true,
     }).start();
 
+    // Expire tassks
+    // TODO: Stagger expire timer if necessary to avoid multiple expiring at the same time and causing a large db load
+
     // Bless
     new CronJob({
       cronTime: '*/1 * * * *',
       onTick: () => {
         cronLog.info('CronJob blessExpire ran');
-        require('./tasks/bless').blessExpire(this.bot, this.game);
+        blessExpire(this.bot, this.game);
+      },
+      start: false,
+      timeZone: this.timeZone,
+      runOnInit: true,
+    }).start();
+
+    // Blizzard
+    new CronJob({
+      cronTime: '*/1 * * * *',
+      onTick: () => {
+        cronLog.info('CronJob expireBlizzard ran');
+        expireBlizzard(this.bot, this.game);
       },
       start: false,
       timeZone: this.timeZone,

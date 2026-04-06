@@ -142,20 +142,9 @@ class Game {
   async loadGuildConfig(guildId) {
     const loadedConfig = await this.db.loadGame(guildId);
     console.log(
-      `\n    Config loaded for guild ${guildId}\n    Multiplier:${loadedConfig.multiplier}\n    Active Bless:${loadedConfig.spells.bless.reduce((prev, curr) => prev + curr.count, 0)}\n    Prize Pool:${loadedConfig.dailyLottery.prizePool}\n    Command Prefix:${loadedConfig.commandPrefix}\n    Blizzard:${loadedConfig.events.isBlizzardActive}\n    Invasion:${loadedConfig.events.isInvasionActive} (${loadedConfig.events.invasionMobType})\n    Blood Moon:${loadedConfig.events.isBloodMoonActive}\n    Weather:${loadedConfig.events.weather ? loadedConfig.events.weather.type : 'none'} in ${loadedConfig.events.weather ? loadedConfig.events.weather.biome : ''}\n`,
+      `\n    Config loaded for guild ${guildId}\n    Multiplier:${loadedConfig.multiplier}\n    Active Bless:${loadedConfig.spells.bless.reduce((prev, curr) => prev + curr.count, 0)}\n    Prize Pool:${loadedConfig.dailyLottery.prizePool}\n    Command Prefix:${loadedConfig.commandPrefix}\n    Blizzard:${loadedConfig.events.blizzard.isActive}\n    Invasion:${loadedConfig.events.isInvasionActive} (${loadedConfig.events.invasionMobType})\n    Blood Moon:${loadedConfig.events.blizzard.isActive}\n    Weather:${loadedConfig.events.weather ? loadedConfig.events.weather.type : 'none'} in ${loadedConfig.events.weather ? loadedConfig.events.weather.biome : ''}\n`,
     );
     this.guildConfigs.set(guildId, loadedConfig);
-    // TODO: Refactor
-    if (loadedConfig.events.isBlizzardActive) {
-      setTimeout(
-        () => {
-          loadedConfig.events.isBlizzardActive = false;
-          this.db.updateGame(guildId, loadedConfig);
-          this.guildConfigs.set(guildId, loadedConfig);
-        },
-        Math.floor(Math.random() * (72000000 - 7200000)) + 7200000,
-      );
-    }
     // TODO: Refactor
     if (loadedConfig.events.isInvasionActive) {
       setTimeout(
