@@ -1,6 +1,6 @@
 if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DNS) {
   // eslint-disable-next-line global-require
-  require('./instrument');
+  require('../../../instrument');
 }
 const { Client, GatewayIntentBits, Partials, ActivityType, ChannelType } = require('discord.js');
 const fs = require('fs');
