@@ -6,19 +6,23 @@ async function blizzardRandom(bot, game) {
     Array.from(bot.guilds.cache.values()).map(async (guild) => {
       const blizzardDice = randomBetween(0, 99);
       const guildConfig = game.guildConfigs.get(guild.id) || (await game.db.loadGame(guild.id));
-      if (blizzardDice <= 15 && !guildConfig.events.blizzard.isActive) {
-        const actionChannel = guild.channels.cache.find(
-          (channel) =>
-            channel && channel.name === 'actions' && channel.type === ChannelType.GuildText,
-        );
-        if (actionChannel) actionChannel.send('```css\n A blizzard has just begun!```');
-        guildConfig.events.blizzard = {
-          isActive: true,
-          expiresAt: randomBetween(7200000, 72000000),
-        };
-        await game.db.updateGame(guild.id, guildConfig);
-        game.guildConfigs.set(guild.id, guildConfig);
+      if (blizzardDice > 15) {
+        return;
       }
+      if (!guildConfig.events.blizzard.isActive) {
+        return;
+      }
+      const actionChannel = guild.channels.cache.find(
+        (channel) =>
+          channel && channel.name === 'actions' && channel.type === ChannelType.GuildText,
+      );
+      if (actionChannel) actionChannel.send('```css\n A blizzard has just begun!```');
+      guildConfig.events.blizzard = {
+        isActive: true,
+        expiresAt: randomBetween(7200000, 72000000),
+      };
+      await game.db.updateGame(guild.id, guildConfig);
+      game.guildConfigs.set(guild.id, guildConfig);
     }),
   );
 }
@@ -27,6 +31,9 @@ async function expireBlizzard(bot, game) {
   await Promise.all(
     Array.from(bot.guilds.cache.values()).map(async (guild) => {
       const guildConfig = game.guildConfigs.get(guild.id) || (await game.db.loadGame(guild.id));
+      if (!guildConfig.events.blizzard.isActive) {
+        return;
+      }
       const actionChannel = guild.channels.cache.find(
         (channel) =>
           channel && channel.name === 'actions' && channel.type === ChannelType.GuildText,
