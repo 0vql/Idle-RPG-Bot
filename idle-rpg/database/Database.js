@@ -130,12 +130,12 @@ class Database {
       }
       const expiredCount = expiredBlesses.reduce((prev, curr) => prev + curr.count, 0);
       const currentMultiplier = gameConfig.multiplier ?? 1;
-      const multiplierDec = Math.min(expiredCount, currentMultiplier - 1);
+      const newMultiplier = Math.max(1, currentMultiplier - expiredCount);
 
       const updated = await Game.findOneAndUpdate(
         { guildId, 'spells.bless.expiresAt': { $lte: Date.now() } },
         {
-          $inc: { multiplier: -multiplierDec },
+          $set: { multiplier: newMultiplier },
           $pull: {
             'spells.bless': {
               expiresAt: { $lte: Date.now() },
