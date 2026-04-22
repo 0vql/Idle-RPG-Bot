@@ -37,7 +37,7 @@ module.exports = [
             calcAmount = Math.floor(player.gold.current / globalSpells.bless.spellCost);
           } else {
             calcAmount = Number(Math.abs(amount));
-            if (calcAmount <= 0 || isNaN(calcAmount))
+            if (calcAmount <= 0 || Number.isNaN(calcAmount))
               return author.send('You must cast a valid amount');
           }
           if (player.gold.current >= globalSpells.bless.spellCost * calcAmount && calcAmount >= 1) {
@@ -51,9 +51,7 @@ module.exports = [
             if (!result) {
               return author.send('An error occurred while casting the spell. Please try again.');
             }
-            const actionsChannel = playerGuild.channels.cache.find(
-              (channel) => channel.name === 'actions' && channel.type === ChannelType.GuildText,
-            );
+            author.send('Spell has been cast!');
             if (actionsChannel) {
               actionsChannel.send(
                 setImportantMessage(
