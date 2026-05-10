@@ -134,14 +134,21 @@ class Database {
 
       const updated = await Game.findOneAndUpdate(
         { guildId, 'spells.bless.expiresAt': { $lte: Date.now() } },
-        {
-          $set: { multiplier: newMultiplier },
-          $pull: {
+        [
+          {
+            $set: {
+              multiplier: {
+                $max: [1, { $subtract: [currentMultiplier, expiredCount] }],
+              },
+            },
             'spells.bless': {
-              expiresAt: { $lte: Date.now() },
+              $filter: {
+                input: '$spells.bless',
+                cond: { $gt: ['$$this.expiresAt', Date.now()] },
+              },
             },
           },
-        },
+        ],
         { new: true },
       ).session(session);
       await session.commitTransaction();
@@ -173,7 +180,9 @@ class Database {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const updated = await Game.updateMany({}, { $dec: { multiplier: -1 } }).session(session);
+      const updated = await Game.updateMany({}, [
+        { $set: { multiplier: { $max: [1, { $subtract: ['$multiplier', 1] }] } } },
+      ]).session(session);
       await session.commitTransaction();
       infoLog.info(`Power Hour ended, updated ${updated.nModified} guilds`);
     } catch (err) {
