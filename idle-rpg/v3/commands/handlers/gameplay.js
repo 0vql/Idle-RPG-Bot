@@ -47,7 +47,10 @@ module.exports = [
               count: calcAmount,
               expiresAt: Date.now() + 1800000 * 2,
             };
-            const result = await game.db.castBless(blessConfig, globalSpells.bless.spellCost);
+            const result = await game.db.castBless(
+              blessConfig,
+              globalSpells.bless.spellCost * calcAmount,
+            );
             if (!result) {
               return author.send('An error occurred while casting the spell. Please try again.');
             }
