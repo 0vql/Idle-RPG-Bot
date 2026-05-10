@@ -154,6 +154,36 @@ class Database {
     }
   }
 
+  async beginPowerHour() {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const updated = await Game.updateMany({}, { $inc: { multiplier: 1 } }).session(session);
+      await session.commitTransaction();
+      infoLog.info(`Power Hour started, updated ${updated.nModified} guilds`);
+    } catch (err) {
+      errorLog.error(err);
+      await session.abortTransaction();
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async endPowerHour() {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const updated = await Game.updateMany({}, { $dec: { multiplier: -1 } }).session(session);
+      await session.commitTransaction();
+      infoLog.info(`Power Hour ended, updated ${updated.nModified} guilds`);
+    } catch (err) {
+      errorLog.error(err);
+      await session.abortTransaction();
+    } finally {
+      session.endSession();
+    }
+  }
+
   // PLAYER
   async createNewPlayer(discordId, guildId, name) {
     try {
